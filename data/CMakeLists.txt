@@ -11,8 +11,6 @@ fcitx5_translate_desktop_file(${CMAKE_CURRENT_BINARY_DIR}/fcitx5-configtool.desk
                               fcitx5-configtool.desktop)
 fcitx5_translate_desktop_file(${CMAKE_CURRENT_BINARY_DIR}/org.fcitx.Fcitx5.desktop.in
                               org.fcitx.Fcitx5.desktop)
-fcitx5_translate_desktop_file(org.fcitx.Fcitx5.metainfo.xml.in
-                              org.fcitx.Fcitx5.metainfo.xml XML)
 
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/org.fcitx.Fcitx5.desktop"
               "${CMAKE_CURRENT_BINARY_DIR}/fcitx5-configtool.desktop"
@@ -22,7 +20,11 @@ if (ENABLE_XDGAUTOSTART)
     install(FILES "${CMAKE_CURRENT_BINARY_DIR}/org.fcitx.Fcitx5.desktop" DESTINATION ${CMAKE_INSTALL_FULL_SYSCONFDIR}/xdg/autostart)
 endif()
 
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/org.fcitx.Fcitx5.metainfo.xml" DESTINATION ${CMAKE_INSTALL_DATADIR}/metainfo)
+if (ENABLE_METAINFO)
+    fcitx5_translate_desktop_file(org.fcitx.Fcitx5.metainfo.xml.in
+                                  org.fcitx.Fcitx5.metainfo.xml XML)
+    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/org.fcitx.Fcitx5.metainfo.xml" DESTINATION ${CMAKE_INSTALL_DATADIR}/metainfo)
+endif()
 
 install(FILES fcitx5-configtool.sh RENAME fcitx5-configtool DESTINATION "${FCITX_INSTALL_BINDIR}" PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
 GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
