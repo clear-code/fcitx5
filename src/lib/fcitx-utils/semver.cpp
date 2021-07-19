@@ -6,7 +6,7 @@
  */
 
 #include "semver.h"
-#include <charconv>
+#include <string>
 #include <fmt/format.h>
 #include "charutils.h"
 #include "misc.h"
@@ -31,14 +31,13 @@ std::optional<uint32_t> consumeNumericIdentifier(std::string_view &str) {
     }
 
     auto numberStr = str.substr(0, length);
-    uint32_t number;
-    if (auto [p, ec] =
-            std::from_chars(numberStr.begin(), numberStr.end(), number);
-        ec == std::errc()) {
-        str.remove_prefix(length);
-        return number;
+    try {
+      uint32_t number = std::stoi(std::string(numberStr));
+      str.remove_prefix(length);
+      return number;
+    } catch(const std::invalid_argument &e) {
+      return std::nullopt;
     }
-    return std::nullopt;
 }
 
 std::optional<std::vector<PreReleaseId>>
