@@ -139,7 +139,7 @@ if (ENABLE_KEYBOARD)
     find_package(XKeyboardConfig REQUIRED)
     pkg_check_modules(JsonC REQUIRED IMPORTED_TARGET "json-c")
 
-    set(DEFAULT_XKB_RULES_FILES "${XKEYBOARDCONFIG_XKBBASE}/rules/${DEFAULT_XKB_RULES}.xml")
+    set(DEFAULT_XKB_RULES_FILES "${CMAKE_SYSROOT}${XKEYBOARDCONFIG_XKBBASE}/rules/${DEFAULT_XKB_RULES}.xml")
     if (NOT EXISTS "${DEFAULT_XKB_RULES_FILES}")
     message(FATAL_ERROR "Could not find default xkb rules file: ${DEFAULT_XKB_RULES_FILES}")
     endif()
