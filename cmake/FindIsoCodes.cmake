@@ -21,10 +21,16 @@ pkg_check_modules(PC_ISOCODES iso-codes)
 find_file(ISOCODES_ISO639_JSON iso_639-3.json
           HINTS "${PC_ISOCODES_PREFIX}/share/iso-codes/json/"
           )
+if (ISOCODES_ISO639_JSON)
+  set(ISOCODES_ISO639_JSON "${PC_ISOCODES_PREFIX}/share/iso-codes/json/iso_639-3.json")
+endif()
 
 find_file(ISOCODES_ISO3166_JSON iso_3166-1.json
           HINTS "${PC_ISOCODES_PREFIX}/share/iso-codes/json/"
           )
+if (ISOCODES_ISO3166_JSON)
+  set(ISOCODES_ISO3166_JSON "${PC_ISOCODES_PREFIX}/share/iso-codes/json/iso_3166-1.json")
+endif()
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(IsoCodes  DEFAULT_MSG  ISOCODES_ISO639_JSON ISOCODES_ISO3166_JSON)
