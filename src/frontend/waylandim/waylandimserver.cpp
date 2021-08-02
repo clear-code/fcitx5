@@ -41,6 +41,7 @@ WaylandIMServer::WaylandIMServer(wl_display *display, FocusGroup *group,
                 init();
             }
         });
+    display_->roundtrip();
 
     init();
 }
