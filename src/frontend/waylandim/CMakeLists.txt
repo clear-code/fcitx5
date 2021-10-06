@@ -1,11 +1,11 @@
 set(WAYLAND_IM_PROTOCOL_SRCS)
 
 ecm_add_wayland_client_protocol(WAYLAND_IM_PROTOCOL_SRCS
-    PROTOCOL ${WAYLAND_PROTOCOLS_PKGDATADIR}/unstable/text-input/text-input-unstable-v1.xml
+    PROTOCOL ${CMAKE_CURRENT_SOURCE_DIR}/text-input-unstable-v1.xml
     BASENAME text-input-unstable-v1)
 
 ecm_add_wayland_client_protocol(WAYLAND_IM_PROTOCOL_SRCS
-    PROTOCOL ${WAYLAND_PROTOCOLS_PKGDATADIR}/unstable/text-input/text-input-unstable-v3.xml
+    PROTOCOL ${CMAKE_CURRENT_SOURCE_DIR}/text-input-unstable-v3.xml
     BASENAME text-input-unstable-v3)
 
 add_library(waylandim MODULE waylandim.cpp waylandimserver.cpp ${WAYLAND_IM_PROTOCOL_SRCS})
