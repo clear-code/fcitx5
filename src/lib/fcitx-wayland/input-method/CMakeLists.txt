@@ -1,5 +1,5 @@
 ecm_add_wayland_client_protocol(WAYLAND_IM_PROTOCOL_SRCS
-    PROTOCOL ${WAYLAND_PROTOCOLS_PKGDATADIR}/unstable/input-method/input-method-unstable-v1.xml
+    PROTOCOL ${CMAKE_CURRENT_SOURCE_DIR}/input-method-unstable-v1.xml
     BASENAME input-method-unstable-v1)
 
 set(FCITX_WAYLAND_INPUTMETHOD_SOURCES
