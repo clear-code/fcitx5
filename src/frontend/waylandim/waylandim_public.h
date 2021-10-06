@@ -14,10 +14,12 @@
 #include <fcitx/addoninstance.h>
 #include <fcitx/focusgroup.h>
 #include <wayland-client.h>
+#if 0
 #include "zwp_input_method_v2.h"
 
 FCITX_ADDON_DECLARE_FUNCTION(
     WaylandIMModule, getInputMethodV2,
     fcitx::wayland::ZwpInputMethodV2 *(fcitx::InputContext *));
+#endif
 
 #endif // _FCITX5_FRONTEND_WAYLANDIM_WAYLANDIM_PUBLIC_H_

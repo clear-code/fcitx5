@@ -18,7 +18,9 @@
 #include "wl_shell.h"
 #include "wl_shm.h"
 #include "zwp_input_panel_v1.h"
+#if 0
 #include "zwp_input_popup_surface_v2.h"
+#endif
 
 #ifdef CAIRO_EGL_FOUND
 

@@ -9,7 +9,9 @@
 #include "waylandui.h"
 #include "waylandwindow.h"
 #include "zwp_input_panel_v1.h"
+#if 0
 #include "zwp_input_popup_surface_v2.h"
+#endif
 
 #ifdef __linux__
 #include <linux/input-event-codes.h>
@@ -90,6 +92,7 @@ void WaylandInputWindow::resetPanel() { panelSurface_.reset(); }
 
 void WaylandInputWindow::update(fcitx::InputContext *ic) {
     InputWindow::update(ic);
+#if 0
     if (ic->frontend() == std::string_view("wayland_v2")) {
         if (ic != v2IC_.get()) {
             v2IC_ = ic->watch();
@@ -100,6 +103,9 @@ void WaylandInputWindow::update(fcitx::InputContext *ic) {
         }
     }
     if (!panelSurface_ && !panelSurfaceV2_) {
+#else
+    if (!panelSurface_) {
+#endif
         return;
     }
 

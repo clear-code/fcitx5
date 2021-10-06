@@ -9,7 +9,9 @@
 
 #include "inputwindow.h"
 #include "zwp_input_panel_surface_v1.h"
+#if 0
 #include "zwp_input_popup_surface_v2.h"
+#endif
 
 namespace fcitx {
 namespace classicui {
@@ -30,8 +32,10 @@ private:
     WaylandUI *ui_;
     wl_fixed_t scroll_ = 0;
     std::unique_ptr<wayland::ZwpInputPanelSurfaceV1> panelSurface_;
+#if 0
     TrackableObjectReference<InputContext> v2IC_;
     std::unique_ptr<wayland::ZwpInputPopupSurfaceV2> panelSurfaceV2_;
+#endif
     std::unique_ptr<WaylandWindow> window_;
     TrackableObjectReference<InputContext> repaintIC_;
 };

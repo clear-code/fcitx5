@@ -14,7 +14,9 @@
 #include "fcitx/inputcontext.h"
 #include "display.h"
 #include "waylandimserver.h"
+#if 0
 #include "waylandimserverv2.h"
+#endif
 
 FCITX_DEFINE_LOG_CATEGORY(waylandim, "waylandim")
 
@@ -28,20 +30,25 @@ WaylandIMModule::WaylandIMModule(Instance *instance) : instance_(instance) {
                 WaylandIMServer *server =
                     new WaylandIMServer(display, group, name, this);
                 servers_[name].reset(server);
+#if 0
                 WaylandIMServerV2 *serverv2 =
                     new WaylandIMServerV2(display, group, name, this);
                 serversV2_[name].reset(serverv2);
+#endif
             });
     closedCallback_ =
         wayland()->call<IWaylandModule::addConnectionClosedCallback>(
             [this](const std::string &name, wl_display *) {
                 servers_.erase(name);
+#if 0
                 serversV2_.erase(name);
+#endif
             });
 }
 
 WaylandIMModule::~WaylandIMModule() {}
 
+#if 0
 wayland::ZwpInputMethodV2 *WaylandIMModule::getInputMethodV2(InputContext *ic) {
     if (ic->frontend() != std::string_view("wayland_v2")) {
         return nullptr;
@@ -50,6 +57,7 @@ wayland::ZwpInputMethodV2 *WaylandIMModule::getInputMethodV2(InputContext *ic) {
     auto *v2IC = static_cast<WaylandIMInputContextV2 *>(ic);
     return v2IC->inputMethodV2();
 }
+#endif
 
 class WaylandIMModuleFactory : public AddonFactory {
 public:
