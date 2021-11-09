@@ -91,6 +91,9 @@ void WaylandInputWindow::initPanel() {
     panelSurface_->setOverlayPanel();
 #else
     panelSurface_->setToplevel(ui_->display()->output(), 0);
+    auto pair = keyboardSizeHint();
+    int width = pair.first, height = pair.second;
+    window_->resize(width, height);
     repaint();
 #endif
 }
@@ -118,7 +121,11 @@ void WaylandInputWindow::update(fcitx::InputContext *ic) {
     if (!panelSurface_ && !panelSurfaceV2_) {
         return;
     }
+#if 0
     auto pair = sizeHint();
+#else
+    auto pair = keyboardSizeHint();
+#endif
     int width = pair.first, height = pair.second;
 
     if (width != window_->width() || height != window_->height()) {
