@@ -25,6 +25,9 @@ public:
     void resetPanel();
     void update(InputContext *ic);
     void repaint();
+    std::pair<unsigned int, unsigned int> keyboardSizeHint() {
+        return {800, 400};
+    }
 
 private:
     WaylandUI *ui_;
