@@ -87,7 +87,11 @@ void WaylandInputWindow::initPanel() {
         return;
     }
     panelSurface_.reset(panel->getInputPanelSurface(window_->surface()));
+#if 0
     panelSurface_->setOverlayPanel();
+#else
+    panelSurface_->setToplevel(ui_->display()->output(), 0);
+#endif
 }
 
 void WaylandInputWindow::resetPanel() { panelSurface_.reset(); }
