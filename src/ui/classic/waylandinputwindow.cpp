@@ -87,6 +87,7 @@ void WaylandInputWindow::initPanel() {
     panelSurface_->setOverlayPanel();
 #else
     panelSurface_->setToplevel(ui_->display()->output(), 0);
+    repaint();
 #endif
 }
 
@@ -107,10 +108,12 @@ void WaylandInputWindow::update(fcitx::InputContext *ic) {
         return;
     }
 
+#if 0
     if (!visible()) {
         window_->hide();
         return;
     }
+#endif
     auto pair = sizeHint();
     int width = pair.first, height = pair.second;
 
