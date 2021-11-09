@@ -91,6 +91,7 @@ void WaylandInputWindow::initPanel() {
     panelSurface_->setOverlayPanel();
 #else
     panelSurface_->setToplevel(ui_->display()->output(), 0);
+    repaint();
 #endif
 }
 
