@@ -387,12 +387,16 @@ std::pair<unsigned int, unsigned int> InputWindow::sizeHint() {
         updateIfLarger(width, w + extraW);
     }
 
+#if 0
     bool vertical = parent_->config().verticalCandidateList.value();
     if (layoutHint_ == CandidateLayoutHint::Vertical) {
         vertical = true;
     } else if (layoutHint_ == CandidateLayoutHint::Horizontal) {
         vertical = false;
     }
+#else
+    bool vertical = false;
+#endif
 
     size_t wholeH = 0, wholeW = 0;
     for (size_t i = 0; i < nCandidates_; i++) {
@@ -531,12 +535,16 @@ void InputWindow::paint(cairo_t *cr, unsigned int width, unsigned int height) {
         currentHeight += fontHeight + extraH;
     }
 
+#if 0
     bool vertical = parent_->config().verticalCandidateList.value();
     if (layoutHint_ == CandidateLayoutHint::Vertical) {
         vertical = true;
     } else if (layoutHint_ == CandidateLayoutHint::Horizontal) {
         vertical = false;
     }
+#else
+    bool vertical = false;
+#endif
 
     candidateRegions_.clear();
     candidateRegions_.reserve(nCandidates_);
