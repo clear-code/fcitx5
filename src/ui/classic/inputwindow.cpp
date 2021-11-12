@@ -574,12 +574,10 @@ void InputWindow::paint(cairo_t *cr, unsigned int width, unsigned int height) {
             candidateW = candidateLayouts_[i].width();
             candidateH = fontHeight * candidateLayouts_[i].size();
         }
-        int vheight;
+        int vheight = std::max({fontHeight, labelH, candidateH});
         if (vertical) {
-            vheight = std::max({fontHeight, labelH, candidateH});
             wholeH += vheight + extraH;
         } else {
-            vheight = candidatesHeight_ - extraH;
             wholeW += candidateW + labelW + extraW;
         }
         const auto &highlightMargin = *theme.inputPanel->highlight->margin;
