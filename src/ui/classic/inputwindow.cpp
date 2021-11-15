@@ -641,6 +641,7 @@ void InputWindow::click(int x, int y) {
                 nthCandidateIgnorePlaceholder(*candidateList, idx);
             if (candidate) {
                 candidate->select(inputContext);
+                update(inputContext);
             }
             break;
         }
