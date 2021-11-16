@@ -635,13 +635,14 @@ void InputWindow::click(int x, int y) {
     if (!candidateList) {
         return;
     }
+    bool needUpdateUI = false;
     for (size_t idx = 0, e = candidateRegions_.size(); idx < e; idx++) {
         if (candidateRegions_[idx].contains(x, y)) {
             const auto *candidate =
                 nthCandidateIgnorePlaceholder(*candidateList, idx);
             if (candidate) {
                 candidate->select(inputContext);
-                update(inputContext);
+                needUpdateUI = true;
             }
             break;
         }
@@ -649,15 +650,15 @@ void InputWindow::click(int x, int y) {
     if (auto *pageable = candidateList->toPageable()) {
         if (pageable->hasPrev() && prevRegion_.contains(x, y)) {
             pageable->prev();
-            inputContext->updateUserInterface(
-                UserInterfaceComponent::InputPanel);
-            return;
-        }
-        if (pageable->hasNext() && nextRegion_.contains(x, y)) {
+            needUpdateUI = true;
+        } else if (pageable->hasNext() && nextRegion_.contains(x, y)) {
             pageable->next();
-            inputContext->updateUserInterface(
-                UserInterfaceComponent::InputPanel);
+            needUpdateUI = true;
         }
+    }
+
+    if (needUpdateUI) {
+        inputContext->updateUserInterface(UserInterfaceComponent::InputPanel);
     }
 }
 
