@@ -66,12 +66,11 @@ public:
 
 class Keyboard {
 public:
-    Keyboard(ClassicUI *parent);
+    Keyboard();
     void paint(cairo_t *cr);
     void click(InputContext *inputContext, int x, int y);
 
     std::vector<Key> keys_;
-    ClassicUI *parent_;
 
 private:
     void paintOneKey(cairo_t *cr, Key key);
