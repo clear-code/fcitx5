@@ -97,7 +97,7 @@ fcitx::Key Key::convert() {
     return fcitx::Key({lower_});
 }
 
-Keyboard::Keyboard(ClassicUI *parent) : parent_(parent) {
+Keyboard::Keyboard() {
     keys_.emplace_back(Key("q", 'q', 'Q'));
     keys_.emplace_back(Key("w", 'w', 'W'));
     keys_.emplace_back(Key("e", 'e', 'E'));
@@ -138,22 +138,16 @@ void Keyboard::paintOneKey(cairo_t *cr, Key key) {
 }
 
 void Keyboard::click(InputContext *inputContext, int x, int y) {
-    auto *engine = parent_->instance()->inputMethodEngine(inputContext);
-    const auto *entry = parent_->instance()->inputMethodEntry(inputContext);
-    if (!engine || !entry) {
-        return;
-    }
-
     for (auto &key : keys_)
     {
         if (!key.region_.contains(x, y)) continue;
         FCITX_KEYBOARD() << "key pushed: " << key.label_;
-        fcitx::KeyEvent keyEvent = fcitx::KeyEvent(inputContext, key.convert());
-        engine->keyEvent(*entry, keyEvent);
+        auto keyEvent = fcitx::KeyEvent(inputContext, key.convert());
+        inputContext->keyEvent(keyEvent);
     }
 }
 
-InputWindow::InputWindow(ClassicUI *parent) : parent_(parent), keyboard_(parent) {
+InputWindow::InputWindow(ClassicUI *parent) : parent_(parent) {
     fontMap_.reset(pango_cairo_font_map_new());
     // Although documentation says it is 96 by default, try not rely on this
     // behavior.
