@@ -458,12 +458,16 @@ void InputWindow::update(InputContext *inputContext) {
         hasNext_ = false;
     }
 
-    visible_ = nCandidates_ ||
+    visible_ = hasVirtualKeyboard_ ||
+               nCandidates_ ||
                pango_layout_get_character_count(upperLayout_.get()) ||
                pango_layout_get_character_count(lowerLayout_.get());
 }
 
 std::pair<unsigned int, unsigned int> InputWindow::sizeHint() {
+    if (hasVirtualKeyboard_)
+        return {800, 400}; // TODO: Calculate appropriate size
+
     auto &theme = parent_->theme();
     auto *fontDesc =
         pango_font_description_from_string(parent_->config().font->c_str());
@@ -506,16 +510,14 @@ std::pair<unsigned int, unsigned int> InputWindow::sizeHint() {
         updateIfLarger(width, w + extraW);
     }
 
-#if 0
     bool vertical = parent_->config().verticalCandidateList.value();
     if (layoutHint_ == CandidateLayoutHint::Vertical) {
         vertical = true;
     } else if (layoutHint_ == CandidateLayoutHint::Horizontal) {
         vertical = false;
     }
-#else
-    bool vertical = false;
-#endif
+    if (hasVirtualKeyboard_)
+        vertical = false;
 
     size_t wholeH = 0, wholeW = 0;
     for (size_t i = 0; i < nCandidates_; i++) {
@@ -654,16 +656,14 @@ void InputWindow::paint(cairo_t *cr, unsigned int width, unsigned int height) {
         currentHeight += fontHeight + extraH;
     }
 
-#if 0
     bool vertical = parent_->config().verticalCandidateList.value();
     if (layoutHint_ == CandidateLayoutHint::Vertical) {
         vertical = true;
     } else if (layoutHint_ == CandidateLayoutHint::Horizontal) {
         vertical = false;
     }
-#else
-    bool vertical = false;
-#endif
+    if (hasVirtualKeyboard_)
+        vertical = false;
 
     candidateRegions_.clear();
     candidateRegions_.reserve(nCandidates_);
@@ -743,7 +743,8 @@ void InputWindow::paint(cairo_t *cr, unsigned int width, unsigned int height) {
         }
     }
 
-    keyboard_.paint(cr);
+    if (hasVirtualKeyboard_)
+        keyboard_.paint(cr);
 
     cairo_restore(cr);
 }
@@ -754,7 +755,8 @@ void InputWindow::click(int x, int y) {
         return;
     }
 
-    keyboard_.click(inputContext, x, y);
+    if (hasVirtualKeyboard_)
+        keyboard_.click(inputContext, x, y);
 
     const auto candidateList = inputContext->inputPanel().candidateList();
     if (!candidateList) {

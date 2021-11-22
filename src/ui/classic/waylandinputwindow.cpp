@@ -83,15 +83,10 @@ void WaylandInputWindow::initPanel() {
         return;
     }
     panelSurface_.reset(panel->getInputPanelSurface(window_->surface()));
-#if 0
-    panelSurface_->setOverlayPanel();
-#else
-    panelSurface_->setToplevel(ui_->display()->output(), 0);
-    auto pair = keyboardSizeHint();
-    int width = pair.first, height = pair.second;
-    window_->resize(width, height);
-    repaint();
-#endif
+    if (hasVirtualKeyboard_)
+        panelSurface_->setToplevel(ui_->display()->output(), 0);
+    else
+        panelSurface_->setOverlayPanel();
 }
 
 void WaylandInputWindow::resetPanel() { panelSurface_.reset(); }
@@ -111,15 +106,11 @@ void WaylandInputWindow::update(fcitx::InputContext *ic) {
         return;
     }
 
-#if 0
     if (!visible()) {
         window_->hide();
         return;
     }
     auto pair = sizeHint();
-#else
-    auto pair = keyboardSizeHint();
-#endif
     int width = pair.first, height = pair.second;
 
     if (width != window_->width() || height != window_->height()) {
