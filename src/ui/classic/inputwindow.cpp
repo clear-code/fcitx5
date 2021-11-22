@@ -93,10 +93,10 @@ void Key::setRegion(int x, int y) {
 }
 
 Keyboard::Keyboard() {
-    keys_.emplace_back(Key("Q", 'q', 'Q'));
-    keys_.emplace_back(Key("W", 'w', 'W'));
-    keys_.emplace_back(Key("E", 'e', 'E'));
-    keys_.emplace_back(Key("R", 'r', 'R'));
+    keys_.emplace_back(Key("q", 'q', 'Q'));
+    keys_.emplace_back(Key("w", 'w', 'W'));
+    keys_.emplace_back(Key("e", 'e', 'E'));
+    keys_.emplace_back(Key("r", 'r', 'R'));
 }
 
 void Keyboard::paint(cairo_t *cr) {
@@ -123,7 +123,7 @@ void Keyboard::paintOneKey(cairo_t *cr, Key key) {
     cairo_rectangle(cr, 0, 0, key.width_, key.height_);
     cairo_set_line_width(cr, 2);
     cairo_stroke(cr);
-    
+
     cairo_text_extents_t extents;
     cairo_text_extents(cr, key.label_, &extents);
     cairo_translate(cr, (key.width_ - extents.width) / 2, (key.height_ - extents.y_bearing) / 2);
