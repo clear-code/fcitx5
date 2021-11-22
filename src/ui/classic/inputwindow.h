@@ -54,6 +54,7 @@ class Key {
 public:
     Key(const char *label, char lower, char upper);
     void setRegion(int x, int y);
+    fcitx::Key convert();
 
     const char *label_;
     const char lower_;
@@ -65,11 +66,12 @@ public:
 
 class Keyboard {
 public:
-    Keyboard();
+    Keyboard(ClassicUI *parent);
     void paint(cairo_t *cr);
-    void click(int x, int y);
+    void click(InputContext *inputContext, int x, int y);
 
     std::vector<Key> keys_;
+    ClassicUI *parent_;
 
 private:
     void paintOneKey(cairo_t *cr, Key key);
