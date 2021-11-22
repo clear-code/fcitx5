@@ -17,6 +17,8 @@
 #include "fcitx/misc_p.h"
 #include "classicui.h"
 
+FCITX_DEFINE_LOG_CATEGORY(keyboard, "keyboard")
+
 namespace fcitx::classicui {
 
 auto newPangoLayout(PangoContext *context) {
@@ -79,6 +81,62 @@ void MultilineLayout::render(cairo_t *cr, int x, int y, int lineHeight,
         }
         renderLayout(cr, lines_[i].get(), x, y);
         y += lineHeight;
+    }
+}
+
+Key::Key(const char *label, char lower, char upper) : label_(label), lower_(lower), upper_(upper) {}
+
+void Key::setRegion(int x, int y) {
+    region_
+        .setPosition(x, y)
+        .setSize(width_, height_);
+}
+
+Keyboard::Keyboard() {
+    keys_.emplace_back(Key("Q", 'q', 'Q'));
+    keys_.emplace_back(Key("W", 'w', 'W'));
+    keys_.emplace_back(Key("E", 'e', 'E'));
+    keys_.emplace_back(Key("R", 'r', 'R'));
+}
+
+void Keyboard::paint(cairo_t *cr) {
+    int curX = 10;
+    int curY = 100;
+
+    cairo_save(cr);
+    cairo_translate(cr, curX, curY);
+
+    for (auto &key : keys_)
+    {
+        paintOneKey(cr, key);
+        key.setRegion(curX, curY);
+        cairo_translate(cr, key.width_, 0);
+        curX += key.width_;
+    }
+
+    cairo_restore(cr);
+}
+
+void Keyboard::paintOneKey(cairo_t *cr, Key key) {
+    cairo_save(cr);
+
+    cairo_rectangle(cr, 0, 0, key.width_, key.height_);
+    cairo_set_line_width(cr, 2);
+    cairo_stroke(cr);
+    
+    cairo_text_extents_t extents;
+    cairo_text_extents(cr, key.label_, &extents);
+    cairo_translate(cr, (key.width_ - extents.width) / 2, (key.height_ - extents.y_bearing) / 2);
+    cairo_show_text(cr, key.label_);
+
+    cairo_restore(cr);
+}
+
+void Keyboard::click(int x, int y) {
+    for (auto &key : keys_)
+    {
+        if (!key.region_.contains(x, y)) continue;
+        FCITX_KEYBOARD() << "key pushed: " << key.label_;
     }
 }
 
@@ -623,10 +681,15 @@ void InputWindow::paint(cairo_t *cr, unsigned int width, unsigned int height) {
                                         highlight);
         }
     }
+
+    keyboard_.paint(cr);
+
     cairo_restore(cr);
 }
 
 void InputWindow::click(int x, int y) {
+    keyboard_.click(x, y);
+
     auto *inputContext = inputContext_.get();
     if (!inputContext) {
         return;

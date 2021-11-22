@@ -13,6 +13,7 @@
 #include "fcitx/candidatelist.h"
 #include "fcitx/inputcontext.h"
 #include "common.h"
+#include "fcitx-utils/log.h"
 
 namespace fcitx {
 namespace classicui {
@@ -47,6 +48,31 @@ public:
     std::vector<GObjectUniquePtr<PangoLayout>> lines_;
     std::vector<PangoAttrListUniquePtr> attrLists_;
     std::vector<PangoAttrListUniquePtr> highlightAttrLists_;
+};
+
+class Key {
+public:
+    Key(const char *label, char lower, char upper);
+    void setRegion(int x, int y);
+
+    const char *label_;
+    const char lower_;
+    const char upper_;
+    Rect region_;
+    double width_ = 60;
+    double height_ = 50;
+};
+
+class Keyboard {
+public:
+    Keyboard();
+    void paint(cairo_t *cr);
+    void click(int x, int y);
+
+    std::vector<Key> keys_;
+
+private:
+    void paintOneKey(cairo_t *cr, Key key);
 };
 
 class InputWindow {
@@ -85,6 +111,7 @@ protected:
     std::vector<MultilineLayout> labelLayouts_;
     std::vector<MultilineLayout> candidateLayouts_;
     std::vector<Rect> candidateRegions_;
+    Keyboard keyboard_;
     TrackableObjectReference<InputContext> inputContext_;
     bool visible_ = false;
     int cursor_ = 0;
@@ -102,5 +129,9 @@ protected:
 };
 } // namespace classicui
 } // namespace fcitx
+
+FCITX_DECLARE_LOG_CATEGORY(keyboard);
+
+#define FCITX_KEYBOARD() FCITX_LOGC(::keyboard, Debug)
 
 #endif // _FCITX_UI_CLASSIC_INPUTWINDOW_H_
