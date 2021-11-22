@@ -53,6 +53,7 @@ public:
 class Key {
 public:
     Key(const char *label, char lower, char upper);
+    Key withCustomLayout(double scale, bool newLine = false);
     void setRegion(int x, int y);
     fcitx::Key convert();
 
@@ -60,8 +61,20 @@ public:
     const char lower_;
     const char upper_;
     Rect region_;
+
     double width_ = 60;
     double height_ = 50;
+    double leftMargin_ = 5;
+    double topMargin_ = 5;
+    bool newLine_ = false;
+    bool visible_ = true;
+};
+
+class DummyKey : public Key {
+public:
+    DummyKey() : Key("", '\0', '\0') {
+        visible_ = false;
+    };
 };
 
 class Keyboard {
