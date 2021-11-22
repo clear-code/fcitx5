@@ -140,6 +140,7 @@ protected:
     CandidateLayoutHint layoutHint_ = CandidateLayoutHint::NotSet;
     size_t candidatesHeight_ = 0;
     int hoverIndex_ = -1;
+    bool hasVirtualKeyboard_ = true;
 };
 } // namespace classicui
 } // namespace fcitx
