@@ -97,15 +97,58 @@ fcitx::Key Key::convert() {
     return fcitx::Key({lower_});
 }
 
+Key Key::withCustomLayout(double scale, bool newLine) {
+    newLine_ = newLine;
+    width_ *= scale;
+    return *this;
+}
+
 Keyboard::Keyboard() {
     keys_.emplace_back(Key("q", 'q', 'Q'));
     keys_.emplace_back(Key("w", 'w', 'W'));
     keys_.emplace_back(Key("e", 'e', 'E'));
     keys_.emplace_back(Key("r", 'r', 'R'));
+    keys_.emplace_back(Key("t", 't', 'T'));
+    keys_.emplace_back(Key("y", 'y', 'Y'));
+    keys_.emplace_back(Key("u", 'u', 'U'));
+    keys_.emplace_back(Key("i", 'i', 'I'));
+    keys_.emplace_back(Key("o", 'o', 'O'));
+    keys_.emplace_back(Key("p", 'p', 'P'));
+    keys_.emplace_back(Key("Back", '\0', '\0').withCustomLayout(1.5, true));
+
+    keys_.emplace_back(DummyKey().withCustomLayout(0.5));
+    keys_.emplace_back(Key("a", 'a', 'A'));
+    keys_.emplace_back(Key("s", 's', 'S'));
+    keys_.emplace_back(Key("d", 'd', 'D'));
+    keys_.emplace_back(Key("f", 'f', 'F'));
+    keys_.emplace_back(Key("g", 'g', 'G'));
+    keys_.emplace_back(Key("h", 'h', 'H'));
+    keys_.emplace_back(Key("j", 'j', 'J'));
+    keys_.emplace_back(Key("k", 'k', 'K'));
+    keys_.emplace_back(Key("l", 'l', 'L'));
+    keys_.emplace_back(Key("Enter", '\0', '\0').withCustomLayout(2.0, true));
+
+    keys_.emplace_back(Key("Shift", '\0', '\0').withCustomLayout(1.5));
+    keys_.emplace_back(Key("z", 'z', 'Z'));
+    keys_.emplace_back(Key("x", 'x', 'X'));
+    keys_.emplace_back(Key("c", 'c', 'C'));
+    keys_.emplace_back(Key("v", 'v', 'V'));
+    keys_.emplace_back(Key("b", 'b', 'B'));
+    keys_.emplace_back(Key("n", 'n', 'N'));
+    keys_.emplace_back(Key("m", 'm', 'M'));
+    keys_.emplace_back(Key("Shift", '\0', '\0').withCustomLayout(3.0, true));
+
+    keys_.emplace_back(Key("?123", '\0', '\0').withCustomLayout(1.5));
+    keys_.emplace_back(Key(",", '\0', '\0'));
+    keys_.emplace_back(Key("", '\0', '\0').withCustomLayout(5.0));
+    keys_.emplace_back(Key(".", '\0', '\0'));
+    keys_.emplace_back(Key("yobi", '\0', '\0').withCustomLayout(3.0));
 }
 
 void Keyboard::paint(cairo_t *cr) {
-    int curX = 10;
+    const int startX = 10;
+
+    int curX = startX;
     int curY = 100;
 
     cairo_save(cr);
@@ -113,10 +156,21 @@ void Keyboard::paint(cairo_t *cr) {
 
     for (auto &key : keys_)
     {
-        paintOneKey(cr, key);
-        key.setRegion(curX, curY);
-        cairo_translate(cr, key.width_, 0);
-        curX += key.width_;
+        if (key.visible_) {
+            paintOneKey(cr, key);
+            key.setRegion(curX, curY);
+        }
+
+        if (key.newLine_) {
+            curX = startX;
+            curY += key.height_;
+            cairo_restore(cr);
+            cairo_save(cr);
+            cairo_translate(cr, startX, curY);
+        } else {
+            curX += key.width_;
+            cairo_translate(cr, key.width_, 0);
+        }
     }
 
     cairo_restore(cr);
@@ -140,7 +194,7 @@ void Keyboard::paintOneKey(cairo_t *cr, Key key) {
 void Keyboard::click(InputContext *inputContext, int x, int y) {
     for (auto &key : keys_)
     {
-        if (!key.region_.contains(x, y)) continue;
+        if (!(key.visible_ && key.region_.contains(x, y))) continue;
         FCITX_KEYBOARD() << "key pushed: " << key.label_;
         auto keyEvent = fcitx::KeyEvent(inputContext, key.convert());
         inputContext->keyEvent(keyEvent);
