@@ -137,6 +137,7 @@ void WaylandIMInputContextV1::activate(wayland::ZwpInputMethodContextV1 *ic) {
     repeatInfoCallback(repeatRate_, repeatDelay_);
     server_->display_->sync();
     focusIn();
+    updateUserInterface(UserInterfaceComponent::InputPanel);
 }
 
 void WaylandIMInputContextV1::deactivate(wayland::ZwpInputMethodContextV1 *ic) {
