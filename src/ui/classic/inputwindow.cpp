@@ -11,6 +11,7 @@
 #include <pango/pangocairo.h>
 #include "fcitx-utils/color.h"
 #include "fcitx-utils/log.h"
+#include "fcitx/inputmethodengine.h"
 #include "fcitx/inputmethodentry.h"
 #include "fcitx/inputpanel.h"
 #include "fcitx/instance.h"
@@ -92,7 +93,11 @@ void Key::setRegion(int x, int y) {
         .setSize(width_, height_);
 }
 
-Keyboard::Keyboard() {
+fcitx::Key Key::convert() {
+    return fcitx::Key({lower_});
+}
+
+Keyboard::Keyboard(ClassicUI *parent) : parent_(parent) {
     keys_.emplace_back(Key("q", 'q', 'Q'));
     keys_.emplace_back(Key("w", 'w', 'W'));
     keys_.emplace_back(Key("e", 'e', 'E'));
@@ -132,15 +137,23 @@ void Keyboard::paintOneKey(cairo_t *cr, Key key) {
     cairo_restore(cr);
 }
 
-void Keyboard::click(int x, int y) {
+void Keyboard::click(InputContext *inputContext, int x, int y) {
+    auto *engine = parent_->instance()->inputMethodEngine(inputContext);
+    const auto *entry = parent_->instance()->inputMethodEntry(inputContext);
+    if (!engine || !entry) {
+        return;
+    }
+
     for (auto &key : keys_)
     {
         if (!key.region_.contains(x, y)) continue;
         FCITX_KEYBOARD() << "key pushed: " << key.label_;
+        fcitx::KeyEvent keyEvent = fcitx::KeyEvent(inputContext, key.convert());
+        engine->keyEvent(*entry, keyEvent);
     }
 }
 
-InputWindow::InputWindow(ClassicUI *parent) : parent_(parent) {
+InputWindow::InputWindow(ClassicUI *parent) : parent_(parent), keyboard_(parent) {
     fontMap_.reset(pango_cairo_font_map_new());
     // Although documentation says it is 96 by default, try not rely on this
     // behavior.
@@ -688,12 +701,13 @@ void InputWindow::paint(cairo_t *cr, unsigned int width, unsigned int height) {
 }
 
 void InputWindow::click(int x, int y) {
-    keyboard_.click(x, y);
-
     auto *inputContext = inputContext_.get();
     if (!inputContext) {
         return;
     }
+
+    keyboard_.click(inputContext, x, y);
+
     const auto candidateList = inputContext->inputPanel().candidateList();
     if (!candidateList) {
         return;
