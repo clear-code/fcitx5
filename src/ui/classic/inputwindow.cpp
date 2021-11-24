@@ -140,9 +140,9 @@ Keyboard::Keyboard() {
     keys_.emplace_back(Key(u8"\u25B2", "Up", "").withCustomLayout(1.0, true)); // ▲
 
     keys_.emplace_back(Key("?123", "", "").withCustomLayout(1.5));
-    keys_.emplace_back(Key(",", "", ""));
+    keys_.emplace_back(Key(",", "comma", ""));
     keys_.emplace_back(Key("", "space", "").withCustomLayout(5.0));
-    keys_.emplace_back(Key(".", "", ""));
+    keys_.emplace_back(Key(".", "period", ""));
     keys_.emplace_back(Key(u8"\u25C0", "Left", "")); // ◀
     keys_.emplace_back(Key(u8"\u25BC", "Down", "")); // ▼
     keys_.emplace_back(Key(u8"\u25B6", "Right", "")); // ▶
