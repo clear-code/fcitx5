@@ -136,13 +136,16 @@ Keyboard::Keyboard() {
     keys_.emplace_back(Key("b", "b", "B"));
     keys_.emplace_back(Key("n", "n", "N"));
     keys_.emplace_back(Key("m", "m", "M"));
-    keys_.emplace_back(Key("Shift", "", "").withCustomLayout(3.0, true));
+    keys_.emplace_back(DummyKey());
+    keys_.emplace_back(Key(u8"\u25B2", "Up", "").withCustomLayout(1.0, true)); // ▲
 
     keys_.emplace_back(Key("?123", "", "").withCustomLayout(1.5));
     keys_.emplace_back(Key(",", "", ""));
     keys_.emplace_back(Key("", "space", "").withCustomLayout(5.0));
     keys_.emplace_back(Key(".", "", ""));
-    keys_.emplace_back(Key("yobi", "", "").withCustomLayout(3.0));
+    keys_.emplace_back(Key(u8"\u25C0", "Left", "")); // ◀
+    keys_.emplace_back(Key(u8"\u25BC", "Down", "")); // ▼
+    keys_.emplace_back(Key(u8"\u25B6", "Right", "")); // ▶
 }
 
 void Keyboard::paint(cairo_t *cr) {
