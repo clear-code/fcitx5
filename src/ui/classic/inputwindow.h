@@ -52,15 +52,32 @@ public:
 
 class Key {
 public:
-    Key(const char *label, const char *lower, const char *upper);
-    Key withCustomLayout(double scale, bool newLine = false);
-    void setRegion(int x, int y);
-    fcitx::Key convert();
+    Key(std::string keyName, std::string label, std::string upperKeyName = "",
+        std::string upperLabel = "");
 
-    const char *label_;
-    const char *lower_;
-    const char *upper_;
-    Rect region_;
+    const char* keyName(bool useUpper = false) const {
+        if (!useUpper || upperKeyName_.empty()) {
+            return keyName_.c_str();
+        }
+        return upperKeyName_.c_str();
+    }
+
+    const char* label(bool useUpper = false) const {
+        if (!useUpper || upperLabel_.empty()) {
+            return label_.c_str();
+        }
+        return upperLabel_.c_str();
+    }
+
+    void setRegion(int x, int y) {
+        region_
+            .setPosition(x, y)
+            .setSize(width_, height_);
+    }
+    bool contains(int x, int y) const { return region_.contains(x, y); }
+
+    Key withCustomLayout(double scale, bool newLine = false);
+    fcitx::Key convert(bool useUpper = false) const;
 
     double width_ = 60;
     double height_ = 50;
@@ -68,11 +85,18 @@ public:
     double topMargin_ = 5;
     bool newLine_ = false;
     bool visible_ = true;
+
+private:
+    const std::string keyName_;
+    const std::string label_;
+    const std::string upperKeyName_;
+    const std::string upperLabel_;
+    Rect region_;
 };
 
 class DummyKey : public Key {
 public:
-    DummyKey() : Key("", "", "") {
+    DummyKey() : Key("", "") {
         visible_ = false;
     }
 };
