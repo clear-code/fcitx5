@@ -192,12 +192,20 @@ void Keyboard::paintOneKey(cairo_t *cr, Key key) {
 }
 
 void Keyboard::click(InputContext *inputContext, int x, int y) {
+    // TODO: manage `isRelease`
     for (auto &key : keys_)
     {
         if (!(key.visible_ && key.region_.contains(x, y))) continue;
         FCITX_KEYBOARD() << "key pushed: " << key.label_;
         auto keyEvent = fcitx::KeyEvent(inputContext, key.convert());
-        inputContext->keyEvent(keyEvent);
+
+        auto hasProcessedInIME = inputContext->keyEvent(keyEvent);
+        FCITX_KEYBOARD() << "key event result: " << hasProcessedInIME;
+
+        if (!hasProcessedInIME) {
+            // Need to set true to`isRelease` in order to process key in forwarding.
+            inputContext->forwardKey(key.convert(), true);
+        }
     }
 }
 
