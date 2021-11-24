@@ -94,55 +94,69 @@ fcitx::Key Key::convert(bool useUpper) const {
     return fcitx::Key(keyName(useUpper));
 }
 
-Key Key::withCustomLayout(double scale, bool newLine) {
-    newLine_ = newLine;
-    width_ *= scale;
-    return *this;
+void Key::click(Keyboard *keyboard, InputContext *inputContext) const {
+    // TODO: manage `isRelease`
+    FCITX_KEYBOARD() << "key pushed: " << label(keyboard->useUpper_);
+    auto keyEvent = fcitx::KeyEvent(inputContext, convert(keyboard->useUpper_));
+
+    auto hasProcessedInIME = inputContext->keyEvent(keyEvent);
+    FCITX_KEYBOARD() << "key event result: " << hasProcessedInIME;
+
+    if (!hasProcessedInIME) {
+        // Need to set true to`isRelease` in order to process key in forwarding.
+        inputContext->forwardKey(convert(keyboard->useUpper_), true);
+    }
+}
+
+void UpperToggleKey::click(Keyboard *keyboard, InputContext *inputContext) const {
+    FCITX_KEYBOARD() << "UpperToggleKey pushed: " << label(keyboard->useUpper_);
+    keyboard->useUpper_ = !keyboard->useUpper_;
+    inputContext->updateUserInterface(UserInterfaceComponent::InputPanel);
 }
 
 Keyboard::Keyboard() {
-    keys_.emplace_back(Key("q", "q", "Q", "Q"));
-    keys_.emplace_back(Key("w", "w", "W", "W"));
-    keys_.emplace_back(Key("e", "e", "E", "E"));
-    keys_.emplace_back(Key("r", "r", "R", "R"));
-    keys_.emplace_back(Key("t", "t", "T", "T"));
-    keys_.emplace_back(Key("y", "y", "Y", "Y"));
-    keys_.emplace_back(Key("u", "u", "U", "U"));
-    keys_.emplace_back(Key("i", "i", "I", "I"));
-    keys_.emplace_back(Key("o", "o", "O", "O"));
-    keys_.emplace_back(Key("p", "p", "P", "P"));
-    keys_.emplace_back(Key("BackSpace", "Back").withCustomLayout(1.5, true));
+    keys_.emplace_back(new Key("q", "q", "Q", "Q"));
+    keys_.emplace_back(new Key("w", "w", "W", "W"));
+    keys_.emplace_back(new Key("e", "e", "E", "E"));
+    keys_.emplace_back(new Key("r", "r", "R", "R"));
+    keys_.emplace_back(new Key("t", "t", "T", "T"));
+    keys_.emplace_back(new Key("y", "y", "Y", "Y"));
+    keys_.emplace_back(new Key("u", "u", "U", "U"));
+    keys_.emplace_back(new Key("i", "i", "I", "I"));
+    keys_.emplace_back(new Key("o", "o", "O", "O"));
+    keys_.emplace_back(new Key("p", "p", "P", "P"));
+    keys_.emplace_back(new Key("BackSpace", "Back")); keys_.back()->setCustomLayout(1.5, true);
 
-    keys_.emplace_back(DummyKey().withCustomLayout(0.5));
-    keys_.emplace_back(Key("a", "a", "A", "A"));
-    keys_.emplace_back(Key("s", "s", "S", "S"));
-    keys_.emplace_back(Key("d", "d", "D", "D"));
-    keys_.emplace_back(Key("f", "f", "F", "F"));
-    keys_.emplace_back(Key("g", "g", "G", "G"));
-    keys_.emplace_back(Key("h", "h", "H", "H"));
-    keys_.emplace_back(Key("j", "j", "J", "J"));
-    keys_.emplace_back(Key("k", "k", "K", "K"));
-    keys_.emplace_back(Key("l", "l", "L", "L"));
-    keys_.emplace_back(Key("Return", "Enter").withCustomLayout(2.0, true));
+    keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
+    keys_.emplace_back(new Key("a", "a", "A", "A"));
+    keys_.emplace_back(new Key("s", "s", "S", "S"));
+    keys_.emplace_back(new Key("d", "d", "D", "D"));
+    keys_.emplace_back(new Key("f", "f", "F", "F"));
+    keys_.emplace_back(new Key("g", "g", "G", "G"));
+    keys_.emplace_back(new Key("h", "h", "H", "H"));
+    keys_.emplace_back(new Key("j", "j", "J", "J"));
+    keys_.emplace_back(new Key("k", "k", "K", "K"));
+    keys_.emplace_back(new Key("l", "l", "L", "L"));
+    keys_.emplace_back(new Key("Return", "Enter")); keys_.back()->setCustomLayout(2.0, true);
 
-    keys_.emplace_back(Key("", "Shift").withCustomLayout(1.5));
-    keys_.emplace_back(Key("z", "z", "Z", "Z"));
-    keys_.emplace_back(Key("x", "x", "X", "X"));
-    keys_.emplace_back(Key("c", "c", "C", "C"));
-    keys_.emplace_back(Key("v", "v", "V", "V"));
-    keys_.emplace_back(Key("b", "b", "B", "B"));
-    keys_.emplace_back(Key("n", "n", "N", "N"));
-    keys_.emplace_back(Key("m", "m", "M", "M"));
-    keys_.emplace_back(DummyKey());
-    keys_.emplace_back(Key("Up", u8"\u25B2").withCustomLayout(1.0, true)); // ▲
+    keys_.emplace_back(new UpperToggleKey("ABC", "abc")); keys_.back()->setCustomLayout(1.5);
+    keys_.emplace_back(new Key("z", "z", "Z", "Z"));
+    keys_.emplace_back(new Key("x", "x", "X", "X"));
+    keys_.emplace_back(new Key("c", "c", "C", "C"));
+    keys_.emplace_back(new Key("v", "v", "V", "V"));
+    keys_.emplace_back(new Key("b", "b", "B", "B"));
+    keys_.emplace_back(new Key("n", "n", "N", "N"));
+    keys_.emplace_back(new Key("m", "m", "M", "M"));
+    keys_.emplace_back(new DummyKey());
+    keys_.emplace_back(new Key("Up", u8"\u25B2")); keys_.back()->setCustomLayout(1.0, true); // ▲ 
 
-    keys_.emplace_back(Key("", "?123").withCustomLayout(1.5));
-    keys_.emplace_back(Key("comma", ","));
-    keys_.emplace_back(Key("space", "").withCustomLayout(5.0));
-    keys_.emplace_back(Key("period", "."));
-    keys_.emplace_back(Key("Left", u8"\u25C0")); // ◀
-    keys_.emplace_back(Key("Down", u8"\u25BC")); // ▼
-    keys_.emplace_back(Key("Right", u8"\u25B6")); // ▶
+    keys_.emplace_back(new Key("", "?123")); keys_.back()->setCustomLayout(1.5);
+    keys_.emplace_back(new Key("comma", ","));
+    keys_.emplace_back(new Key("space", "")); keys_.back()->setCustomLayout(5.0);
+    keys_.emplace_back(new Key("period", "."));
+    keys_.emplace_back(new Key("Left", u8"\u25C0")); // ◀
+    keys_.emplace_back(new Key("Down", u8"\u25BC")); // ▼
+    keys_.emplace_back(new Key("Right", u8"\u25B6")); // ▶
 }
 
 void Keyboard::paint(cairo_t *cr) {
@@ -154,58 +168,48 @@ void Keyboard::paint(cairo_t *cr) {
     cairo_save(cr);
     cairo_translate(cr, curX, curY);
 
-    for (auto &key : keys_)
+    for (const auto &key : keys_)
     {
-        if (key.visible_) {
-            paintOneKey(cr, key);
-            key.setRegion(curX, curY);
+        if (key->visible_) {
+            paintOneKey(cr, key.get());
+            key->setRegion(curX, curY);
         }
 
-        if (key.newLine_) {
+        if (key->newLine_) {
             curX = startX;
-            curY += key.height_;
+            curY += key->height_;
             cairo_restore(cr);
             cairo_save(cr);
             cairo_translate(cr, startX, curY);
         } else {
-            curX += key.width_;
-            cairo_translate(cr, key.width_, 0);
+            curX += key->width_;
+            cairo_translate(cr, key->width_, 0);
         }
     }
 
     cairo_restore(cr);
 }
 
-void Keyboard::paintOneKey(cairo_t *cr, Key key) {
+void Keyboard::paintOneKey(cairo_t *cr, Key *key) {
     cairo_save(cr);
 
-    cairo_rectangle(cr, 0, 0, key.width_, key.height_);
+    cairo_rectangle(cr, 0, 0, key->width_, key->height_);
     cairo_set_line_width(cr, 2);
     cairo_stroke(cr);
 
     cairo_text_extents_t extents;
-    cairo_text_extents(cr, key.label(), &extents);
-    cairo_translate(cr, (key.width_ - extents.width) / 2, (key.height_ - extents.y_bearing) / 2);
-    cairo_show_text(cr, key.label());
+    cairo_text_extents(cr, key->label(useUpper_), &extents);
+    cairo_translate(cr, (key->width_ - extents.width) / 2, (key->height_ - extents.y_bearing) / 2);
+    cairo_show_text(cr, key->label(useUpper_));
 
     cairo_restore(cr);
 }
 
 void Keyboard::click(InputContext *inputContext, int x, int y) {
-    // TODO: manage `isRelease`
-    for (auto &key : keys_)
+    for (const auto &key : keys_)
     {
-        if (!(key.visible_ && key.contains(x, y))) continue;
-        FCITX_KEYBOARD() << "key pushed: " << key.label();
-        auto keyEvent = fcitx::KeyEvent(inputContext, key.convert());
-
-        auto hasProcessedInIME = inputContext->keyEvent(keyEvent);
-        FCITX_KEYBOARD() << "key event result: " << hasProcessedInIME;
-
-        if (!hasProcessedInIME) {
-            // Need to set true to`isRelease` in order to process key in forwarding.
-            inputContext->forwardKey(key.convert(), true);
-        }
+        if (!(key->visible_ && key->contains(x, y))) continue;
+        key->click(this, inputContext);
     }
 }
 
