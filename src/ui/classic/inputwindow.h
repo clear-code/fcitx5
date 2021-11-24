@@ -50,19 +50,20 @@ public:
     std::vector<PangoAttrListUniquePtr> highlightAttrLists_;
 };
 
+class Keyboard;
 class Key {
 public:
     Key(std::string keyName, std::string label, std::string upperKeyName = "",
         std::string upperLabel = "");
 
-    const char* keyName(bool useUpper = false) const {
+    const char* keyName(bool useUpper) const {
         if (!useUpper || upperKeyName_.empty()) {
             return keyName_.c_str();
         }
         return upperKeyName_.c_str();
     }
 
-    const char* label(bool useUpper = false) const {
+    const char* label(bool useUpper) const {
         if (!useUpper || upperLabel_.empty()) {
             return label_.c_str();
         }
@@ -76,8 +77,13 @@ public:
     }
     bool contains(int x, int y) const { return region_.contains(x, y); }
 
-    Key withCustomLayout(double scale, bool newLine = false);
-    fcitx::Key convert(bool useUpper = false) const;
+    void setCustomLayout(double scale, bool newLine = false) {
+        newLine_ = newLine;
+        width_ *= scale;
+    }
+
+    fcitx::Key convert(bool useUpper) const;
+    virtual void click(Keyboard *keyboard, InputContext *inputContext) const;
 
     double width_ = 60;
     double height_ = 50;
@@ -87,10 +93,20 @@ public:
     bool visible_ = true;
 
 private:
+    /*
+     * Be used in converting to Fcitx::Key.
+     * Corresponding to keyNameList in keynametable.h.
+     */
     const std::string keyName_;
+
+    /*
+     * Text for display.
+     */
     const std::string label_;
+
     const std::string upperKeyName_;
     const std::string upperLabel_;
+
     Rect region_;
 };
 
@@ -101,16 +117,24 @@ public:
     }
 };
 
+class UpperToggleKey : public Key {
+public:
+    UpperToggleKey(std::string labelInLower, std::string labelInUpper)
+                   : Key("", labelInLower, "", labelInUpper) {}
+    void click(Keyboard *keyboard, InputContext *inputContext) const override;
+};
+
 class Keyboard {
 public:
     Keyboard();
     void paint(cairo_t *cr);
     void click(InputContext *inputContext, int x, int y);
 
-    std::vector<Key> keys_;
+    std::vector<std::unique_ptr<Key>> keys_;
+    bool useUpper_ = false;
 
 private:
-    void paintOneKey(cairo_t *cr, Key key);
+    void paintOneKey(cairo_t *cr, Key *key);
 };
 
 class InputWindow {
