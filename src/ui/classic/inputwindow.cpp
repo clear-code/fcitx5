@@ -85,16 +85,13 @@ void MultilineLayout::render(cairo_t *cr, int x, int y, int lineHeight,
     }
 }
 
-Key::Key(const char *label, const char *lower, const char *upper) : label_(label), lower_(lower), upper_(upper) {}
+Key::Key(std::string keyName, std::string label, std::string upperKeyName,
+         std::string upperLabel)
+         : keyName_(keyName), label_(label), upperKeyName_(upperKeyName),
+           upperLabel_(upperLabel) {};
 
-void Key::setRegion(int x, int y) {
-    region_
-        .setPosition(x, y)
-        .setSize(width_, height_);
-}
-
-fcitx::Key Key::convert() {
-    return fcitx::Key(lower_);
+fcitx::Key Key::convert(bool useUpper) const {
+    return fcitx::Key(keyName(useUpper));
 }
 
 Key Key::withCustomLayout(double scale, bool newLine) {
@@ -104,48 +101,48 @@ Key Key::withCustomLayout(double scale, bool newLine) {
 }
 
 Keyboard::Keyboard() {
-    keys_.emplace_back(Key("q", "q", "Q"));
-    keys_.emplace_back(Key("w", "w", "W"));
-    keys_.emplace_back(Key("e", "e", "E"));
-    keys_.emplace_back(Key("r", "r", "R"));
-    keys_.emplace_back(Key("t", "t", "T"));
-    keys_.emplace_back(Key("y", "y", "Y"));
-    keys_.emplace_back(Key("u", "u", "U"));
-    keys_.emplace_back(Key("i", "i", "I"));
-    keys_.emplace_back(Key("o", "o", "O"));
-    keys_.emplace_back(Key("p", "p", "P"));
-    keys_.emplace_back(Key("Back", "BackSpace", "").withCustomLayout(1.5, true));
+    keys_.emplace_back(Key("q", "q", "Q", "Q"));
+    keys_.emplace_back(Key("w", "w", "W", "W"));
+    keys_.emplace_back(Key("e", "e", "E", "E"));
+    keys_.emplace_back(Key("r", "r", "R", "R"));
+    keys_.emplace_back(Key("t", "t", "T", "T"));
+    keys_.emplace_back(Key("y", "y", "Y", "Y"));
+    keys_.emplace_back(Key("u", "u", "U", "U"));
+    keys_.emplace_back(Key("i", "i", "I", "I"));
+    keys_.emplace_back(Key("o", "o", "O", "O"));
+    keys_.emplace_back(Key("p", "p", "P", "P"));
+    keys_.emplace_back(Key("BackSpace", "Back").withCustomLayout(1.5, true));
 
     keys_.emplace_back(DummyKey().withCustomLayout(0.5));
-    keys_.emplace_back(Key("a", "a", "A"));
-    keys_.emplace_back(Key("s", "s", "S"));
-    keys_.emplace_back(Key("d", "d", "D"));
-    keys_.emplace_back(Key("f", "f", "F"));
-    keys_.emplace_back(Key("g", "g", "G"));
-    keys_.emplace_back(Key("h", "h", "H"));
-    keys_.emplace_back(Key("j", "j", "J"));
-    keys_.emplace_back(Key("k", "k", "K"));
-    keys_.emplace_back(Key("l", "l", "L"));
-    keys_.emplace_back(Key("Enter", "Return", "").withCustomLayout(2.0, true));
+    keys_.emplace_back(Key("a", "a", "A", "A"));
+    keys_.emplace_back(Key("s", "s", "S", "S"));
+    keys_.emplace_back(Key("d", "d", "D", "D"));
+    keys_.emplace_back(Key("f", "f", "F", "F"));
+    keys_.emplace_back(Key("g", "g", "G", "G"));
+    keys_.emplace_back(Key("h", "h", "H", "H"));
+    keys_.emplace_back(Key("j", "j", "J", "J"));
+    keys_.emplace_back(Key("k", "k", "K", "K"));
+    keys_.emplace_back(Key("l", "l", "L", "L"));
+    keys_.emplace_back(Key("Return", "Enter").withCustomLayout(2.0, true));
 
-    keys_.emplace_back(Key("Shift", "", "").withCustomLayout(1.5));
-    keys_.emplace_back(Key("z", "z", "Z"));
-    keys_.emplace_back(Key("x", "x", "X"));
-    keys_.emplace_back(Key("c", "c", "C"));
-    keys_.emplace_back(Key("v", "v", "V"));
-    keys_.emplace_back(Key("b", "b", "B"));
-    keys_.emplace_back(Key("n", "n", "N"));
-    keys_.emplace_back(Key("m", "m", "M"));
+    keys_.emplace_back(Key("", "Shift").withCustomLayout(1.5));
+    keys_.emplace_back(Key("z", "z", "Z", "Z"));
+    keys_.emplace_back(Key("x", "x", "X", "X"));
+    keys_.emplace_back(Key("c", "c", "C", "C"));
+    keys_.emplace_back(Key("v", "v", "V", "V"));
+    keys_.emplace_back(Key("b", "b", "B", "B"));
+    keys_.emplace_back(Key("n", "n", "N", "N"));
+    keys_.emplace_back(Key("m", "m", "M", "M"));
     keys_.emplace_back(DummyKey());
-    keys_.emplace_back(Key(u8"\u25B2", "Up", "").withCustomLayout(1.0, true)); // ▲
+    keys_.emplace_back(Key("Up", u8"\u25B2").withCustomLayout(1.0, true)); // ▲
 
-    keys_.emplace_back(Key("?123", "", "").withCustomLayout(1.5));
-    keys_.emplace_back(Key(",", "comma", ""));
-    keys_.emplace_back(Key("", "space", "").withCustomLayout(5.0));
-    keys_.emplace_back(Key(".", "period", ""));
-    keys_.emplace_back(Key(u8"\u25C0", "Left", "")); // ◀
-    keys_.emplace_back(Key(u8"\u25BC", "Down", "")); // ▼
-    keys_.emplace_back(Key(u8"\u25B6", "Right", "")); // ▶
+    keys_.emplace_back(Key("", "?123").withCustomLayout(1.5));
+    keys_.emplace_back(Key("comma", ","));
+    keys_.emplace_back(Key("space", "").withCustomLayout(5.0));
+    keys_.emplace_back(Key("period", "."));
+    keys_.emplace_back(Key("Left", u8"\u25C0")); // ◀
+    keys_.emplace_back(Key("Down", u8"\u25BC")); // ▼
+    keys_.emplace_back(Key("Right", u8"\u25B6")); // ▶
 }
 
 void Keyboard::paint(cairo_t *cr) {
@@ -187,9 +184,9 @@ void Keyboard::paintOneKey(cairo_t *cr, Key key) {
     cairo_stroke(cr);
 
     cairo_text_extents_t extents;
-    cairo_text_extents(cr, key.label_, &extents);
+    cairo_text_extents(cr, key.label(), &extents);
     cairo_translate(cr, (key.width_ - extents.width) / 2, (key.height_ - extents.y_bearing) / 2);
-    cairo_show_text(cr, key.label_);
+    cairo_show_text(cr, key.label());
 
     cairo_restore(cr);
 }
@@ -198,8 +195,8 @@ void Keyboard::click(InputContext *inputContext, int x, int y) {
     // TODO: manage `isRelease`
     for (auto &key : keys_)
     {
-        if (!(key.visible_ && key.region_.contains(x, y))) continue;
-        FCITX_KEYBOARD() << "key pushed: " << key.label_;
+        if (!(key.visible_ && key.contains(x, y))) continue;
+        FCITX_KEYBOARD() << "key pushed: " << key.label();
         auto keyEvent = fcitx::KeyEvent(inputContext, key.convert());
 
         auto hasProcessedInIME = inputContext->keyEvent(keyEvent);
