@@ -275,11 +275,9 @@ void Keyboard::setMarkKeys() {
     keys_.emplace_back(new Key("Right", u8"\u25B6")); // ▶
 }
 
-void Keyboard::paint(cairo_t *cr) {
-    const int startX = 10;
-
-    int curX = startX;
-    int curY = 100;
+void Keyboard::paint(cairo_t *cr, unsigned int offsetX, unsigned int offsetY) {
+    int curX = offsetX;
+    int curY = offsetY;
 
     cairo_save(cr);
     cairo_translate(cr, curX, curY);
@@ -292,11 +290,11 @@ void Keyboard::paint(cairo_t *cr) {
         }
 
         if (key->newLine_) {
-            curX = startX;
+            curX = offsetX;
             curY += key->height_;
             cairo_restore(cr);
             cairo_save(cr);
-            cairo_translate(cr, startX, curY);
+            cairo_translate(cr, offsetX, curY);
         } else {
             curX += key->width_;
             cairo_translate(cr, key->width_, 0);
@@ -304,6 +302,27 @@ void Keyboard::paint(cairo_t *cr) {
     }
 
     cairo_restore(cr);
+}
+
+std::pair<unsigned int, unsigned int> Keyboard::size() {
+    unsigned int width = 0, height = 0, w = 0;
+
+    for (const auto &key : keys_)
+    {
+        if (key->visible_) {
+            w += key->width_;
+            if (height == 0)
+                height += key->height_;
+        }
+
+        if (key->newLine_) {
+            width = MAX(width, w);
+            height += key->height_;
+            w = 0;
+        }
+    }
+
+    return {width, height};
 }
 
 void Keyboard::paintOneKey(cairo_t *cr, Key *key) {
@@ -592,10 +611,7 @@ void InputWindow::update(InputContext *inputContext) {
                pango_layout_get_character_count(lowerLayout_.get());
 }
 
-std::pair<unsigned int, unsigned int> InputWindow::sizeHint() {
-    if (hasVirtualKeyboard_)
-        return {800, 400}; // TODO: Calculate appropriate size
-
+std::pair<unsigned int, unsigned int> InputWindow::sizeHint(bool withKeyboard) {
     auto &theme = parent_->theme();
     auto *fontDesc =
         pango_font_description_from_string(parent_->config().font->c_str());
@@ -685,6 +701,16 @@ std::pair<unsigned int, unsigned int> InputWindow::sizeHint() {
         if (prev.valid() && next.valid()) {
             width += prev.width() + next.width();
         }
+    }
+
+    if (hasVirtualKeyboard_ && withKeyboard) {
+        // TODO: Probably it's not correct yet
+        auto pair = keyboard_.size();
+        unsigned int borderWidth = 2;
+        unsigned int keyboardWidth = pair.first + keyboard_.marginX() * 2;
+        unsigned int keyboardHeight = pair.second + keyboard_.marginY() * 2;
+        width = MAX(width, keyboardWidth + borderWidth * 2);
+        height = height + keyboardHeight + *textMargin.marginTop + *textMargin.marginBottom;
     }
 
     return {width, height};
@@ -871,8 +897,11 @@ void InputWindow::paint(cairo_t *cr, unsigned int width, unsigned int height) {
         }
     }
 
-    if (hasVirtualKeyboard_)
-        keyboard_.paint(cr);
+    if (hasVirtualKeyboard_) {
+        auto pair = sizeHint(false);
+        unsigned int marginY = pair.second + keyboard_.marginY();
+        keyboard_.paint(cr, keyboard_.marginX(), marginY);
+    }
 
     cairo_restore(cr);
 }

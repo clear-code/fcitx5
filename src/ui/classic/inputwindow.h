@@ -145,11 +145,14 @@ public:
 class Keyboard {
 public:
     Keyboard();
-    void paint(cairo_t *cr);
+    void paint(cairo_t *cr, unsigned int offsetX, unsigned int offsetY);
     void click(InputContext *inputContext, int x, int y);
     void setNormalKeys();
     void setNumberKeys();
     void setMarkKeys();
+    std::pair<unsigned int, unsigned int> size();
+    unsigned int marginX() { return 15; }
+    unsigned int marginY() { return 5; }
 
     std::vector<std::unique_ptr<Key>> keys_;
     bool useUpper_ = false;
@@ -162,7 +165,7 @@ class InputWindow {
 public:
     InputWindow(ClassicUI *parent);
     void update(InputContext *inputContext);
-    std::pair<unsigned int, unsigned int> sizeHint();
+    std::pair<unsigned int, unsigned int> sizeHint(bool withKeyboard = true);
     void paint(cairo_t *cr, unsigned int width, unsigned int height);
     void hide();
     bool visible() const { return visible_; }
