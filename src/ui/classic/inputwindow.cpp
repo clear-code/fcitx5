@@ -309,11 +309,9 @@ std::pair<unsigned int, unsigned int> Keyboard::size() {
 
     for (const auto &key : keys_)
     {
-        if (key->visible_) {
-            w += key->width_;
-            if (height == 0)
-                height += key->height_;
-        }
+        w += key->width_;
+        if (height == 0)
+            height += key->height_;
 
         if (key->newLine_) {
             width = MAX(width, w);
