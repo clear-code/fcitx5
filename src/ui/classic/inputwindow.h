@@ -124,11 +124,32 @@ public:
     void click(Keyboard *keyboard, InputContext *inputContext) const override;
 };
 
+class NormalSwitchKey : public Key {
+public:
+    NormalSwitchKey(std::string label) : Key("", label) {}
+    void click(Keyboard *keyboard, InputContext *inputContext) const override;
+};
+
+class NumberSwitchKey : public Key {
+public:
+    NumberSwitchKey(std::string label) : Key("", label) {}
+    void click(Keyboard *keyboard, InputContext *inputContext) const override;
+};
+
+class MarkSwitchKey : public Key {
+public:
+    MarkSwitchKey(std::string label) : Key("", label) {}
+    void click(Keyboard *keyboard, InputContext *inputContext) const override;
+};
+
 class Keyboard {
 public:
     Keyboard();
     void paint(cairo_t *cr);
     void click(InputContext *inputContext, int x, int y);
+    void setNormalKeys();
+    void setNumberKeys();
+    void setMarkKeys();
 
     std::vector<std::unique_ptr<Key>> keys_;
     bool useUpper_ = false;
