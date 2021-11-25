@@ -114,7 +114,31 @@ void UpperToggleKey::click(Keyboard *keyboard, InputContext *inputContext) const
     inputContext->updateUserInterface(UserInterfaceComponent::InputPanel);
 }
 
+void NormalSwitchKey::click(Keyboard *keyboard, InputContext *inputContext) const {
+    FCITX_KEYBOARD() << "NormalSwitchKey pushed: " << label(keyboard->useUpper_);
+    keyboard->useUpper_ = false;
+    keyboard->setNormalKeys();
+    inputContext->updateUserInterface(UserInterfaceComponent::InputPanel);
+}
+
+void NumberSwitchKey::click(Keyboard *keyboard, InputContext *inputContext) const {
+    FCITX_KEYBOARD() << "NumberSwitchKey pushed: " << label(keyboard->useUpper_);
+    keyboard->setNumberKeys();
+    inputContext->updateUserInterface(UserInterfaceComponent::InputPanel);
+}
+
+void MarkSwitchKey::click(Keyboard *keyboard, InputContext *inputContext) const {
+    FCITX_KEYBOARD() << "MarkSwitchKey pushed: " << label(keyboard->useUpper_);
+    keyboard->setMarkKeys();
+    inputContext->updateUserInterface(UserInterfaceComponent::InputPanel);
+}
+
 Keyboard::Keyboard() {
+    setNormalKeys();
+}
+
+void Keyboard::setNormalKeys() {
+    keys_.clear();
     keys_.emplace_back(new Key("q", "q", "Q", "Q"));
     keys_.emplace_back(new Key("w", "w", "W", "W"));
     keys_.emplace_back(new Key("e", "e", "E", "E"));
@@ -150,7 +174,99 @@ Keyboard::Keyboard() {
     keys_.emplace_back(new DummyKey());
     keys_.emplace_back(new Key("Up", u8"\u25B2")); keys_.back()->setCustomLayout(1.0, true); // ▲ 
 
-    keys_.emplace_back(new Key("", "?123")); keys_.back()->setCustomLayout(1.5);
+    keys_.emplace_back(new NumberSwitchKey("123")); keys_.back()->setCustomLayout(1.5);
+    keys_.emplace_back(new Key("comma", ","));
+    keys_.emplace_back(new Key("space", "")); keys_.back()->setCustomLayout(5.0);
+    keys_.emplace_back(new Key("period", "."));
+    keys_.emplace_back(new Key("Left", u8"\u25C0")); // ◀
+    keys_.emplace_back(new Key("Down", u8"\u25BC")); // ▼
+    keys_.emplace_back(new Key("Right", u8"\u25B6")); // ▶
+}
+
+void Keyboard::setNumberKeys() {
+    keys_.clear();
+    keys_.emplace_back(new Key("0", "0"));
+    keys_.emplace_back(new Key("1", "1"));
+    keys_.emplace_back(new Key("2", "2"));
+    keys_.emplace_back(new Key("3", "3"));
+    keys_.emplace_back(new Key("4", "4"));
+    keys_.emplace_back(new Key("5", "5"));
+    keys_.emplace_back(new Key("6", "6"));
+    keys_.emplace_back(new Key("7", "7"));
+    keys_.emplace_back(new Key("8", "8"));
+    keys_.emplace_back(new Key("9", "9"));
+    keys_.emplace_back(new Key("BackSpace", "Back")); keys_.back()->setCustomLayout(1.5, true);
+
+    keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
+    keys_.emplace_back(new Key("minus", "-"));
+    keys_.emplace_back(new Key("slash", "/")); // TODO this becomes `・` in zenkaku
+    keys_.emplace_back(new Key("colon", ":"));
+    keys_.emplace_back(new Key("semicolon", ";"));
+    keys_.emplace_back(new Key("parenleft", "("));
+    keys_.emplace_back(new Key("parenright", ")"));
+    keys_.emplace_back(new Key("yen", u8"\u00A5")); // TODO `yen` does not work
+    keys_.emplace_back(new Key("ampersand", "&"));
+    keys_.emplace_back(new Key("at", "@"));
+    keys_.emplace_back(new Key("Return", "Enter")); keys_.back()->setCustomLayout(2.0, true);
+
+    keys_.emplace_back(new MarkSwitchKey("#+=")); keys_.back()->setCustomLayout(1.5);
+    keys_.emplace_back(new Key("quotedbl", "\""));
+    keys_.emplace_back(new Key("apostrophe", "\'"));
+    keys_.emplace_back(new Key("question", "?"));
+    keys_.emplace_back(new Key("exclam", "!"));
+    keys_.emplace_back(new Key("", ""));
+    keys_.emplace_back(new Key("", ""));
+    keys_.emplace_back(new Key("", ""));
+    keys_.emplace_back(new DummyKey());
+    keys_.emplace_back(new Key("Up", u8"\u25B2")); keys_.back()->setCustomLayout(1.0, true); // ▲ 
+
+    keys_.emplace_back(new NormalSwitchKey("abc")); keys_.back()->setCustomLayout(1.5);
+    keys_.emplace_back(new Key("comma", ","));
+    keys_.emplace_back(new Key("space", "")); keys_.back()->setCustomLayout(5.0);
+    keys_.emplace_back(new Key("period", "."));
+    keys_.emplace_back(new Key("Left", u8"\u25C0")); // ◀
+    keys_.emplace_back(new Key("Down", u8"\u25BC")); // ▼
+    keys_.emplace_back(new Key("Right", u8"\u25B6")); // ▶
+}
+
+void Keyboard::setMarkKeys() {
+    keys_.clear();
+    keys_.emplace_back(new Key("bracketleft", "["));
+    keys_.emplace_back(new Key("bracketright", "]"));
+    keys_.emplace_back(new Key("braceleft", "{"));
+    keys_.emplace_back(new Key("braceright", "}"));
+    keys_.emplace_back(new Key("numbersign", "#"));
+    keys_.emplace_back(new Key("percent", "%"));
+    keys_.emplace_back(new Key("asciicircum", "^"));
+    keys_.emplace_back(new Key("asterisk", "*"));
+    keys_.emplace_back(new Key("plus", "+"));
+    keys_.emplace_back(new Key("equal", "="));
+    keys_.emplace_back(new Key("BackSpace", "Back")); keys_.back()->setCustomLayout(1.5, true);
+
+    keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
+    keys_.emplace_back(new Key("underscore", "_")); // TODO `_` looks like `-`. maybe size problem?
+    keys_.emplace_back(new Key("backslash", "\\"));
+    keys_.emplace_back(new Key("bar", "|"));
+    keys_.emplace_back(new Key("asciitilde", "~"));
+    keys_.emplace_back(new Key("less", "<"));
+    keys_.emplace_back(new Key("greater", ">"));
+    keys_.emplace_back(new Key("", ""));
+    keys_.emplace_back(new Key("", ""));
+    keys_.emplace_back(new Key("", ""));
+    keys_.emplace_back(new Key("Return", "Enter")); keys_.back()->setCustomLayout(2.0, true);
+
+    keys_.emplace_back(new NumberSwitchKey("123")); keys_.back()->setCustomLayout(1.5);
+    keys_.emplace_back(new Key("quotedbl", "\""));
+    keys_.emplace_back(new Key("apostrophe", "\'"));
+    keys_.emplace_back(new Key("question", "?"));
+    keys_.emplace_back(new Key("exclam", "!"));
+    keys_.emplace_back(new Key("", ""));
+    keys_.emplace_back(new Key("", ""));
+    keys_.emplace_back(new Key("", ""));
+    keys_.emplace_back(new DummyKey());
+    keys_.emplace_back(new Key("Up", u8"\u25B2")); keys_.back()->setCustomLayout(1.0, true); // ▲ 
+
+    keys_.emplace_back(new NormalSwitchKey("abc")); keys_.back()->setCustomLayout(1.5);
     keys_.emplace_back(new Key("comma", ","));
     keys_.emplace_back(new Key("space", "")); keys_.back()->setCustomLayout(5.0);
     keys_.emplace_back(new Key("period", "."));
