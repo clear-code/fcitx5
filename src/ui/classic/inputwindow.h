@@ -87,8 +87,6 @@ public:
 
     double width_ = 60;
     double height_ = 50;
-    double leftMargin_ = 5;
-    double topMargin_ = 5;
     bool newLine_ = false;
     bool visible_ = true;
 
