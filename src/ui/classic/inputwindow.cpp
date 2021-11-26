@@ -113,7 +113,8 @@ void ForwardKey::click(Keyboard *keyboard, InputContext *inputContext, bool isHa
     FCITX_KEYBOARD() << "ForwardKey pushed: " << label(keyboard->useUpper_);
 
     if (isHankaku) {
-        // Need to set true to`isRelease` in order to process key in forwarding.
+        // Need to set pair of false and true to`isRelease` in order to process key in forwarding.
+        inputContext->forwardKey(convert(keyboard->useUpper_), false);
         inputContext->forwardKey(convert(keyboard->useUpper_), true);
         return;
     }
@@ -123,7 +124,8 @@ void ForwardKey::click(Keyboard *keyboard, InputContext *inputContext, bool isHa
     FCITX_KEYBOARD() << "key event result: " << hasProcessedInIME;
 
     if (!hasProcessedInIME) {
-        // Need to set true to`isRelease` in order to process key in forwarding.
+        // Need to set pair of false and true to`isRelease` in order to process key in forwarding.
+        inputContext->forwardKey(convert(keyboard->useUpper_), false);
         inputContext->forwardKey(convert(keyboard->useUpper_), true);
     }
 }
