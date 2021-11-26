@@ -213,7 +213,11 @@ void Keyboard::setTextKeys(bool isZenkakuMode) {
     keys_.emplace_back(new TextKey("i", "i", "I"));
     keys_.emplace_back(new TextKey("o", "o", "O"));
     keys_.emplace_back(new TextKey("p", "p", "P"));
-    keys_.emplace_back(new ForwardKey("BackSpace", "Back")); keys_.back()->setCustomLayout(1.5, true);
+    keys_.emplace_back(new ForwardKey("BackSpace", "Back")); keys_.back()->setCustomLayout(1.5);
+    keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
+    keys_.emplace_back(new MarkKey("7", "7", "７"));
+    keys_.emplace_back(new MarkKey("8", "8", "８"));
+    keys_.emplace_back(new MarkKey("9", "9", "９")); keys_.back()->setCustomLayout(1.0, true);
 
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new TextKey("a", "a", "A"));
@@ -225,7 +229,11 @@ void Keyboard::setTextKeys(bool isZenkakuMode) {
     keys_.emplace_back(new TextKey("j", "j", "J"));
     keys_.emplace_back(new TextKey("k", "k", "K"));
     keys_.emplace_back(new TextKey("l", "l", "L"));
-    keys_.emplace_back(new ForwardKey("Return", "Enter")); keys_.back()->setCustomLayout(2.0, true);
+    keys_.emplace_back(new ForwardKey("Return", "Enter")); keys_.back()->setCustomLayout(2.0);
+    keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
+    keys_.emplace_back(new MarkKey("4", "4", "４"));
+    keys_.emplace_back(new MarkKey("5", "5", "５"));
+    keys_.emplace_back(new MarkKey("6", "6", "６")); keys_.back()->setCustomLayout(1.0, true);
 
     if (isZenkakuMode) {
         keys_.emplace_back(new EmptyKey()); keys_.back()->setCustomLayout(1.5);
@@ -240,7 +248,11 @@ void Keyboard::setTextKeys(bool isZenkakuMode) {
     keys_.emplace_back(new TextKey("n", "n", "N"));
     keys_.emplace_back(new TextKey("m", "m", "M"));
     keys_.emplace_back(new TextKey("question", isZenkakuMode ? "？" : "?"));
-    keys_.emplace_back(new ForwardKey("Up", u8"\u25B2")); keys_.back()->setCustomLayout(1.0, true); // ▲ 
+    keys_.emplace_back(new ForwardKey("Up", u8"\u25B2")); keys_.back()->setCustomLayout(1.0); // ▲
+    keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(1.5);
+    keys_.emplace_back(new MarkKey("1", "1", "１"));
+    keys_.emplace_back(new MarkKey("2", "2", "２"));
+    keys_.emplace_back(new MarkKey("3", "3", "３")); keys_.back()->setCustomLayout(1.0, true);
 
     keys_.emplace_back(new ModeSwitchKey()); keys_.back()->setCustomLayout(1.5);
     keys_.emplace_back(new TextKey("comma", isZenkakuMode ? "、" : ","));
@@ -250,6 +262,9 @@ void Keyboard::setTextKeys(bool isZenkakuMode) {
     keys_.emplace_back(new ForwardKey("Left", u8"\u25C0")); // ◀
     keys_.emplace_back(new ForwardKey("Down", u8"\u25BC")); // ▼
     keys_.emplace_back(new ForwardKey("Right", u8"\u25B6")); // ▶
+    keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
+    keys_.emplace_back(new MarkKey("0", "0", "０")); keys_.back()->setCustomLayout(2.0);
+    keys_.emplace_back(new MarkKey("period", ".", "。"));
 }
 
 void Keyboard::setMarkKeys() {
