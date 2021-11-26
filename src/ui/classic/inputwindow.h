@@ -83,7 +83,7 @@ public:
     }
 
     fcitx::Key convert(bool useUpper) const;
-    virtual void click(Keyboard *keyboard, InputContext *inputContext) const;
+    virtual void click(Keyboard *keyboard, InputContext *inputContext, bool isHankaku) const;
 
     double width_ = 60;
     double height_ = 50;
@@ -98,7 +98,7 @@ private:
     const std::string keyName_;
 
     /*
-     * Text for display.
+     * Text for display, and commit-string in hankaku mode.
      */
     const std::string label_;
 
@@ -108,6 +108,9 @@ private:
     Rect region_;
 };
 
+/*
+ * For making empty space in keyboard layout.
+ */
 class DummyKey : public Key {
 public:
     DummyKey() : Key("", "") {
@@ -115,36 +118,51 @@ public:
     }
 };
 
+/*
+ * Keys like enter and arrow keys that can not use commit-string and need to forward.
+ */
+class ForwardKey : public Key {
+public:
+    ForwardKey(std::string keyName, std::string label) : Key(keyName, label) {}
+    void click(Keyboard *keyboard, InputContext *inputContext, bool isHankaku) const override;
+};
+
+class ZenkakuHankakuKey : public Key {
+public:
+    ZenkakuHankakuKey() : Key("Zenkaku_Hankaku", "半角/全角") {}
+    void click(Keyboard *keyboard, InputContext *inputContext, bool) const override;
+};
+
 class UpperToggleKey : public Key {
 public:
     UpperToggleKey(std::string labelInLower, std::string labelInUpper)
                    : Key("", labelInLower, "", labelInUpper) {}
-    void click(Keyboard *keyboard, InputContext *inputContext) const override;
+    void click(Keyboard *keyboard, InputContext *inputContext, bool) const override;
 };
 
 class NormalSwitchKey : public Key {
 public:
     NormalSwitchKey(std::string label) : Key("", label) {}
-    void click(Keyboard *keyboard, InputContext *inputContext) const override;
+    void click(Keyboard *keyboard, InputContext *inputContext, bool) const override;
 };
 
 class NumberSwitchKey : public Key {
 public:
     NumberSwitchKey(std::string label) : Key("", label) {}
-    void click(Keyboard *keyboard, InputContext *inputContext) const override;
+    void click(Keyboard *keyboard, InputContext *inputContext, bool) const override;
 };
 
 class MarkSwitchKey : public Key {
 public:
     MarkSwitchKey(std::string label) : Key("", label) {}
-    void click(Keyboard *keyboard, InputContext *inputContext) const override;
+    void click(Keyboard *keyboard, InputContext *inputContext, bool) const override;
 };
 
 class Keyboard {
 public:
     Keyboard();
     void paint(cairo_t *cr, unsigned int offsetX, unsigned int offsetY);
-    void click(InputContext *inputContext, int x, int y);
+    void click(InputContext *inputContext, bool isHankaku, int x, int y);
     void setNormalKeys();
     void setNumberKeys();
     void setMarkKeys();
