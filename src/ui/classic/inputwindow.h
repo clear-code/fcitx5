@@ -157,7 +157,7 @@ private:
 
 class ZenkakuHankakuKey : public Key {
 public:
-    const char* label(Keyboard *) const override;
+    const char* label(Keyboard *keyboard) const override;
     void click(Keyboard *keyboard, InputContext *inputContext) const override;
 };
 
@@ -169,7 +169,7 @@ public:
 
 class ModeSwitchKey : public Key {
 public:
-    const char* label(Keyboard *) const override;
+    const char* label(Keyboard *keyboard) const override;
     void click(Keyboard *keyboard, InputContext *inputContext) const override;
 };
 
