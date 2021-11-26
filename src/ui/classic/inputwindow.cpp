@@ -85,178 +85,168 @@ void MultilineLayout::render(cairo_t *cr, int x, int y, int lineHeight,
     }
 }
 
-Key::Key(std::string keyName, std::string label, std::string upperKeyName,
-         std::string upperLabel)
-         : keyName_(keyName), label_(label), upperKeyName_(upperKeyName),
-           upperLabel_(upperLabel) {};
-
-fcitx::Key Key::convert(bool useUpper) const {
-    return fcitx::Key(keyName(useUpper));
+const char* TextKey::label(Keyboard *keyboard) const {
+    if (!keyboard->useUpperHankakuText_ || upperText_.empty()) {
+        return text_.c_str();
+    }
+    return upperText_.c_str();
 }
 
-void Key::click(Keyboard *keyboard, InputContext *inputContext, bool isHankaku) const {
-    FCITX_KEYBOARD() << "key pushed: " << label(keyboard->useUpper_);
+void TextKey::click(Keyboard *keyboard, InputContext *inputContext) const {
+    FCITX_KEYBOARD() << "TextKey pushed: " << label(keyboard);
 
-    if (isHankaku) {
-        inputContext->commitString(label(keyboard->useUpper_));
+    if (keyboard->mode_ == KeyboardMode::HankakuText) {
+        inputContext->commitString(label(keyboard));
         return;
     }
 
-    auto keyEvent = fcitx::KeyEvent(inputContext, convert(keyboard->useUpper_));
+    auto keyEvent = fcitx::KeyEvent(inputContext, convert());
     // TODO: manage `isRelease`
     auto hasProcessedInIME = inputContext->keyEvent(keyEvent);
     FCITX_KEYBOARD() << "key event result: " << hasProcessedInIME;
 }
 
-void ForwardKey::click(Keyboard *keyboard, InputContext *inputContext, bool isHankaku) const {
-    // TODO: manage `isRelease`
-    FCITX_KEYBOARD() << "ForwardKey pushed: " << label(keyboard->useUpper_);
+const char* MarkKey::label(Keyboard *keyboard) const {
+    if (keyboard->useZenkakuMark_) {
+        return zenkakuMark_.c_str();
+    }
+    return hankakuMark_.c_str();
+}
 
-    if (isHankaku) {
-        // Need to set pair of false and true to`isRelease` in order to process key in forwarding.
-        inputContext->forwardKey(convert(keyboard->useUpper_), false);
-        inputContext->forwardKey(convert(keyboard->useUpper_), true);
+void MarkKey::click(Keyboard *keyboard, InputContext *inputContext) const {
+    FCITX_KEYBOARD() << "MarkKey pushed: " << label(keyboard);
+
+    if (!keyboard->useZenkakuMark_) {
+        inputContext->commitString(label(keyboard));
         return;
     }
 
-    auto keyEvent = fcitx::KeyEvent(inputContext, convert(keyboard->useUpper_));
+    auto keyEvent = fcitx::KeyEvent(inputContext, convert());
+    // TODO: manage `isRelease`
+    auto hasProcessedInIME = inputContext->keyEvent(keyEvent);
+    FCITX_KEYBOARD() << "key event result: " << hasProcessedInIME;
+}
+
+void ForwardKey::click(Keyboard *keyboard, InputContext *inputContext) const {
+    // TODO: manage `isRelease`
+    FCITX_KEYBOARD() << "ForwardKey pushed: " << label(keyboard);
+
+    auto keyEvent = fcitx::KeyEvent(inputContext, convert());
     auto hasProcessedInIME = inputContext->keyEvent(keyEvent);
     FCITX_KEYBOARD() << "key event result: " << hasProcessedInIME;
 
     if (!hasProcessedInIME) {
         // Need to set pair of false and true to`isRelease` in order to process key in forwarding.
-        inputContext->forwardKey(convert(keyboard->useUpper_), false);
-        inputContext->forwardKey(convert(keyboard->useUpper_), true);
+        inputContext->forwardKey(convert(), false);
+        inputContext->forwardKey(convert(), true);
     }
 }
 
-void ZenkakuHankakuKey::click(Keyboard *keyboard, InputContext *inputContext, bool) const {
-    FCITX_KEYBOARD() << "ZenkakuHankakuKey pushed: " << label(keyboard->useUpper_);
-
-    auto keyEvent = fcitx::KeyEvent(inputContext, convert(keyboard->useUpper_));
-    // TODO: manage `isRelease`
-    auto hasProcessedInIME = inputContext->keyEvent(keyEvent);
-    FCITX_KEYBOARD() << "key event result: " << hasProcessedInIME;
+const char* ZenkakuHankakuKey::label(Keyboard *keyboard) const {
+    if (keyboard->useZenkakuMark_) {
+        return "半角    [ 全角 ]";
+    }
+    return "[ 半角 ]    全角";
 }
 
-void UpperToggleKey::click(Keyboard *keyboard, InputContext *inputContext, bool) const {
-    FCITX_KEYBOARD() << "UpperToggleKey pushed: " << label(keyboard->useUpper_);
-    keyboard->useUpper_ = !keyboard->useUpper_;
+void ZenkakuHankakuKey::click(Keyboard *keyboard, InputContext *inputContext) const {
+    FCITX_KEYBOARD() << "ZenkakuHankakuKey pushed: " << label(keyboard);
+    keyboard->useZenkakuMark_ = !keyboard->useZenkakuMark_;
     inputContext->updateUserInterface(UserInterfaceComponent::InputPanel);
 }
 
-void NormalSwitchKey::click(Keyboard *keyboard, InputContext *inputContext, bool) const {
-    FCITX_KEYBOARD() << "NormalSwitchKey pushed: " << label(keyboard->useUpper_);
-    keyboard->useUpper_ = false;
-    keyboard->setNormalKeys();
+const char* UpperToggleKey::label(Keyboard *keyboard) const {
+    if (keyboard->useUpperHankakuText_) {
+        return "abc    [ ABC ]";
+    }
+    return "[ abc ]    ABC";
+}
+
+void UpperToggleKey::click(Keyboard *keyboard, InputContext *inputContext) const {
+    FCITX_KEYBOARD() << "UpperToggleKey pushed: " << label(keyboard);
+    keyboard->useUpperHankakuText_ = !keyboard->useUpperHankakuText_;
     inputContext->updateUserInterface(UserInterfaceComponent::InputPanel);
 }
 
-void NumberSwitchKey::click(Keyboard *keyboard, InputContext *inputContext, bool) const {
-    FCITX_KEYBOARD() << "NumberSwitchKey pushed: " << label(keyboard->useUpper_);
-    keyboard->setNumberKeys();
-    inputContext->updateUserInterface(UserInterfaceComponent::InputPanel);
+const char* ModeSwitchKey::label(Keyboard *keyboard) const {
+    if (keyboard->mode_ == KeyboardMode::ZenkakuText) {
+        return "[あ]  A  1";
+    } else if (keyboard->mode_ == KeyboardMode::HankakuText) {
+        return "あ  [A]  1";
+    } else {
+        return "あ  A  [1]";
+    }
 }
 
-void MarkSwitchKey::click(Keyboard *keyboard, InputContext *inputContext, bool) const {
-    FCITX_KEYBOARD() << "MarkSwitchKey pushed: " << label(keyboard->useUpper_);
-    keyboard->setMarkKeys();
+void ModeSwitchKey::click(Keyboard *keyboard, InputContext *inputContext) const {
+    FCITX_KEYBOARD() << "ModeSwitchKey pushed";
+
+    if (keyboard->mode_ == KeyboardMode::ZenkakuText) {
+        keyboard->mode_ = KeyboardMode::HankakuText;
+        keyboard->setTextKeys(false);
+    } else if (keyboard->mode_ == KeyboardMode::HankakuText) {
+        keyboard->mode_ = KeyboardMode::Mark;
+        keyboard->useUpperHankakuText_ = false;
+        keyboard->setMarkKeys();
+    } else {
+        keyboard->mode_ = KeyboardMode::ZenkakuText;
+        keyboard->useZenkakuMark_ = false;
+        keyboard->setTextKeys(true);
+    }
+
     inputContext->updateUserInterface(UserInterfaceComponent::InputPanel);
 }
 
 Keyboard::Keyboard() {
-    setNormalKeys();
+    setTextKeys(true);
 }
 
-void Keyboard::setNormalKeys() {
+void Keyboard::setTextKeys(bool isZenkakuMode) {
     keys_.clear();
-    keys_.emplace_back(new Key("q", "q", "Q", "Q"));
-    keys_.emplace_back(new Key("w", "w", "W", "W"));
-    keys_.emplace_back(new Key("e", "e", "E", "E"));
-    keys_.emplace_back(new Key("r", "r", "R", "R"));
-    keys_.emplace_back(new Key("t", "t", "T", "T"));
-    keys_.emplace_back(new Key("y", "y", "Y", "Y"));
-    keys_.emplace_back(new Key("u", "u", "U", "U"));
-    keys_.emplace_back(new Key("i", "i", "I", "I"));
-    keys_.emplace_back(new Key("o", "o", "O", "O"));
-    keys_.emplace_back(new Key("p", "p", "P", "P"));
+    keys_.emplace_back(new TextKey("q", "q", "Q"));
+    keys_.emplace_back(new TextKey("w", "w", "W"));
+    keys_.emplace_back(new TextKey("e", "e", "E"));
+    keys_.emplace_back(new TextKey("r", "r", "R"));
+    keys_.emplace_back(new TextKey("t", "t", "T"));
+    keys_.emplace_back(new TextKey("y", "y", "Y"));
+    keys_.emplace_back(new TextKey("u", "u", "U"));
+    keys_.emplace_back(new TextKey("i", "i", "I"));
+    keys_.emplace_back(new TextKey("o", "o", "O"));
+    keys_.emplace_back(new TextKey("p", "p", "P"));
     keys_.emplace_back(new ForwardKey("BackSpace", "Back")); keys_.back()->setCustomLayout(1.5, true);
 
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new Key("a", "a", "A", "A"));
-    keys_.emplace_back(new Key("s", "s", "S", "S"));
-    keys_.emplace_back(new Key("d", "d", "D", "D"));
-    keys_.emplace_back(new Key("f", "f", "F", "F"));
-    keys_.emplace_back(new Key("g", "g", "G", "G"));
-    keys_.emplace_back(new Key("h", "h", "H", "H"));
-    keys_.emplace_back(new Key("j", "j", "J", "J"));
-    keys_.emplace_back(new Key("k", "k", "K", "K"));
-    keys_.emplace_back(new Key("l", "l", "L", "L"));
+    keys_.emplace_back(new TextKey("a", "a", "A"));
+    keys_.emplace_back(new TextKey("s", "s", "S"));
+    keys_.emplace_back(new TextKey("d", "d", "D"));
+    keys_.emplace_back(new TextKey("f", "f", "F"));
+    keys_.emplace_back(new TextKey("g", "g", "G"));
+    keys_.emplace_back(new TextKey("h", "h", "H"));
+    keys_.emplace_back(new TextKey("j", "j", "J"));
+    keys_.emplace_back(new TextKey("k", "k", "K"));
+    keys_.emplace_back(new TextKey("l", "l", "L"));
     keys_.emplace_back(new ForwardKey("Return", "Enter")); keys_.back()->setCustomLayout(2.0, true);
 
-    keys_.emplace_back(new UpperToggleKey("ABC", "abc")); keys_.back()->setCustomLayout(1.5);
-    keys_.emplace_back(new Key("z", "z", "Z", "Z"));
-    keys_.emplace_back(new Key("x", "x", "X", "X"));
-    keys_.emplace_back(new Key("c", "c", "C", "C"));
-    keys_.emplace_back(new Key("v", "v", "V", "V"));
-    keys_.emplace_back(new Key("b", "b", "B", "B"));
-    keys_.emplace_back(new Key("n", "n", "N", "N"));
-    keys_.emplace_back(new Key("m", "m", "M", "M"));
-    keys_.emplace_back(new DummyKey());
+    if (isZenkakuMode) {
+        keys_.emplace_back(new EmptyKey()); keys_.back()->setCustomLayout(1.5);
+    } else {
+        keys_.emplace_back(new UpperToggleKey()); keys_.back()->setCustomLayout(1.5);
+    }
+    keys_.emplace_back(new TextKey("z", "z", "Z"));
+    keys_.emplace_back(new TextKey("x", "x", "X"));
+    keys_.emplace_back(new TextKey("c", "c", "C"));
+    keys_.emplace_back(new TextKey("v", "v", "V"));
+    keys_.emplace_back(new TextKey("b", "b", "B"));
+    keys_.emplace_back(new TextKey("n", "n", "N"));
+    keys_.emplace_back(new TextKey("m", "m", "M"));
+    keys_.emplace_back(new TextKey("question", isZenkakuMode ? "？" : "?"));
     keys_.emplace_back(new ForwardKey("Up", u8"\u25B2")); keys_.back()->setCustomLayout(1.0, true); // ▲ 
 
-    keys_.emplace_back(new NumberSwitchKey("123")); keys_.back()->setCustomLayout(1.5);
-    keys_.emplace_back(new ZenkakuHankakuKey()); keys_.back()->setCustomLayout(1.5);
-    keys_.emplace_back(new Key("comma", ","));
-    keys_.emplace_back(new Key("space", " ")); keys_.back()->setCustomLayout(3.5);
-    keys_.emplace_back(new Key("period", "."));
-    keys_.emplace_back(new ForwardKey("Left", u8"\u25C0")); // ◀
-    keys_.emplace_back(new ForwardKey("Down", u8"\u25BC")); // ▼
-    keys_.emplace_back(new ForwardKey("Right", u8"\u25B6")); // ▶
-}
-
-void Keyboard::setNumberKeys() {
-    keys_.clear();
-    keys_.emplace_back(new Key("0", "0"));
-    keys_.emplace_back(new Key("1", "1"));
-    keys_.emplace_back(new Key("2", "2"));
-    keys_.emplace_back(new Key("3", "3"));
-    keys_.emplace_back(new Key("4", "4"));
-    keys_.emplace_back(new Key("5", "5"));
-    keys_.emplace_back(new Key("6", "6"));
-    keys_.emplace_back(new Key("7", "7"));
-    keys_.emplace_back(new Key("8", "8"));
-    keys_.emplace_back(new Key("9", "9"));
-    keys_.emplace_back(new ForwardKey("BackSpace", "Back")); keys_.back()->setCustomLayout(1.5, true);
-
-    keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new Key("minus", "-"));
-    keys_.emplace_back(new Key("slash", "/")); // TODO this becomes `・` in zenkaku
-    keys_.emplace_back(new Key("colon", ":"));
-    keys_.emplace_back(new Key("semicolon", ";"));
-    keys_.emplace_back(new Key("parenleft", "("));
-    keys_.emplace_back(new Key("parenright", ")"));
-    keys_.emplace_back(new Key("yen", u8"\u00A5")); // TODO `yen` does not work
-    keys_.emplace_back(new Key("ampersand", "&"));
-    keys_.emplace_back(new Key("at", "@"));
-    keys_.emplace_back(new ForwardKey("Return", "Enter")); keys_.back()->setCustomLayout(2.0, true);
-
-    keys_.emplace_back(new MarkSwitchKey("#+=")); keys_.back()->setCustomLayout(1.5);
-    keys_.emplace_back(new Key("quotedbl", "\""));
-    keys_.emplace_back(new Key("apostrophe", "\'"));
-    keys_.emplace_back(new Key("question", "?"));
-    keys_.emplace_back(new Key("exclam", "!"));
-    keys_.emplace_back(new Key("", ""));
-    keys_.emplace_back(new Key("", ""));
-    keys_.emplace_back(new Key("", ""));
-    keys_.emplace_back(new DummyKey());
-    keys_.emplace_back(new ForwardKey("Up", u8"\u25B2")); keys_.back()->setCustomLayout(1.0, true); // ▲ 
-
-    keys_.emplace_back(new NormalSwitchKey("abc")); keys_.back()->setCustomLayout(1.5);
-    keys_.emplace_back(new ZenkakuHankakuKey()); keys_.back()->setCustomLayout(1.5);
-    keys_.emplace_back(new Key("comma", ","));
-    keys_.emplace_back(new Key("space", " ")); keys_.back()->setCustomLayout(3.5);
-    keys_.emplace_back(new Key("period", "."));
+    keys_.emplace_back(new ModeSwitchKey()); keys_.back()->setCustomLayout(1.5);
+    keys_.emplace_back(new TextKey("comma", isZenkakuMode ? "、" : ","));
+    keys_.emplace_back(new TextKey("space", isZenkakuMode ? "" : " ")); keys_.back()->setCustomLayout(4.0);
+    keys_.emplace_back(new TextKey("period", isZenkakuMode ? "。" : "."));
+    keys_.emplace_back(new TextKey("exclam", isZenkakuMode ? "！" : "!"));
     keys_.emplace_back(new ForwardKey("Left", u8"\u25C0")); // ◀
     keys_.emplace_back(new ForwardKey("Down", u8"\u25BC")); // ▼
     keys_.emplace_back(new ForwardKey("Right", u8"\u25B6")); // ▶
@@ -264,49 +254,64 @@ void Keyboard::setNumberKeys() {
 
 void Keyboard::setMarkKeys() {
     keys_.clear();
-    keys_.emplace_back(new Key("bracketleft", "["));
-    keys_.emplace_back(new Key("bracketright", "]"));
-    keys_.emplace_back(new Key("braceleft", "{"));
-    keys_.emplace_back(new Key("braceright", "}"));
-    keys_.emplace_back(new Key("numbersign", "#"));
-    keys_.emplace_back(new Key("percent", "%"));
-    keys_.emplace_back(new Key("asciicircum", "^"));
-    keys_.emplace_back(new Key("asterisk", "*"));
-    keys_.emplace_back(new Key("plus", "+"));
-    keys_.emplace_back(new Key("equal", "="));
-    keys_.emplace_back(new ForwardKey("BackSpace", "Back")); keys_.back()->setCustomLayout(1.5, true);
-
+    keys_.emplace_back(new MarkKey("bracketleft", "[", "「"));
+    keys_.emplace_back(new MarkKey("bracketright", "]", "」"));
+    keys_.emplace_back(new MarkKey("braceleft", "{", "｛"));
+    keys_.emplace_back(new MarkKey("braceright", "}", "｝"));
+    keys_.emplace_back(new MarkKey("numbersign", "#", "＃"));
+    keys_.emplace_back(new MarkKey("percent", "%", "％"));
+    keys_.emplace_back(new MarkKey("asciicircum", "^", "＾"));
+    keys_.emplace_back(new MarkKey("asterisk", "*", "＊"));
+    keys_.emplace_back(new MarkKey("plus", "+", "＋"));
+    keys_.emplace_back(new MarkKey("equal", "=", "＝"));
+    keys_.emplace_back(new ForwardKey("BackSpace", "Back")); keys_.back()->setCustomLayout(1.5);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new Key("underscore", "_")); // TODO `_` looks like `-`. maybe size problem?
-    keys_.emplace_back(new Key("backslash", "\\"));
-    keys_.emplace_back(new Key("bar", "|"));
-    keys_.emplace_back(new Key("asciitilde", "~"));
-    keys_.emplace_back(new Key("less", "<"));
-    keys_.emplace_back(new Key("greater", ">"));
-    keys_.emplace_back(new Key("", ""));
-    keys_.emplace_back(new Key("", ""));
-    keys_.emplace_back(new Key("", ""));
-    keys_.emplace_back(new ForwardKey("Return", "Enter")); keys_.back()->setCustomLayout(2.0, true);
+    keys_.emplace_back(new MarkKey("7", "7", "７"));
+    keys_.emplace_back(new MarkKey("8", "8", "８"));
+    keys_.emplace_back(new MarkKey("9", "9", "９")); keys_.back()->setCustomLayout(1.0, true);
 
-    keys_.emplace_back(new NumberSwitchKey("123")); keys_.back()->setCustomLayout(1.5);
-    keys_.emplace_back(new Key("quotedbl", "\""));
-    keys_.emplace_back(new Key("apostrophe", "\'"));
-    keys_.emplace_back(new Key("question", "?"));
-    keys_.emplace_back(new Key("exclam", "!"));
-    keys_.emplace_back(new Key("", ""));
-    keys_.emplace_back(new Key("", ""));
-    keys_.emplace_back(new Key("", ""));
-    keys_.emplace_back(new DummyKey());
-    keys_.emplace_back(new ForwardKey("Up", u8"\u25B2")); keys_.back()->setCustomLayout(1.0, true); // ▲ 
+    keys_.emplace_back(new MarkKey("minus", "-", "ー"));
+    keys_.emplace_back(new MarkKey("slash", "/", "・"));
+    keys_.emplace_back(new MarkKey("backslash", "\\", "＼"));
+    keys_.emplace_back(new MarkKey("colon", ":", "："));
+    keys_.emplace_back(new MarkKey("semicolon", ";", "；"));
+    keys_.emplace_back(new MarkKey("parenleft", "(", "（"));
+    keys_.emplace_back(new MarkKey("parenright", ")", "）"));
+    keys_.emplace_back(new MarkKey("ampersand", "&", "＆"));
+    keys_.emplace_back(new MarkKey("at", "@", "＠"));
+    keys_.emplace_back(new MarkKey("yen", u8"\u00A5", "")); // `yen` does not work in Zenkaku
+    keys_.emplace_back(new ForwardKey("Return", "Enter")); keys_.back()->setCustomLayout(1.5);
+    keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
+    keys_.emplace_back(new MarkKey("4", "4", "４"));
+    keys_.emplace_back(new MarkKey("5", "5", "５"));
+    keys_.emplace_back(new MarkKey("6", "6", "６")); keys_.back()->setCustomLayout(1.0, true);
 
-    keys_.emplace_back(new NormalSwitchKey("abc")); keys_.back()->setCustomLayout(1.5);
     keys_.emplace_back(new ZenkakuHankakuKey()); keys_.back()->setCustomLayout(1.5);
-    keys_.emplace_back(new Key("comma", ","));
-    keys_.emplace_back(new Key("space", " ")); keys_.back()->setCustomLayout(3.5);
-    keys_.emplace_back(new Key("period", "."));
+    keys_.emplace_back(new MarkKey("quotedbl", "\"", "”"));
+    keys_.emplace_back(new MarkKey("apostrophe", "\'", "’"));
+    keys_.emplace_back(new MarkKey("underscore", "_", "＿"));
+    keys_.emplace_back(new MarkKey("bar", "|", "｜"));
+    keys_.emplace_back(new MarkKey("asciitilde", "~", "〜"));
+    keys_.emplace_back(new MarkKey("less", "<", "＜"));
+    keys_.emplace_back(new MarkKey("greater", ">", "＞"));
+    keys_.emplace_back(new MarkKey("question", "?", "？"));
+    keys_.emplace_back(new ForwardKey("Up", u8"\u25B2")); keys_.back()->setCustomLayout(1.0); // ▲
+    keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(1.5);
+    keys_.emplace_back(new MarkKey("1", "1", "１"));
+    keys_.emplace_back(new MarkKey("2", "2", "２"));
+    keys_.emplace_back(new MarkKey("3", "3", "３")); keys_.back()->setCustomLayout(1.0, true);
+
+    keys_.emplace_back(new ModeSwitchKey()); keys_.back()->setCustomLayout(1.5);
+    keys_.emplace_back(new MarkKey("comma", ",", "、"));
+    keys_.emplace_back(new MarkKey("space", " ", "")); keys_.back()->setCustomLayout(4.0);
+    keys_.emplace_back(new MarkKey("period", ".", "。"));
+    keys_.emplace_back(new MarkKey("exclam", "!", "！"));
     keys_.emplace_back(new ForwardKey("Left", u8"\u25C0")); // ◀
     keys_.emplace_back(new ForwardKey("Down", u8"\u25BC")); // ▼
     keys_.emplace_back(new ForwardKey("Right", u8"\u25B6")); // ▶
+    keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
+    keys_.emplace_back(new MarkKey("0", "0", "０")); keys_.back()->setCustomLayout(2.0);
+    keys_.emplace_back(new MarkKey("period", ".", "。"));
 }
 
 void Keyboard::paint(cairo_t *cr, unsigned int offsetX, unsigned int offsetY) {
@@ -365,18 +370,18 @@ void Keyboard::paintOneKey(cairo_t *cr, Key *key) {
     cairo_stroke(cr);
 
     cairo_text_extents_t extents;
-    cairo_text_extents(cr, key->label(useUpper_), &extents);
+    cairo_text_extents(cr, key->label(this), &extents);
     cairo_translate(cr, (key->width_ - extents.width) / 2, (key->height_ - extents.y_bearing) / 2);
-    cairo_show_text(cr, key->label(useUpper_));
+    cairo_show_text(cr, key->label(this));
 
     cairo_restore(cr);
 }
 
-void Keyboard::click(InputContext *inputContext, bool isHankaku, int x, int y) {
+void Keyboard::click(InputContext *inputContext, int x, int y) {
     for (const auto &key : keys_)
     {
         if (!(key->visible_ && key->contains(x, y))) continue;
-        key->click(this, inputContext, isHankaku);
+        key->click(this, inputContext);
         return; // Must return here because click may change `keys_` and cause iteration problem.
     }
 }
@@ -945,12 +950,8 @@ void InputWindow::click(int x, int y) {
         return;
     }
 
-    if (hasVirtualKeyboard_) {
-        auto imName = parent_->instance()->inputMethod(inputContext);
-        FCITX_KEYBOARD() << "imName: " << imName;
-        auto isHankaku = imName == "keyboard-us";
-        keyboard_.click(inputContext, isHankaku, x, y);
-    }
+    if (hasVirtualKeyboard_)
+        keyboard_.click(inputContext, x, y);
 
     const auto candidateList = inputContext->inputPanel().candidateList();
     if (!candidateList) {
