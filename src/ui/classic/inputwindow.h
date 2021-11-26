@@ -53,22 +53,8 @@ public:
 class Keyboard;
 class Key {
 public:
-    Key(std::string keyName, std::string label, std::string upperKeyName = "",
-        std::string upperLabel = "");
-
-    const char* keyName(bool useUpper) const {
-        if (!useUpper || upperKeyName_.empty()) {
-            return keyName_.c_str();
-        }
-        return upperKeyName_.c_str();
-    }
-
-    const char* label(bool useUpper) const {
-        if (!useUpper || upperLabel_.empty()) {
-            return label_.c_str();
-        }
-        return upperLabel_.c_str();
-    }
+    virtual const char* label(Keyboard *keyboard) const = 0;
+    virtual void click(Keyboard *keyboard, InputContext *inputContext) const = 0;
 
     void setRegion(int x, int y) {
         region_
@@ -82,29 +68,12 @@ public:
         width_ *= scale;
     }
 
-    fcitx::Key convert(bool useUpper) const;
-    virtual void click(Keyboard *keyboard, InputContext *inputContext, bool isHankaku) const;
-
     double width_ = 60;
     double height_ = 50;
     bool newLine_ = false;
     bool visible_ = true;
 
 private:
-    /*
-     * Be used in converting to Fcitx::Key.
-     * Corresponding to keyNameList in keynametable.h.
-     */
-    const std::string keyName_;
-
-    /*
-     * Text for display, and commit-string in hankaku mode.
-     */
-    const std::string label_;
-
-    const std::string upperKeyName_;
-    const std::string upperLabel_;
-
     Rect region_;
 };
 
@@ -113,65 +82,118 @@ private:
  */
 class DummyKey : public Key {
 public:
-    DummyKey() : Key("", "") {
+    DummyKey() {
         visible_ = false;
     }
+    const char* label(Keyboard *) const override { return ""; }
+    void click(Keyboard *, InputContext *) const override {}
+};
+
+/*
+ * Key that is visible, but do not work.
+ */
+class EmptyKey : public Key {
+public:
+    const char* label(Keyboard *) const override { return ""; }
+    void click(Keyboard *, InputContext *) const override {}
+};
+
+/*
+ * Base class that provides function to convert to fcitx::key by keyname in keynametable.h.
+ * Keyname corresponds to keysym, but not to keycode.
+ */
+class KeyByName : public Key {
+protected:
+    KeyByName(std::string keyName) : keyName_(keyName) {}
+    const char* keyName() const { return keyName_.c_str(); };
+    fcitx::Key convert() const { return fcitx::Key(keyName()); }
+
+    /*
+     * Be used in converting to Fcitx::Key.
+     * Corresponding to keyNameList in keynametable.h.
+     */
+    const std::string keyName_;
+};
+
+class TextKey : public KeyByName {
+public:
+    TextKey(std::string keyName, std::string text, std::string upperText = "")
+            : KeyByName(keyName), text_(text), upperText_(upperText) {};
+    const char* label(Keyboard *keyboard) const override;
+    void click(Keyboard *keyboard, InputContext *inputContext) const override;
+
+private:
+    /*
+     * Text for display, and commit-string.
+     */
+    const std::string text_;
+    const std::string upperText_;
+};
+
+class MarkKey : public KeyByName {
+public:
+    MarkKey(std::string keyName, std::string hankakuMark, std::string zenkakuMark)
+            : KeyByName(keyName), hankakuMark_(hankakuMark), zenkakuMark_(zenkakuMark) {};
+    const char* label(Keyboard *keyboard) const override;
+    void click(Keyboard *keyboard, InputContext *inputContext) const override;
+
+private:
+    const std::string hankakuMark_;
+    const std::string zenkakuMark_;
 };
 
 /*
  * Keys like enter and arrow keys that can not use commit-string and need to forward.
  */
-class ForwardKey : public Key {
+class ForwardKey : public KeyByName {
 public:
-    ForwardKey(std::string keyName, std::string label) : Key(keyName, label) {}
-    void click(Keyboard *keyboard, InputContext *inputContext, bool isHankaku) const override;
+    ForwardKey(std::string keyName, std::string label) : KeyByName(keyName), label_(label) {}
+    const char* label(Keyboard *) const override { return label_.c_str(); }
+    void click(Keyboard *keyboard, InputContext *inputContext) const override;
+
+private:
+    const std::string label_;
 };
 
 class ZenkakuHankakuKey : public Key {
 public:
-    ZenkakuHankakuKey() : Key("Zenkaku_Hankaku", "半角/全角") {}
-    void click(Keyboard *keyboard, InputContext *inputContext, bool) const override;
+    const char* label(Keyboard *) const override;
+    void click(Keyboard *keyboard, InputContext *inputContext) const override;
 };
 
 class UpperToggleKey : public Key {
 public:
-    UpperToggleKey(std::string labelInLower, std::string labelInUpper)
-                   : Key("", labelInLower, "", labelInUpper) {}
-    void click(Keyboard *keyboard, InputContext *inputContext, bool) const override;
+    const char* label(Keyboard *keyboard) const override;
+    void click(Keyboard *keyboard, InputContext *inputContext) const override;
 };
 
-class NormalSwitchKey : public Key {
+class ModeSwitchKey : public Key {
 public:
-    NormalSwitchKey(std::string label) : Key("", label) {}
-    void click(Keyboard *keyboard, InputContext *inputContext, bool) const override;
+    const char* label(Keyboard *) const override;
+    void click(Keyboard *keyboard, InputContext *inputContext) const override;
 };
 
-class NumberSwitchKey : public Key {
-public:
-    NumberSwitchKey(std::string label) : Key("", label) {}
-    void click(Keyboard *keyboard, InputContext *inputContext, bool) const override;
-};
-
-class MarkSwitchKey : public Key {
-public:
-    MarkSwitchKey(std::string label) : Key("", label) {}
-    void click(Keyboard *keyboard, InputContext *inputContext, bool) const override;
+enum class KeyboardMode {
+    ZenkakuText,
+    HankakuText,
+    Mark,
 };
 
 class Keyboard {
 public:
     Keyboard();
     void paint(cairo_t *cr, unsigned int offsetX, unsigned int offsetY);
-    void click(InputContext *inputContext, bool isHankaku, int x, int y);
-    void setNormalKeys();
-    void setNumberKeys();
+    void click(InputContext *inputContext, int x, int y);
+    void setTextKeys(bool isZenkakuMode);
     void setMarkKeys();
     std::pair<unsigned int, unsigned int> size();
     unsigned int marginX() { return 15; }
     unsigned int marginY() { return 5; }
 
     std::vector<std::unique_ptr<Key>> keys_;
-    bool useUpper_ = false;
+    KeyboardMode mode_ = KeyboardMode::ZenkakuText;
+    bool useUpperHankakuText_ = false;
+    bool useZenkakuMark_ = false;
 
 private:
     void paintOneKey(cairo_t *cr, Key *key);
