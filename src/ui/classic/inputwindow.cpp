@@ -136,7 +136,8 @@ void ForwardKey::click(Keyboard *keyboard, InputContext *inputContext) const {
     FCITX_KEYBOARD() << "key event result: " << hasProcessedInIME;
 
     if (!hasProcessedInIME) {
-        // Need to set true to`isRelease` in order to process key in forwarding.
+        // Need to set pair of false and true to`isRelease` in order to process key in forwarding.
+        inputContext->forwardKey(convert(), false);
         inputContext->forwardKey(convert(), true);
     }
 }
