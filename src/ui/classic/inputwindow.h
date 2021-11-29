@@ -80,6 +80,7 @@ protected:
     int highlight() const;
     void clickVirtualKeyboard(InputContext *inputContext, int x, int y, bool isRelease);
     void onKeyRepeat();
+    bool hasVirtualKeyboard() { return !!keyboard_; }
 
     ClassicUI *parent_;
     GObjectUniquePtr<PangoFontMap> fontMap_;
@@ -90,7 +91,7 @@ protected:
     std::vector<MultilineLayout> labelLayouts_;
     std::vector<MultilineLayout> candidateLayouts_;
     std::vector<Rect> candidateRegions_;
-    Keyboard keyboard_;
+    std::unique_ptr<Keyboard> keyboard_;
     TrackableObjectReference<InputContext> inputContext_;
     bool visible_ = false;
     int cursor_ = 0;
@@ -105,7 +106,6 @@ protected:
     CandidateLayoutHint layoutHint_ = CandidateLayoutHint::NotSet;
     size_t candidatesHeight_ = 0;
     int hoverIndex_ = -1;
-    bool hasVirtualKeyboard_ = true;
     std::unique_ptr<EventSourceTime> repeatKeyTimer_;
     int32_t repeatRate_ = 40, repeatDelay_ = 400;
 };
