@@ -308,7 +308,7 @@ std::pair<unsigned int, unsigned int> Keyboard::size() {
 }
 
 void Keyboard::paintOneKey(cairo_t *cr, Key *key) {
-    auto highlight = isAnyKeyPushing_ && pushingKey_ == key;
+    auto highlight = (pushingKey_ == key);
 
     cairo_save(cr);
 
@@ -334,15 +334,13 @@ void Keyboard::paintOneKey(cairo_t *cr, Key *key) {
 bool Keyboard::click(InputContext *inputContext, int x, int y, bool isRelease) {
     auto [clickedKey, hasFound] = findClickedKey(x, y);
     if (!hasFound) {
-        isAnyKeyPushing_ = false;
         pushingKey_ = nullptr;
         return false;
     }
 
     clickedKey->click(this, inputContext, isRelease);
 
-    isAnyKeyPushing_ = !isRelease;
-    pushingKey_ = !isRelease ? clickedKey : nullptr;
+    pushingKey_ = isRelease ? nullptr : clickedKey;
 
     return true;
 }

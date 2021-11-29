@@ -158,8 +158,7 @@ public:
     unsigned int marginY() { return 5; }
 
     std::vector<std::unique_ptr<Key>> keys_;
-    Key *pushingKey_;
-    bool isAnyKeyPushing_ = false;
+    Key *pushingKey_ = nullptr;
 
     KeyboardMode mode_ = KeyboardMode::ZenkakuText;
     bool useUpperHankakuText_ = false;

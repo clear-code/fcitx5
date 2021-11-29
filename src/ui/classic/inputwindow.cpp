@@ -106,7 +106,7 @@ InputWindow::InputWindow(ClassicUI *parent) : parent_(parent) {
 }
 
 void InputWindow::onKeyRepeat() {
-    if (!keyboard_->isAnyKeyPushing_) {
+    if (!keyboard_->pushingKey_) {
         return;
     }
 
