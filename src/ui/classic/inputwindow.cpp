@@ -93,31 +93,7 @@ InputWindow::InputWindow(ClassicUI *parent) : parent_(parent) {
     upperLayout_ = newPangoLayout(context_.get());
     lowerLayout_ = newPangoLayout(context_.get());
 
-    keyboard_.reset(new Keyboard());
-    if (hasVirtualKeyboard()) {
-        repeatKeyTimer_ = parent->instance()->eventLoop().addTimeEvent(
-            CLOCK_MONOTONIC, now(CLOCK_MONOTONIC), 0,
-            [this](EventSourceTime *, uint64_t) {
-                onKeyRepeat();
-                return true;
-            });
-        repeatKeyTimer_->setEnabled(false);
-    }
-}
-
-void InputWindow::onKeyRepeat() {
-    if (!keyboard_->pushingKey_) {
-        return;
-    }
-
-    auto *inputContext = inputContext_.get();
-    if (!inputContext) {
-        return;
-    }
-
-    repeatKeyTimer_->setNextInterval(1000000 / repeatRate_);
-    repeatKeyTimer_->setOneShot();
-    keyboard_->pushingKey_->click(keyboard_.get(), inputContext, false);
+    keyboard_.reset(new Keyboard(parent->instance()));
 }
 
 void InputWindow::insertAttr(PangoAttrList *attrList, TextFormatFlags format,
@@ -674,7 +650,7 @@ void InputWindow::click(int x, int y, bool isRelease) {
     }
 
     if (hasVirtualKeyboard())
-        clickVirtualKeyboard(inputContext, x, y, isRelease);
+        keyboard_->click(inputContext, x, y, isRelease);
 
     const auto candidateList = inputContext->inputPanel().candidateList();
     if (!candidateList) {
@@ -759,19 +735,6 @@ bool InputWindow::hover(int x, int y) {
     prevHovered_ = prevHovered;
     nextHovered_ = nextHovered;
     return needRepaint;
-}
-
-void InputWindow::clickVirtualKeyboard(InputContext *inputContext, int x, int y, bool isRelease) {
-    if (isRelease) {
-        repeatKeyTimer_->setEnabled(false);
-    }
-
-    auto hasClicked = keyboard_->click(inputContext, x, y, isRelease);
-
-    if (hasClicked && !isRelease) {
-        repeatKeyTimer_->setNextInterval(repeatDelay_ * 1000);
-        repeatKeyTimer_->setOneShot();
-    }
 }
 
 } // namespace fcitx::classicui
