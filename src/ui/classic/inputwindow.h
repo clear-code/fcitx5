@@ -107,7 +107,6 @@ protected:
     int hoverIndex_ = -1;
     bool hasVirtualKeyboard_ = true;
     std::unique_ptr<EventSourceTime> repeatKeyTimer_;
-    Key *repeatKey_;
     int32_t repeatRate_ = 40, repeatDelay_ = 400;
 };
 } // namespace classicui

@@ -73,13 +73,12 @@ const char* ZenkakuHankakuKey::label(Keyboard *keyboard) const {
     return "[ 半角 ]    全角";
 }
 
-void ZenkakuHankakuKey::click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) const {
+void ZenkakuHankakuKey::click(Keyboard *keyboard, InputContext *, bool isRelease) const {
     FCITX_KEYBOARD() << "ZenkakuHankakuKey pushed: " << label(keyboard);
     if (isRelease) {
         return;
     }
     keyboard->useZenkakuMark_ = !keyboard->useZenkakuMark_;
-    inputContext->updateUserInterface(UserInterfaceComponent::InputPanel);
 }
 
 const char* UpperToggleKey::label(Keyboard *keyboard) const {
@@ -89,13 +88,12 @@ const char* UpperToggleKey::label(Keyboard *keyboard) const {
     return "[ abc ]    ABC";
 }
 
-void UpperToggleKey::click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) const {
+void UpperToggleKey::click(Keyboard *keyboard, InputContext *, bool isRelease) const {
     FCITX_KEYBOARD() << "UpperToggleKey pushed: " << label(keyboard);
     if (isRelease) {
         return;
     }
     keyboard->useUpperHankakuText_ = !keyboard->useUpperHankakuText_;
-    inputContext->updateUserInterface(UserInterfaceComponent::InputPanel);
 }
 
 const char* ModeSwitchKey::label(Keyboard *keyboard) const {
@@ -108,7 +106,7 @@ const char* ModeSwitchKey::label(Keyboard *keyboard) const {
     }
 }
 
-void ModeSwitchKey::click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) const {
+void ModeSwitchKey::click(Keyboard *keyboard, InputContext *, bool isRelease) const {
     FCITX_KEYBOARD() << "ModeSwitchKey pushed";
 
     if (isRelease) {
@@ -127,8 +125,6 @@ void ModeSwitchKey::click(Keyboard *keyboard, InputContext *inputContext, bool i
         keyboard->useZenkakuMark_ = false;
         keyboard->setTextKeys(true);
     }
-
-    inputContext->updateUserInterface(UserInterfaceComponent::InputPanel);
 }
 
 Keyboard::Keyboard() {
@@ -312,8 +308,16 @@ std::pair<unsigned int, unsigned int> Keyboard::size() {
 }
 
 void Keyboard::paintOneKey(cairo_t *cr, Key *key) {
+    auto highlight = isAnyKeyPushing_ && pushingKey_ == key;
+
     cairo_save(cr);
 
+    if (highlight) {
+        cairo_set_source_rgb(cr, 0.7, 0.7, 0.7);
+        cairo_rectangle(cr, 0, 0, key->width_, key->height_);
+        cairo_fill(cr);
+        cairo_set_source_rgb(cr, 0, 0, 0);
+    }
     cairo_rectangle(cr, 0, 0, key->width_, key->height_);
     cairo_set_line_width(cr, 2);
     cairo_stroke(cr);
@@ -326,15 +330,20 @@ void Keyboard::paintOneKey(cairo_t *cr, Key *key) {
     cairo_restore(cr);
 }
 
-std::tuple<Key *, bool> Keyboard::click(InputContext *inputContext, int x, int y, bool isRelease) {
+bool Keyboard::click(InputContext *inputContext, int x, int y, bool isRelease) {
     auto [clickedKey, hasFound] = findClickedKey(x, y);
     if (!hasFound) {
-        return {nullptr, false};
+        isAnyKeyPushing_ = false;
+        pushingKey_ = nullptr;
+        return false;
     }
 
     clickedKey->click(this, inputContext, isRelease);
 
-    return {clickedKey, true};
+    isAnyKeyPushing_ = !isRelease;
+    pushingKey_ = !isRelease ? clickedKey : nullptr;
+
+    return true;
 }
 
 std::tuple<Key *, bool> Keyboard::findClickedKey(int x, int y) {
@@ -342,7 +351,6 @@ std::tuple<Key *, bool> Keyboard::findClickedKey(int x, int y) {
     {
         if (!(key->visible_ && key->contains(x, y))) continue;
         return {key.get(), true}; 
-
     }
     return {nullptr, false};
 }

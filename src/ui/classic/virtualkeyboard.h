@@ -149,7 +149,7 @@ class Keyboard {
 public:
     Keyboard();
     void paint(cairo_t *cr, unsigned int offsetX, unsigned int offsetY);
-    std::tuple<Key *, bool> click(InputContext *inputContext, int x, int y, bool isRelease);
+    bool click(InputContext *inputContext, int x, int y, bool isRelease);
     void setTextKeys(bool isZenkakuMode);
     void setMarkKeys();
     std::pair<unsigned int, unsigned int> size();
@@ -157,6 +157,9 @@ public:
     unsigned int marginY() { return 5; }
 
     std::vector<std::unique_ptr<Key>> keys_;
+    Key *pushingKey_;
+    bool isAnyKeyPushing_ = false;
+
     KeyboardMode mode_ = KeyboardMode::ZenkakuText;
     bool useUpperHankakuText_ = false;
     bool useZenkakuMark_ = false;
