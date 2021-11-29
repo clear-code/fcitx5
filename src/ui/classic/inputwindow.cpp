@@ -441,10 +441,10 @@ std::pair<unsigned int, unsigned int> InputWindow::sizeHint(bool withKeyboard) {
     if (hasVirtualKeyboard_ && withKeyboard) {
         // TODO: Probably it's not correct yet
         auto pair = keyboard_.size();
-        unsigned int borderWidth = 2;
-        unsigned int keyboardWidth = pair.first + keyboard_.marginX() * 2;
-        unsigned int keyboardHeight = pair.second + keyboard_.marginY() * 2;
-        width = MAX(width, keyboardWidth + borderWidth * 2);
+        size_t borderWidth = 2;
+        size_t keyboardWidth = pair.first + keyboard_.marginX() * 2;
+        size_t keyboardHeight = pair.second + keyboard_.marginY() * 2;
+        width = std::max(width, keyboardWidth + borderWidth * 2);
         height = height + keyboardHeight + *textMargin.marginTop + *textMargin.marginBottom;
     }
 
