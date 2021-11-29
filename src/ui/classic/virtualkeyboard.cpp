@@ -127,8 +127,16 @@ void ModeSwitchKey::click(Keyboard *keyboard, InputContext *, bool isRelease) co
     }
 }
 
-Keyboard::Keyboard() {
+Keyboard::Keyboard(Instance *instance) : instance_(instance) {
     setTextKeys(true);
+
+    repeatKeyTimer_ = instance_->eventLoop().addTimeEvent(
+        CLOCK_MONOTONIC, now(CLOCK_MONOTONIC), 0,
+        [this](EventSourceTime *, uint64_t) {
+            onKeyRepeat();
+            return true;
+        });
+    repeatKeyTimer_->setEnabled(false);
 }
 
 void Keyboard::setTextKeys(bool isZenkakuMode) {
@@ -307,6 +315,21 @@ std::pair<unsigned int, unsigned int> Keyboard::size() {
     return {width, height};
 }
 
+void Keyboard::onKeyRepeat() {
+    if (!pushingKey_) {
+        return;
+    }
+
+    auto *inputContext = lastInputContext_.get();
+    if (!inputContext) {
+        return;
+    }
+
+    repeatKeyTimer_->setNextInterval(1000000 / repeatRate_);
+    repeatKeyTimer_->setOneShot();
+    pushingKey_->click(this, inputContext, false);
+}
+
 void Keyboard::paintOneKey(cairo_t *cr, Key *key) {
     auto highlight = (pushingKey_ == key);
 
@@ -332,6 +355,12 @@ void Keyboard::paintOneKey(cairo_t *cr, Key *key) {
 }
 
 bool Keyboard::click(InputContext *inputContext, int x, int y, bool isRelease) {
+    lastInputContext_ = inputContext->watch();
+
+    if (isRelease) {
+        repeatKeyTimer_->setEnabled(false);
+    }
+
     auto [clickedKey, hasFound] = findClickedKey(x, y);
     if (!hasFound) {
         pushingKey_ = nullptr;
@@ -341,6 +370,10 @@ bool Keyboard::click(InputContext *inputContext, int x, int y, bool isRelease) {
     clickedKey->click(this, inputContext, isRelease);
 
     pushingKey_ = isRelease ? nullptr : clickedKey;
+    if (pushingKey_) {
+        repeatKeyTimer_->setNextInterval(repeatDelay_ * 1000);
+        repeatKeyTimer_->setOneShot();
+    }
 
     return true;
 }

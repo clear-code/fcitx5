@@ -13,8 +13,6 @@
 #include "fcitx/candidatelist.h"
 #include "fcitx/inputcontext.h"
 #include "common.h"
-#include <fcitx-utils/event.h>
-#include "fcitx-utils/log.h"
 #include "virtualkeyboard.h"
 
 namespace fcitx {
@@ -78,8 +76,6 @@ protected:
     void setTextToMultilineLayout(InputContext *inputContext,
                                   MultilineLayout &layout, const Text &text);
     int highlight() const;
-    void clickVirtualKeyboard(InputContext *inputContext, int x, int y, bool isRelease);
-    void onKeyRepeat();
     bool hasVirtualKeyboard() { return !!keyboard_; }
 
     ClassicUI *parent_;
@@ -106,8 +102,6 @@ protected:
     CandidateLayoutHint layoutHint_ = CandidateLayoutHint::NotSet;
     size_t candidatesHeight_ = 0;
     int hoverIndex_ = -1;
-    std::unique_ptr<EventSourceTime> repeatKeyTimer_;
-    int32_t repeatRate_ = 40, repeatDelay_ = 400;
 };
 } // namespace classicui
 } // namespace fcitx

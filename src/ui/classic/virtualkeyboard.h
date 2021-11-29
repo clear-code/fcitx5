@@ -10,7 +10,9 @@
 #include "common.h"
 #include <cairo/cairo.h>
 #include <pango/pango.h>
+#include "fcitx/instance.h"
 #include "fcitx/inputcontext.h"
+#include <fcitx-utils/event.h>
 #include "fcitx-utils/log.h"
 
 namespace fcitx {
@@ -148,7 +150,7 @@ enum class KeyboardMode {
 
 class Keyboard {
 public:
-    Keyboard();
+    Keyboard(Instance *instance);
     void paint(cairo_t *cr, unsigned int offsetX, unsigned int offsetY);
     bool click(InputContext *inputContext, int x, int y, bool isRelease);
     void setTextKeys(bool isZenkakuMode);
@@ -157,12 +159,19 @@ public:
     unsigned int marginX() { return 15; }
     unsigned int marginY() { return 5; }
 
+    Instance *instance_;
     std::vector<std::unique_ptr<Key>> keys_;
     Key *pushingKey_ = nullptr;
+    TrackableObjectReference<InputContext> lastInputContext_;
+    std::unique_ptr<EventSourceTime> repeatKeyTimer_;
+    int32_t repeatRate_ = 40, repeatDelay_ = 400;
 
     KeyboardMode mode_ = KeyboardMode::ZenkakuText;
     bool useUpperHankakuText_ = false;
     bool useZenkakuMark_ = false;
+
+protected:
+    void onKeyRepeat();
 
 private:
     void paintOneKey(cairo_t *cr, Key *key);
