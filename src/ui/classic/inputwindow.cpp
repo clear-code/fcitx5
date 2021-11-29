@@ -92,6 +92,26 @@ InputWindow::InputWindow(ClassicUI *parent) : parent_(parent) {
     context_.reset(pango_font_map_create_context(fontMap_.get()));
     upperLayout_ = newPangoLayout(context_.get());
     lowerLayout_ = newPangoLayout(context_.get());
+    if (hasVirtualKeyboard_) {
+        repeatKeyTimer_ = parent->instance()->eventLoop().addTimeEvent(
+            CLOCK_MONOTONIC, now(CLOCK_MONOTONIC), 0,
+            [this](EventSourceTime *, uint64_t) {
+                onKeyRepeat();
+                return true;
+            });
+        repeatKeyTimer_->setEnabled(false);
+    }
+}
+
+void InputWindow::onKeyRepeat() {
+    auto *inputContext = inputContext_.get();
+    if (!inputContext) {
+        return;
+    }
+
+    repeatKeyTimer_->setNextInterval(1000000 / repeatRate_);
+    repeatKeyTimer_->setOneShot();
+    repeatKey_->click(&keyboard_, inputContext, false);
 }
 
 void InputWindow::insertAttr(PangoAttrList *attrList, TextFormatFlags format,
@@ -641,14 +661,14 @@ void InputWindow::paint(cairo_t *cr, unsigned int width, unsigned int height) {
     cairo_restore(cr);
 }
 
-void InputWindow::click(int x, int y) {
+void InputWindow::click(int x, int y, bool isRelease) {
     auto *inputContext = inputContext_.get();
     if (!inputContext) {
         return;
     }
 
     if (hasVirtualKeyboard_)
-        keyboard_.click(inputContext, x, y);
+        clickVirtualKeyboard(inputContext, x, y, isRelease);
 
     const auto candidateList = inputContext->inputPanel().candidateList();
     if (!candidateList) {
@@ -733,6 +753,20 @@ bool InputWindow::hover(int x, int y) {
     prevHovered_ = prevHovered;
     nextHovered_ = nextHovered;
     return needRepaint;
+}
+
+void InputWindow::clickVirtualKeyboard(InputContext *inputContext, int x, int y, bool isRelease) {
+    if (isRelease) {
+        repeatKeyTimer_->setEnabled(false);
+    }
+
+    auto [clickedKey, hasClicked] = keyboard_.click(inputContext, x, y, isRelease);
+
+    if (hasClicked && !isRelease) {
+        repeatKey_ = clickedKey;
+        repeatKeyTimer_->setNextInterval(repeatDelay_ * 1000);
+        repeatKeyTimer_->setOneShot();
+    }
 }
 
 } // namespace fcitx::classicui

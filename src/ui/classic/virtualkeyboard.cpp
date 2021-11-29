@@ -17,16 +17,17 @@ const char* TextKey::label(Keyboard *keyboard) const {
     return upperText_.c_str();
 }
 
-void TextKey::click(Keyboard *keyboard, InputContext *inputContext) const {
+void TextKey::click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) const {
     FCITX_KEYBOARD() << "TextKey pushed: " << label(keyboard);
 
     if (keyboard->mode_ == KeyboardMode::HankakuText) {
-        inputContext->commitString(label(keyboard));
+        if (!isRelease) {
+            inputContext->commitString(label(keyboard));
+        }
         return;
     }
 
-    auto keyEvent = fcitx::KeyEvent(inputContext, convert());
-    // TODO: manage `isRelease`
+    auto keyEvent = fcitx::KeyEvent(inputContext, convert(), isRelease);
     auto hasProcessedInIME = inputContext->keyEvent(keyEvent);
     FCITX_KEYBOARD() << "key event result: " << hasProcessedInIME;
 }
@@ -38,32 +39,30 @@ const char* MarkKey::label(Keyboard *keyboard) const {
     return hankakuMark_.c_str();
 }
 
-void MarkKey::click(Keyboard *keyboard, InputContext *inputContext) const {
+void MarkKey::click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) const {
     FCITX_KEYBOARD() << "MarkKey pushed: " << label(keyboard);
 
     if (!keyboard->useZenkakuMark_) {
-        inputContext->commitString(label(keyboard));
+        if (!isRelease) {
+            inputContext->commitString(label(keyboard));
+        }
         return;
     }
 
-    auto keyEvent = fcitx::KeyEvent(inputContext, convert());
-    // TODO: manage `isRelease`
+    auto keyEvent = fcitx::KeyEvent(inputContext, convert(), isRelease);
     auto hasProcessedInIME = inputContext->keyEvent(keyEvent);
     FCITX_KEYBOARD() << "key event result: " << hasProcessedInIME;
 }
 
-void ForwardKey::click(Keyboard *keyboard, InputContext *inputContext) const {
-    // TODO: manage `isRelease`
+void ForwardKey::click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) const {
     FCITX_KEYBOARD() << "ForwardKey pushed: " << label(keyboard);
 
-    auto keyEvent = fcitx::KeyEvent(inputContext, convert());
+    auto keyEvent = fcitx::KeyEvent(inputContext, convert(), isRelease);
     auto hasProcessedInIME = inputContext->keyEvent(keyEvent);
     FCITX_KEYBOARD() << "key event result: " << hasProcessedInIME;
 
     if (!hasProcessedInIME) {
-        // Need to set pair of false and true to`isRelease` in order to process key in forwarding.
-        inputContext->forwardKey(convert(), false);
-        inputContext->forwardKey(convert(), true);
+        inputContext->forwardKey(convert(), isRelease);
     }
 }
 
@@ -74,8 +73,11 @@ const char* ZenkakuHankakuKey::label(Keyboard *keyboard) const {
     return "[ 半角 ]    全角";
 }
 
-void ZenkakuHankakuKey::click(Keyboard *keyboard, InputContext *inputContext) const {
+void ZenkakuHankakuKey::click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) const {
     FCITX_KEYBOARD() << "ZenkakuHankakuKey pushed: " << label(keyboard);
+    if (isRelease) {
+        return;
+    }
     keyboard->useZenkakuMark_ = !keyboard->useZenkakuMark_;
     inputContext->updateUserInterface(UserInterfaceComponent::InputPanel);
 }
@@ -87,8 +89,11 @@ const char* UpperToggleKey::label(Keyboard *keyboard) const {
     return "[ abc ]    ABC";
 }
 
-void UpperToggleKey::click(Keyboard *keyboard, InputContext *inputContext) const {
+void UpperToggleKey::click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) const {
     FCITX_KEYBOARD() << "UpperToggleKey pushed: " << label(keyboard);
+    if (isRelease) {
+        return;
+    }
     keyboard->useUpperHankakuText_ = !keyboard->useUpperHankakuText_;
     inputContext->updateUserInterface(UserInterfaceComponent::InputPanel);
 }
@@ -103,8 +108,12 @@ const char* ModeSwitchKey::label(Keyboard *keyboard) const {
     }
 }
 
-void ModeSwitchKey::click(Keyboard *keyboard, InputContext *inputContext) const {
+void ModeSwitchKey::click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) const {
     FCITX_KEYBOARD() << "ModeSwitchKey pushed";
+
+    if (isRelease) {
+        return;
+    }
 
     if (keyboard->mode_ == KeyboardMode::ZenkakuText) {
         keyboard->mode_ = KeyboardMode::HankakuText;
@@ -317,13 +326,25 @@ void Keyboard::paintOneKey(cairo_t *cr, Key *key) {
     cairo_restore(cr);
 }
 
-void Keyboard::click(InputContext *inputContext, int x, int y) {
+std::tuple<Key *, bool> Keyboard::click(InputContext *inputContext, int x, int y, bool isRelease) {
+    auto [clickedKey, hasFound] = findClickedKey(x, y);
+    if (!hasFound) {
+        return {nullptr, false};
+    }
+
+    clickedKey->click(this, inputContext, isRelease);
+
+    return {clickedKey, true};
+}
+
+std::tuple<Key *, bool> Keyboard::findClickedKey(int x, int y) {
     for (const auto &key : keys_)
     {
         if (!(key->visible_ && key->contains(x, y))) continue;
-        key->click(this, inputContext);
-        return; // Must return here because click may change `keys_` and cause iteration problem.
+        return {key.get(), true}; 
+
     }
+    return {nullptr, false};
 }
 
 } // namespace fcitx::classicui
