@@ -84,7 +84,7 @@ void WaylandInputWindow::initPanel() {
         return;
     }
     panelSurface_.reset(panel->getInputPanelSurface(window_->surface()));
-    if (hasVirtualKeyboard_)
+    if (hasVirtualKeyboard())
         panelSurface_->setToplevel(ui_->display()->output(), 0);
     else
         panelSurface_->setOverlayPanel();

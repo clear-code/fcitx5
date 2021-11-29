@@ -92,7 +92,9 @@ InputWindow::InputWindow(ClassicUI *parent) : parent_(parent) {
     context_.reset(pango_font_map_create_context(fontMap_.get()));
     upperLayout_ = newPangoLayout(context_.get());
     lowerLayout_ = newPangoLayout(context_.get());
-    if (hasVirtualKeyboard_) {
+
+    keyboard_.reset(new Keyboard());
+    if (hasVirtualKeyboard()) {
         repeatKeyTimer_ = parent->instance()->eventLoop().addTimeEvent(
             CLOCK_MONOTONIC, now(CLOCK_MONOTONIC), 0,
             [this](EventSourceTime *, uint64_t) {
@@ -104,7 +106,7 @@ InputWindow::InputWindow(ClassicUI *parent) : parent_(parent) {
 }
 
 void InputWindow::onKeyRepeat() {
-    if (!keyboard_.isAnyKeyPushing_) {
+    if (!keyboard_->isAnyKeyPushing_) {
         return;
     }
 
@@ -115,7 +117,7 @@ void InputWindow::onKeyRepeat() {
 
     repeatKeyTimer_->setNextInterval(1000000 / repeatRate_);
     repeatKeyTimer_->setOneShot();
-    keyboard_.pushingKey_->click(&keyboard_, inputContext, false);
+    keyboard_->pushingKey_->click(keyboard_.get(), inputContext, false);
 }
 
 void InputWindow::insertAttr(PangoAttrList *attrList, TextFormatFlags format,
@@ -364,7 +366,7 @@ void InputWindow::update(InputContext *inputContext) {
         hasNext_ = false;
     }
 
-    visible_ = hasVirtualKeyboard_ ||
+    visible_ = hasVirtualKeyboard() ||
                nCandidates_ ||
                pango_layout_get_character_count(upperLayout_.get()) ||
                pango_layout_get_character_count(lowerLayout_.get());
@@ -419,7 +421,7 @@ std::pair<unsigned int, unsigned int> InputWindow::sizeHint(bool withKeyboard) {
     } else if (layoutHint_ == CandidateLayoutHint::Horizontal) {
         vertical = false;
     }
-    if (hasVirtualKeyboard_)
+    if (hasVirtualKeyboard())
         vertical = false;
 
     size_t wholeH = 0, wholeW = 0;
@@ -462,12 +464,12 @@ std::pair<unsigned int, unsigned int> InputWindow::sizeHint(bool withKeyboard) {
         }
     }
 
-    if (hasVirtualKeyboard_ && withKeyboard) {
+    if (hasVirtualKeyboard() && withKeyboard) {
         // TODO: Probably it's not correct yet
-        auto pair = keyboard_.size();
+        auto pair = keyboard_->size();
         size_t borderWidth = 2;
-        size_t keyboardWidth = pair.first + keyboard_.marginX() * 2;
-        size_t keyboardHeight = pair.second + keyboard_.marginY() * 2;
+        size_t keyboardWidth = pair.first + keyboard_->marginX() * 2;
+        size_t keyboardHeight = pair.second + keyboard_->marginY() * 2;
         width = std::max(width, keyboardWidth + borderWidth * 2);
         height = height + keyboardHeight + *textMargin.marginTop + *textMargin.marginBottom;
     }
@@ -575,7 +577,7 @@ void InputWindow::paint(cairo_t *cr, unsigned int width, unsigned int height) {
     } else if (layoutHint_ == CandidateLayoutHint::Horizontal) {
         vertical = false;
     }
-    if (hasVirtualKeyboard_)
+    if (hasVirtualKeyboard())
         vertical = false;
 
     candidateRegions_.clear();
@@ -656,10 +658,10 @@ void InputWindow::paint(cairo_t *cr, unsigned int width, unsigned int height) {
         }
     }
 
-    if (hasVirtualKeyboard_) {
+    if (hasVirtualKeyboard()) {
         auto pair = sizeHint(false);
-        unsigned int marginY = pair.second + keyboard_.marginY();
-        keyboard_.paint(cr, keyboard_.marginX(), marginY);
+        unsigned int marginY = pair.second + keyboard_->marginY();
+        keyboard_->paint(cr, keyboard_->marginX(), marginY);
     }
 
     cairo_restore(cr);
@@ -671,7 +673,7 @@ void InputWindow::click(int x, int y, bool isRelease) {
         return;
     }
 
-    if (hasVirtualKeyboard_)
+    if (hasVirtualKeyboard())
         clickVirtualKeyboard(inputContext, x, y, isRelease);
 
     const auto candidateList = inputContext->inputPanel().candidateList();
@@ -764,7 +766,7 @@ void InputWindow::clickVirtualKeyboard(InputContext *inputContext, int x, int y,
         repeatKeyTimer_->setEnabled(false);
     }
 
-    auto hasClicked = keyboard_.click(inputContext, x, y, isRelease);
+    auto hasClicked = keyboard_->click(inputContext, x, y, isRelease);
 
     if (hasClicked && !isRelease) {
         repeatKeyTimer_->setNextInterval(repeatDelay_ * 1000);
