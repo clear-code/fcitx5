@@ -36,6 +36,7 @@ public:
 
     double width_ = 60;
     double height_ = 50;
+    double fontSize_ = 14;
     bool newLine_ = false;
     bool visible_ = true;
 
