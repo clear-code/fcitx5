@@ -13,6 +13,7 @@
 #include "fcitx/candidatelist.h"
 #include "fcitx/inputcontext.h"
 #include "common.h"
+#include <fcitx-utils/event.h>
 #include "fcitx-utils/log.h"
 #include "virtualkeyboard.h"
 
@@ -60,7 +61,7 @@ public:
     void hide();
     bool visible() const { return visible_; }
     bool hover(int x, int y);
-    void click(int x, int y);
+    void click(int x, int y, bool isRelease = false);
     void wheel(bool up);
 
 protected:
@@ -77,6 +78,8 @@ protected:
     void setTextToMultilineLayout(InputContext *inputContext,
                                   MultilineLayout &layout, const Text &text);
     int highlight() const;
+    void clickVirtualKeyboard(InputContext *inputContext, int x, int y, bool isRelease);
+    void onKeyRepeat();
 
     ClassicUI *parent_;
     GObjectUniquePtr<PangoFontMap> fontMap_;
@@ -103,6 +106,9 @@ protected:
     size_t candidatesHeight_ = 0;
     int hoverIndex_ = -1;
     bool hasVirtualKeyboard_ = true;
+    std::unique_ptr<EventSourceTime> repeatKeyTimer_;
+    Key *repeatKey_;
+    int32_t repeatRate_ = 40, repeatDelay_ = 400;
 };
 } // namespace classicui
 } // namespace fcitx

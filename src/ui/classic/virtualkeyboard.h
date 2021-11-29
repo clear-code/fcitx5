@@ -20,7 +20,7 @@ class Keyboard;
 class Key {
 public:
     virtual const char* label(Keyboard *keyboard) const = 0;
-    virtual void click(Keyboard *keyboard, InputContext *inputContext) const = 0;
+    virtual void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) const = 0;
 
     void setRegion(int x, int y) {
         region_
@@ -52,7 +52,7 @@ public:
         visible_ = false;
     }
     const char* label(Keyboard *) const override { return ""; }
-    void click(Keyboard *, InputContext *) const override {}
+    void click(Keyboard *, InputContext *, bool) const override {}
 };
 
 /*
@@ -61,7 +61,7 @@ public:
 class EmptyKey : public Key {
 public:
     const char* label(Keyboard *) const override { return ""; }
-    void click(Keyboard *, InputContext *) const override {}
+    void click(Keyboard *, InputContext *, bool) const override {}
 };
 
 /*
@@ -86,7 +86,7 @@ public:
     TextKey(std::string keyName, std::string text, std::string upperText = "")
             : KeyByName(keyName), text_(text), upperText_(upperText) {};
     const char* label(Keyboard *keyboard) const override;
-    void click(Keyboard *keyboard, InputContext *inputContext) const override;
+    void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) const override;
 
 private:
     /*
@@ -101,7 +101,7 @@ public:
     MarkKey(std::string keyName, std::string hankakuMark, std::string zenkakuMark)
             : KeyByName(keyName), hankakuMark_(hankakuMark), zenkakuMark_(zenkakuMark) {};
     const char* label(Keyboard *keyboard) const override;
-    void click(Keyboard *keyboard, InputContext *inputContext) const override;
+    void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) const override;
 
 private:
     const std::string hankakuMark_;
@@ -115,7 +115,7 @@ class ForwardKey : public KeyByName {
 public:
     ForwardKey(std::string keyName, std::string label) : KeyByName(keyName), label_(label) {}
     const char* label(Keyboard *) const override { return label_.c_str(); }
-    void click(Keyboard *keyboard, InputContext *inputContext) const override;
+    void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) const override;
 
 private:
     const std::string label_;
@@ -124,19 +124,19 @@ private:
 class ZenkakuHankakuKey : public Key {
 public:
     const char* label(Keyboard *keyboard) const override;
-    void click(Keyboard *keyboard, InputContext *inputContext) const override;
+    void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) const override;
 };
 
 class UpperToggleKey : public Key {
 public:
     const char* label(Keyboard *keyboard) const override;
-    void click(Keyboard *keyboard, InputContext *inputContext) const override;
+    void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) const override;
 };
 
 class ModeSwitchKey : public Key {
 public:
     const char* label(Keyboard *keyboard) const override;
-    void click(Keyboard *keyboard, InputContext *inputContext) const override;
+    void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) const override;
 };
 
 enum class KeyboardMode {
@@ -149,7 +149,7 @@ class Keyboard {
 public:
     Keyboard();
     void paint(cairo_t *cr, unsigned int offsetX, unsigned int offsetY);
-    void click(InputContext *inputContext, int x, int y);
+    std::tuple<Key *, bool> click(InputContext *inputContext, int x, int y, bool isRelease);
     void setTextKeys(bool isZenkakuMode);
     void setMarkKeys();
     std::pair<unsigned int, unsigned int> size();
@@ -163,6 +163,7 @@ public:
 
 private:
     void paintOneKey(cairo_t *cr, Key *key);
+    std::tuple<Key *, bool> findClickedKey(int x, int y);
 };
 
 } // namespace classicui
