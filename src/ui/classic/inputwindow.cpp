@@ -104,6 +104,10 @@ InputWindow::InputWindow(ClassicUI *parent) : parent_(parent) {
 }
 
 void InputWindow::onKeyRepeat() {
+    if (!keyboard_.isAnyKeyPushing_) {
+        return;
+    }
+
     auto *inputContext = inputContext_.get();
     if (!inputContext) {
         return;
@@ -111,7 +115,7 @@ void InputWindow::onKeyRepeat() {
 
     repeatKeyTimer_->setNextInterval(1000000 / repeatRate_);
     repeatKeyTimer_->setOneShot();
-    repeatKey_->click(&keyboard_, inputContext, false);
+    keyboard_.pushingKey_->click(&keyboard_, inputContext, false);
 }
 
 void InputWindow::insertAttr(PangoAttrList *attrList, TextFormatFlags format,
@@ -760,10 +764,9 @@ void InputWindow::clickVirtualKeyboard(InputContext *inputContext, int x, int y,
         repeatKeyTimer_->setEnabled(false);
     }
 
-    auto [clickedKey, hasClicked] = keyboard_.click(inputContext, x, y, isRelease);
+    auto hasClicked = keyboard_.click(inputContext, x, y, isRelease);
 
     if (hasClicked && !isRelease) {
-        repeatKey_ = clickedKey;
         repeatKeyTimer_->setNextInterval(repeatDelay_ * 1000);
         repeatKeyTimer_->setOneShot();
     }

@@ -35,6 +35,7 @@ WaylandInputWindow::WaylandInputWindow(WaylandUI *ui)
                                     uint32_t state) {
         if (button == BTN_LEFT) {
             click(x, y, state == WL_POINTER_BUTTON_STATE_RELEASED);
+            repaint();
         }
     });
     window_->hover().connect([this](int x, int y) {
