@@ -322,6 +322,7 @@ void Keyboard::paintOneKey(cairo_t *cr, Key *key) {
     cairo_set_line_width(cr, 2);
     cairo_stroke(cr);
 
+    cairo_set_font_size(cr, key->fontSize_);
     cairo_text_extents_t extents;
     cairo_text_extents(cr, key->label(this), &extents);
     cairo_translate(cr, (key->width_ - extents.width) / 2, (key->height_ - extents.y_bearing) / 2);
