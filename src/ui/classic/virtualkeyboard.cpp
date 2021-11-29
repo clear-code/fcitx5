@@ -351,7 +351,7 @@ std::tuple<Key *, bool> Keyboard::findClickedKey(int x, int y) {
     for (const auto &key : keys_)
     {
         if (!(key->visible_ && key->contains(x, y))) continue;
-        return {key.get(), true}; 
+        return {key.get(), true};
     }
     return {nullptr, false};
 }
