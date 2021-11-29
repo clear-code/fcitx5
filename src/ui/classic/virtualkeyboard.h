@@ -159,6 +159,9 @@ public:
     unsigned int marginX() { return 15; }
     unsigned int marginY() { return 5; }
 
+protected:
+    void onKeyRepeat();
+
     Instance *instance_;
     std::vector<std::unique_ptr<Key>> keys_;
     Key *pushingKey_ = nullptr;
@@ -166,12 +169,10 @@ public:
     std::unique_ptr<EventSourceTime> repeatKeyTimer_;
     int32_t repeatRate_ = 40, repeatDelay_ = 400;
 
+public: // TODO: Should be moved to protected
     KeyboardMode mode_ = KeyboardMode::ZenkakuText;
     bool useUpperHankakuText_ = false;
     bool useZenkakuMark_ = false;
-
-protected:
-    void onKeyRepeat();
 
 private:
     void paintOneKey(cairo_t *cr, Key *key);
