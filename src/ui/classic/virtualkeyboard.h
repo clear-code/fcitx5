@@ -167,7 +167,7 @@ private:
 class EnterKey : public ForwardKey {
 public:
     EnterKey() : ForwardKey("Return", "Enter") {
-        setCustomBackgroundColor({0.4, 0.7, 0.7});
+        setCustomBackgroundColor({0.2, 0.7, 0.6});
         setFontColor({1.0, 1.0, 1.0});
     };
 };
@@ -175,7 +175,7 @@ public:
 class BackSpaceKey : public ForwardKey {
 public:
     BackSpaceKey() : ForwardKey("BackSpace", "Back") {
-        setCustomBackgroundColor({0.45, 0.45, 0.45});
+        setCustomBackgroundColor({0.3, 0.3, 0.3});
         setFontColor({1.0, 1.0, 1.0});
     };
 };
@@ -183,7 +183,7 @@ public:
 class ArrowKey : public ForwardKey {
 public:
     ArrowKey(std::string keyName, std::string label) : ForwardKey(keyName, label) {
-        setCustomBackgroundColor({0.45, 0.45, 0.45});
+        setCustomBackgroundColor({0.3, 0.3, 0.3});
         setFontColor({1.0, 1.0, 1.0});
     };
 };
@@ -191,7 +191,7 @@ public:
 class ZenkakuHankakuKey : public Key {
 public:
     ZenkakuHankakuKey() {
-        setCustomBackgroundColor({0.45, 0.45, 0.45});
+        setCustomBackgroundColor({0.3, 0.3, 0.3});
     }
     const char* label(Keyboard *) const override { return "全角"; }
     void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) const override;
@@ -201,7 +201,7 @@ public:
 class UpperToggleKey : public Key {
 public:
     UpperToggleKey() {
-        setCustomBackgroundColor({0.45, 0.45, 0.45});
+        setCustomBackgroundColor({0.3, 0.3, 0.3});
     }
     const char* label(Keyboard *) const override { return "ABC"; }
     void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) const override;
@@ -211,7 +211,7 @@ public:
 class ModeSwitchKey : public Key {
 public:
     ModeSwitchKey() {
-        setCustomBackgroundColor({0.45, 0.45, 0.45});
+        setCustomBackgroundColor({0.3, 0.3, 0.3});
     }
     const char* label(Keyboard *) const override { return "あ A @"; }
     void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) const override;
