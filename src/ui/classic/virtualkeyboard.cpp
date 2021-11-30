@@ -16,8 +16,7 @@ void Key::paintLabel(Keyboard *keyboard, cairo_t *cr) {
     cairo_set_font_size(cr, fontSize_);
     cairo_text_extents_t extents;
     cairo_text_extents(cr, label(keyboard), &extents);
-    cairo_translate(cr, (width_ - extents.width) / 2 - extents.x_bearing,
-        (height_ - extents.height) / 2 - extents.y_bearing);
+    cairo_translate(cr, labelOffsetX(extents), labelOffsetY(extents));
     cairo_show_text(cr, label(keyboard));
 }
 
@@ -111,7 +110,7 @@ void ZenkakuHankakuKey::paintLabel(Keyboard *keyboard, cairo_t *cr) {
     cairo_set_font_size(cr, fontSize_);
     cairo_text_extents_t extents;
     cairo_text_extents(cr, label(keyboard), &extents);
-    cairo_translate(cr, (width_ - extents.width) / 2, (height_ - extents.y_bearing) / 2);
+    cairo_translate(cr, labelOffsetX(extents), labelOffsetY(extents));
     cairo_show_text(cr, label(keyboard));
 }
 
@@ -132,7 +131,7 @@ void UpperToggleKey::paintLabel(Keyboard *keyboard, cairo_t *cr) {
     cairo_set_font_size(cr, fontSize_);
     cairo_text_extents_t extents;
     cairo_text_extents(cr, label(keyboard), &extents);
-    cairo_translate(cr, (width_ - extents.width) / 2, (height_ - extents.y_bearing) / 2);
+    cairo_translate(cr, labelOffsetX(extents), labelOffsetY(extents));
     cairo_show_text(cr, label(keyboard));
 }
 
@@ -161,7 +160,7 @@ void ModeSwitchKey::paintLabel(Keyboard *keyboard, cairo_t *cr) {
     cairo_set_font_size(cr, fontSize_);
     cairo_text_extents_t extents;
     cairo_text_extents(cr, label(keyboard), &extents);
-    cairo_translate(cr, (width_ - extents.width) / 2, (height_ - extents.y_bearing) / 2);
+    cairo_translate(cr, labelOffsetX(extents), labelOffsetY(extents));
 
     if (keyboard->mode_ == KeyboardMode::ZenkakuText) {
         cairo_set_source_rgb(cr, 0.5, 0.9, 0.8);
@@ -249,16 +248,16 @@ void Keyboard::setTextKeys(bool isZenkakuMode) {
     keys_.emplace_back(new MarkKey("3", "3", "３")); keys_.back()->setCustomLayout(1.0, true);
 
     keys_.emplace_back(new ModeSwitchKey()); keys_.back()->setCustomLayout(1.5);
-    keys_.emplace_back(new TextKey("comma", isZenkakuMode ? "、" : ","));
+    keys_.emplace_back(new TextKey("comma", isZenkakuMode ? "、" : ",")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
     keys_.emplace_back(new TextKey("space", isZenkakuMode ? "" : " ")); keys_.back()->setCustomLayout(4.0); keys_.back()->setCustomBackgroundColor({0.45, 0.45, 0.45});
-    keys_.emplace_back(new TextKey("period", isZenkakuMode ? "。" : "."));
+    keys_.emplace_back(new TextKey("period", isZenkakuMode ? "。" : ".")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
     keys_.emplace_back(new TextKey("exclam", isZenkakuMode ? "！" : "!"));
     keys_.emplace_back(new ArrowKey("Left", u8"\u2190"));
     keys_.emplace_back(new ArrowKey("Down", u8"\u2193"));
     keys_.emplace_back(new ArrowKey("Right", u8"\u2192"));
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new MarkKey("0", "0", "０"));
-    keys_.emplace_back(new MarkKey("period", ".", "。"));
+    keys_.emplace_back(new MarkKey("period", ".", "。")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
 }
 
 void Keyboard::setMarkKeys() {
@@ -298,7 +297,7 @@ void Keyboard::setMarkKeys() {
     keys_.emplace_back(new ZenkakuHankakuKey()); keys_.back()->setCustomLayout(1.5);
     keys_.emplace_back(new MarkKey("quotedbl", "\"", "”"));
     keys_.emplace_back(new MarkKey("apostrophe", "\'", "’"));
-    keys_.emplace_back(new MarkKey("underscore", "_", "＿"));
+    keys_.emplace_back(new MarkKey("underscore", "_", "＿")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
     keys_.emplace_back(new MarkKey("bar", "|", "｜"));
     keys_.emplace_back(new MarkKey("asciitilde", "~", "〜"));
     keys_.emplace_back(new MarkKey("less", "<", "＜"));
@@ -311,16 +310,16 @@ void Keyboard::setMarkKeys() {
     keys_.emplace_back(new MarkKey("3", "3", "３")); keys_.back()->setCustomLayout(1.0, true);
 
     keys_.emplace_back(new ModeSwitchKey()); keys_.back()->setCustomLayout(1.5);
-    keys_.emplace_back(new MarkKey("comma", ",", "、"));
+    keys_.emplace_back(new MarkKey("comma", ",", "、")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
     keys_.emplace_back(new MarkKey("space", " ", "")); keys_.back()->setCustomLayout(4.0); keys_.back()->setCustomBackgroundColor({0.45, 0.45, 0.45});
-    keys_.emplace_back(new MarkKey("period", ".", "。"));
+    keys_.emplace_back(new MarkKey("period", ".", "。")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
     keys_.emplace_back(new MarkKey("exclam", "!", "！"));
     keys_.emplace_back(new ArrowKey("Left", u8"\u2190"));
     keys_.emplace_back(new ArrowKey("Down", u8"\u2193"));
     keys_.emplace_back(new ArrowKey("Right", u8"\u2192"));
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new MarkKey("0", "0", "０"));
-    keys_.emplace_back(new MarkKey("period", ".", "。"));
+    keys_.emplace_back(new MarkKey("period", ".", "。")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
 }
 
 void Keyboard::paint(cairo_t *cr, unsigned int offsetX, unsigned int offsetY) {
