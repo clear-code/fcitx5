@@ -179,12 +179,12 @@ void ModeSwitchKey::paintLabel(Keyboard *keyboard, cairo_t *cr) {
         cairo_set_source_rgb(cr, 0.2, 0.7, 0.6);
         cairo_show_text(cr, "A");
         cairo_set_source_rgb(cr, 0.8, 0.8, 0.8);
-        cairo_show_text(cr, "@");
+        cairo_show_text(cr, "#");
     } else {
         cairo_set_source_rgb(cr, 0.8, 0.8, 0.8);
         cairo_show_text(cr, "A");
         cairo_set_source_rgb(cr, 0.2, 0.7, 0.6);
-        cairo_show_text(cr, "@");
+        cairo_show_text(cr, "#");
     }
 
     cairo_restore(cr);
