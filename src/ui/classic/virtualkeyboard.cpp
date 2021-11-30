@@ -226,7 +226,7 @@ void Keyboard::setTextKeys(bool isZenkakuMode) {
     keys_.emplace_back(new TextKey("i", "i", "I"));
     keys_.emplace_back(new TextKey("o", "o", "O"));
     keys_.emplace_back(new TextKey("p", "p", "P"));
-    keys_.emplace_back(new BackSpaceKey()); keys_.back()->setCustomLayout(1.5);
+    keys_.emplace_back(new BackSpaceKey()); keys_.back()->setCustomLayout(1.0);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new MarkKey("7", "7", "７"));
     keys_.emplace_back(new MarkKey("8", "8", "８"));
@@ -242,16 +242,16 @@ void Keyboard::setTextKeys(bool isZenkakuMode) {
     keys_.emplace_back(new TextKey("j", "j", "J"));
     keys_.emplace_back(new TextKey("k", "k", "K"));
     keys_.emplace_back(new TextKey("l", "l", "L"));
-    keys_.emplace_back(new EnterKey()); keys_.back()->setCustomLayout(2.0);
+    keys_.emplace_back(new EnterKey()); keys_.back()->setCustomLayout(1.5);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new MarkKey("4", "4", "４"));
     keys_.emplace_back(new MarkKey("5", "5", "５"));
     keys_.emplace_back(new MarkKey("6", "6", "６")); keys_.back()->setCustomLayout(1.0, true);
 
     if (isZenkakuMode) {
-        keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(1.5);
+        keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(1.0);
     } else {
-        keys_.emplace_back(new UpperToggleKey()); keys_.back()->setCustomLayout(1.5);
+        keys_.emplace_back(new UpperToggleKey()); keys_.back()->setCustomLayout(1.0);
     }
     keys_.emplace_back(new TextKey("z", "z", "Z"));
     keys_.emplace_back(new TextKey("x", "x", "X"));
@@ -269,7 +269,7 @@ void Keyboard::setTextKeys(bool isZenkakuMode) {
 
     keys_.emplace_back(new ModeSwitchKey()); keys_.back()->setCustomLayout(1.5);
     keys_.emplace_back(new TextKey("comma", isZenkakuMode ? "、" : ",")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-    keys_.emplace_back(new TextKey("space", isZenkakuMode ? "" : " ")); keys_.back()->setCustomLayout(4.0); keys_.back()->setCustomBackgroundColor({0.3, 0.3, 0.3});
+    keys_.emplace_back(new TextKey("space", isZenkakuMode ? "" : " ")); keys_.back()->setCustomLayout(3.5); keys_.back()->setCustomBackgroundColor({0.3, 0.3, 0.3});
     keys_.emplace_back(new TextKey("period", isZenkakuMode ? "。" : ".")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
     keys_.emplace_back(new TextKey("exclam", isZenkakuMode ? "！" : "!"));
     keys_.emplace_back(new ArrowKey("Left", u8"\u2190"));
@@ -292,7 +292,7 @@ void Keyboard::setMarkKeys() {
     keys_.emplace_back(new MarkKey("asterisk", "*", "＊"));
     keys_.emplace_back(new MarkKey("plus", "+", "＋"));
     keys_.emplace_back(new MarkKey("equal", "=", "＝"));
-    keys_.emplace_back(new BackSpaceKey()); keys_.back()->setCustomLayout(1.5);
+    keys_.emplace_back(new BackSpaceKey()); keys_.back()->setCustomLayout(1.0);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new MarkKey("7", "7", "７"));
     keys_.emplace_back(new MarkKey("8", "8", "８"));
@@ -308,13 +308,13 @@ void Keyboard::setMarkKeys() {
     keys_.emplace_back(new MarkKey("ampersand", "&", "＆"));
     keys_.emplace_back(new MarkKey("at", "@", "＠"));
     keys_.emplace_back(new MarkKey("yen", u8"\u00A5", "")); // `yen` does not work in Zenkaku
-    keys_.emplace_back(new EnterKey()); keys_.back()->setCustomLayout(1.5);
+    keys_.emplace_back(new EnterKey()); keys_.back()->setCustomLayout(1.0);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new MarkKey("4", "4", "４"));
     keys_.emplace_back(new MarkKey("5", "5", "５"));
     keys_.emplace_back(new MarkKey("6", "6", "６")); keys_.back()->setCustomLayout(1.0, true);
 
-    keys_.emplace_back(new ZenkakuHankakuKey()); keys_.back()->setCustomLayout(1.5);
+    keys_.emplace_back(new ZenkakuHankakuKey()); keys_.back()->setCustomLayout(1.0);
     keys_.emplace_back(new MarkKey("quotedbl", "\"", "”"));
     keys_.emplace_back(new MarkKey("apostrophe", "\'", "’"));
     keys_.emplace_back(new MarkKey("underscore", "_", "＿")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
@@ -331,7 +331,7 @@ void Keyboard::setMarkKeys() {
 
     keys_.emplace_back(new ModeSwitchKey()); keys_.back()->setCustomLayout(1.5);
     keys_.emplace_back(new MarkKey("comma", ",", "、")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-    keys_.emplace_back(new MarkKey("space", " ", "")); keys_.back()->setCustomLayout(4.0); keys_.back()->setCustomBackgroundColor({0.3, 0.3, 0.3});
+    keys_.emplace_back(new MarkKey("space", " ", "")); keys_.back()->setCustomLayout(3.5); keys_.back()->setCustomBackgroundColor({0.3, 0.3, 0.3});
     keys_.emplace_back(new MarkKey("period", ".", "。")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
     keys_.emplace_back(new MarkKey("exclam", "!", "！"));
     keys_.emplace_back(new ArrowKey("Left", u8"\u2190"));
