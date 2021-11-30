@@ -24,6 +24,7 @@ public:
     virtual const char* label(Keyboard *keyboard) const = 0;
     virtual void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) const = 0;
     virtual void paintLabel(Keyboard *keyboard, cairo_t *cr);
+    void paintBackground(cairo_t *cr, bool highlight);
 
     void setRegion(int x, int y) {
         region_
@@ -52,15 +53,15 @@ public:
 
     double width_ = 60;
     double height_ = 50;
+    bool newLine_ = false;
+    bool visible_ = true;
+
+protected:
+    Rect region_;
     double fontSize_ = 22;
     std::tuple<double, double, double> fontColorRgb_ = {0.3, 0.35, 0.4};
     bool useCustomBackgroundColor_ = false;
     std::tuple<double, double, double> customBackgroundColorRgb_ = {0, 0, 0};
-    bool newLine_ = false;
-    bool visible_ = true;
-
-private:
-    Rect region_;
 };
 
 /*

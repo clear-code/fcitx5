@@ -21,6 +21,23 @@ void Key::paintLabel(Keyboard *keyboard, cairo_t *cr) {
     cairo_show_text(cr, label(keyboard));
 }
 
+void Key::paintBackground(cairo_t *cr, bool highlight) {
+    if (highlight) {
+        cairo_set_source_rgb(cr, 0.7, 0.7, 0.7);
+        cairo_rectangle(cr, 0, 0, width_, height_);
+        cairo_fill(cr);
+    } else if (useCustomBackgroundColor_) {
+        auto [r, g, b] = customBackgroundColorRgb_;
+        cairo_set_source_rgb(cr, r, g, b);
+        cairo_rectangle(cr, 0, 0, width_, height_);
+        cairo_fill(cr);
+    } else {
+        // I don't know the reason, but this is needed in order to
+        // correctly move to the next position.
+        cairo_stroke(cr);
+    }
+}
+
 const char* TextKey::label(Keyboard *keyboard) const {
     if (!keyboard->useUpperHankakuText_ || upperText_.empty()) {
         return text_.c_str();
@@ -384,18 +401,7 @@ void Keyboard::paintOneKey(cairo_t *cr, Key *key) {
 
     cairo_save(cr);
 
-    if (highlight) {
-        cairo_set_source_rgb(cr, 0.7, 0.7, 0.7);
-        cairo_rectangle(cr, 0, 0, key->width_, key->height_);
-        cairo_fill(cr);
-    } else if (key->useCustomBackgroundColor_) {
-        auto [r, g, b] = key->customBackgroundColorRgb_;
-        cairo_set_source_rgb(cr, r, g, b);
-        cairo_rectangle(cr, 0, 0, key->width_, key->height_);
-        cairo_fill(cr);
-    }
-    cairo_stroke(cr);
-
+    key->paintBackground(cr, highlight);
     key->paintLabel(this, cr);
 
     cairo_restore(cr);
