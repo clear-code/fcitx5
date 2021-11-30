@@ -23,6 +23,7 @@ class Key {
 public:
     virtual const char* label(Keyboard *keyboard) const = 0;
     virtual void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) const = 0;
+    virtual void paintLabel(Keyboard *keyboard, cairo_t *cr);
 
     void setRegion(int x, int y) {
         region_
@@ -36,9 +37,25 @@ public:
         width_ *= scale;
     }
 
+    void setFontColor(std::tuple<double, double, double> colorRgb) {
+        fontColorRgb_ = colorRgb;
+    }
+
+    void setFontSize(double size) {
+        fontSize_ = size;
+    }
+
+    void setCustomBackgroundColor(std::tuple<double, double, double> colorRgb) {
+        useCustomBackgroundColor_ = true;
+        customBackgroundColorRgb_ = colorRgb;
+    }
+
     double width_ = 60;
     double height_ = 50;
-    double fontSize_ = 14;
+    double fontSize_ = 22;
+    std::tuple<double, double, double> fontColorRgb_ = {0.3, 0.35, 0.4};
+    bool useCustomBackgroundColor_ = false;
+    std::tuple<double, double, double> customBackgroundColorRgb_ = {0, 0, 0};
     bool newLine_ = false;
     bool visible_ = true;
 
@@ -124,22 +141,58 @@ private:
     const std::string label_;
 };
 
+class EnterKey : public ForwardKey {
+public:
+    EnterKey() : ForwardKey("Return", "Enter") {
+        setCustomBackgroundColor({0.4, 0.7, 0.7});
+        setFontColor({1.0, 1.0, 1.0});
+    };
+};
+
+class BackSpaceKey : public ForwardKey {
+public:
+    BackSpaceKey() : ForwardKey("BackSpace", "Back") {
+        setCustomBackgroundColor({0.45, 0.45, 0.45});
+        setFontColor({1.0, 1.0, 1.0});
+    };
+};
+
+class ArrowKey : public ForwardKey {
+public:
+    ArrowKey(std::string keyName, std::string label) : ForwardKey(keyName, label) {
+        setCustomBackgroundColor({0.45, 0.45, 0.45});
+        setFontColor({1.0, 1.0, 1.0});
+    };
+};
+
 class ZenkakuHankakuKey : public Key {
 public:
-    const char* label(Keyboard *keyboard) const override;
+    ZenkakuHankakuKey() {
+        setCustomBackgroundColor({0.45, 0.45, 0.45});
+    }
+    const char* label(Keyboard *) const override { return "全角"; }
     void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) const override;
+    void paintLabel(Keyboard *keyboard, cairo_t *cr) override;
 };
 
 class UpperToggleKey : public Key {
 public:
-    const char* label(Keyboard *keyboard) const override;
+    UpperToggleKey() {
+        setCustomBackgroundColor({0.45, 0.45, 0.45});
+    }
+    const char* label(Keyboard *) const override { return "ABC"; }
     void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) const override;
+    void paintLabel(Keyboard *keyboard, cairo_t *cr) override;
 };
 
 class ModeSwitchKey : public Key {
 public:
-    const char* label(Keyboard *keyboard) const override;
+    ModeSwitchKey() {
+        setCustomBackgroundColor({0.45, 0.45, 0.45});
+    }
+    const char* label(Keyboard *) const override { return "あ A @"; }
     void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) const override;
+    void paintLabel(Keyboard *keyboard, cairo_t *cr) override;
 };
 
 enum class KeyboardMode {
@@ -175,8 +228,9 @@ public: // TODO: Should be moved to protected
     bool useZenkakuMark_ = false;
 
 private:
-    void paintOneKey(cairo_t *cr, Key *key);
     std::tuple<Key *, bool> findClickedKey(int x, int y);
+    void paintOneKey(cairo_t *cr, Key *key);
+    void paintBackground(cairo_t *cr);
 };
 
 } // namespace classicui

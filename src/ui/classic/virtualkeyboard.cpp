@@ -10,6 +10,16 @@ FCITX_DEFINE_LOG_CATEGORY(keyboard, "keyboard")
 
 namespace fcitx::classicui {
 
+void Key::paintLabel(Keyboard *keyboard, cairo_t *cr) {
+    auto [r, g, b] = fontColorRgb_;
+    cairo_set_source_rgb(cr, r, g, b);
+    cairo_set_font_size(cr, fontSize_);
+    cairo_text_extents_t extents;
+    cairo_text_extents(cr, label(keyboard), &extents);
+    cairo_translate(cr, (width_ - extents.width) / 2, (height_ - extents.y_bearing) / 2);
+    cairo_show_text(cr, label(keyboard));
+}
+
 const char* TextKey::label(Keyboard *keyboard) const {
     if (!keyboard->useUpperHankakuText_ || upperText_.empty()) {
         return text_.c_str();
@@ -66,13 +76,6 @@ void ForwardKey::click(Keyboard *keyboard, InputContext *inputContext, bool isRe
     }
 }
 
-const char* ZenkakuHankakuKey::label(Keyboard *keyboard) const {
-    if (keyboard->useZenkakuMark_) {
-        return "半角    [ 全角 ]";
-    }
-    return "[ 半角 ]    全角";
-}
-
 void ZenkakuHankakuKey::click(Keyboard *keyboard, InputContext *, bool isRelease) const {
     FCITX_KEYBOARD() << "ZenkakuHankakuKey pushed: " << label(keyboard);
     if (isRelease) {
@@ -81,11 +84,17 @@ void ZenkakuHankakuKey::click(Keyboard *keyboard, InputContext *, bool isRelease
     keyboard->useZenkakuMark_ = !keyboard->useZenkakuMark_;
 }
 
-const char* UpperToggleKey::label(Keyboard *keyboard) const {
-    if (keyboard->useUpperHankakuText_) {
-        return "abc    [ ABC ]";
+void ZenkakuHankakuKey::paintLabel(Keyboard *keyboard, cairo_t *cr) {
+    if (keyboard->useZenkakuMark_) {
+        cairo_set_source_rgb(cr, 0.5, 0.9, 0.8);
+    } else {
+        cairo_set_source_rgb(cr, 0.8, 0.8, 0.8);
     }
-    return "[ abc ]    ABC";
+    cairo_set_font_size(cr, fontSize_);
+    cairo_text_extents_t extents;
+    cairo_text_extents(cr, label(keyboard), &extents);
+    cairo_translate(cr, (width_ - extents.width) / 2, (height_ - extents.y_bearing) / 2);
+    cairo_show_text(cr, label(keyboard));
 }
 
 void UpperToggleKey::click(Keyboard *keyboard, InputContext *, bool isRelease) const {
@@ -96,14 +105,17 @@ void UpperToggleKey::click(Keyboard *keyboard, InputContext *, bool isRelease) c
     keyboard->useUpperHankakuText_ = !keyboard->useUpperHankakuText_;
 }
 
-const char* ModeSwitchKey::label(Keyboard *keyboard) const {
-    if (keyboard->mode_ == KeyboardMode::ZenkakuText) {
-        return "[あ]  A  1";
-    } else if (keyboard->mode_ == KeyboardMode::HankakuText) {
-        return "あ  [A]  1";
+void UpperToggleKey::paintLabel(Keyboard *keyboard, cairo_t *cr) {
+    if (keyboard->useUpperHankakuText_) {
+        cairo_set_source_rgb(cr, 0.5, 0.9, 0.8);
     } else {
-        return "あ  A  [1]";
+        cairo_set_source_rgb(cr, 0.8, 0.8, 0.8);
     }
+    cairo_set_font_size(cr, fontSize_);
+    cairo_text_extents_t extents;
+    cairo_text_extents(cr, label(keyboard), &extents);
+    cairo_translate(cr, (width_ - extents.width) / 2, (height_ - extents.y_bearing) / 2);
+    cairo_show_text(cr, label(keyboard));
 }
 
 void ModeSwitchKey::click(Keyboard *keyboard, InputContext *, bool isRelease) const {
@@ -124,6 +136,32 @@ void ModeSwitchKey::click(Keyboard *keyboard, InputContext *, bool isRelease) co
         keyboard->mode_ = KeyboardMode::ZenkakuText;
         keyboard->useZenkakuMark_ = false;
         keyboard->setTextKeys(true);
+    }
+}
+
+void ModeSwitchKey::paintLabel(Keyboard *keyboard, cairo_t *cr) {
+    cairo_set_font_size(cr, fontSize_);
+    cairo_text_extents_t extents;
+    cairo_text_extents(cr, label(keyboard), &extents);
+    cairo_translate(cr, (width_ - extents.width) / 2, (height_ - extents.y_bearing) / 2);
+
+    if (keyboard->mode_ == KeyboardMode::ZenkakuText) {
+        cairo_set_source_rgb(cr, 0.5, 0.9, 0.8);
+        cairo_show_text(cr, "あ ");
+        cairo_set_source_rgb(cr, 0.8, 0.8, 0.8);
+        cairo_show_text(cr, "A @");
+    } else if (keyboard->mode_ == KeyboardMode::HankakuText) {
+        cairo_set_source_rgb(cr, 0.8, 0.8, 0.8);
+        cairo_show_text(cr, "あ ");
+        cairo_set_source_rgb(cr, 0.5, 0.9, 0.8);
+        cairo_show_text(cr, "A ");
+        cairo_set_source_rgb(cr, 0.8, 0.8, 0.8);
+        cairo_show_text(cr, "@");
+    } else {
+        cairo_set_source_rgb(cr, 0.8, 0.8, 0.8);
+        cairo_show_text(cr, "あ A ");
+        cairo_set_source_rgb(cr, 0.5, 0.9, 0.8);
+        cairo_show_text(cr, "@");
     }
 }
 
@@ -151,7 +189,7 @@ void Keyboard::setTextKeys(bool isZenkakuMode) {
     keys_.emplace_back(new TextKey("i", "i", "I"));
     keys_.emplace_back(new TextKey("o", "o", "O"));
     keys_.emplace_back(new TextKey("p", "p", "P"));
-    keys_.emplace_back(new ForwardKey("BackSpace", "Back")); keys_.back()->setCustomLayout(1.5);
+    keys_.emplace_back(new BackSpaceKey()); keys_.back()->setCustomLayout(1.5);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new MarkKey("7", "7", "７"));
     keys_.emplace_back(new MarkKey("8", "8", "８"));
@@ -167,14 +205,14 @@ void Keyboard::setTextKeys(bool isZenkakuMode) {
     keys_.emplace_back(new TextKey("j", "j", "J"));
     keys_.emplace_back(new TextKey("k", "k", "K"));
     keys_.emplace_back(new TextKey("l", "l", "L"));
-    keys_.emplace_back(new ForwardKey("Return", "Enter")); keys_.back()->setCustomLayout(2.0);
+    keys_.emplace_back(new EnterKey()); keys_.back()->setCustomLayout(2.0);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new MarkKey("4", "4", "４"));
     keys_.emplace_back(new MarkKey("5", "5", "５"));
     keys_.emplace_back(new MarkKey("6", "6", "６")); keys_.back()->setCustomLayout(1.0, true);
 
     if (isZenkakuMode) {
-        keys_.emplace_back(new EmptyKey()); keys_.back()->setCustomLayout(1.5);
+        keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(1.5);
     } else {
         keys_.emplace_back(new UpperToggleKey()); keys_.back()->setCustomLayout(1.5);
     }
@@ -186,7 +224,7 @@ void Keyboard::setTextKeys(bool isZenkakuMode) {
     keys_.emplace_back(new TextKey("n", "n", "N"));
     keys_.emplace_back(new TextKey("m", "m", "M"));
     keys_.emplace_back(new TextKey("question", isZenkakuMode ? "？" : "?"));
-    keys_.emplace_back(new ForwardKey("Up", u8"\u25B2")); keys_.back()->setCustomLayout(1.0); // ▲
+    keys_.emplace_back(new ArrowKey("Up", u8"\u2191"));
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(1.5);
     keys_.emplace_back(new MarkKey("1", "1", "１"));
     keys_.emplace_back(new MarkKey("2", "2", "２"));
@@ -194,14 +232,14 @@ void Keyboard::setTextKeys(bool isZenkakuMode) {
 
     keys_.emplace_back(new ModeSwitchKey()); keys_.back()->setCustomLayout(1.5);
     keys_.emplace_back(new TextKey("comma", isZenkakuMode ? "、" : ","));
-    keys_.emplace_back(new TextKey("space", isZenkakuMode ? "" : " ")); keys_.back()->setCustomLayout(4.0);
+    keys_.emplace_back(new TextKey("space", isZenkakuMode ? "" : " ")); keys_.back()->setCustomLayout(4.0); keys_.back()->setCustomBackgroundColor({0.45, 0.45, 0.45});
     keys_.emplace_back(new TextKey("period", isZenkakuMode ? "。" : "."));
     keys_.emplace_back(new TextKey("exclam", isZenkakuMode ? "！" : "!"));
-    keys_.emplace_back(new ForwardKey("Left", u8"\u25C0")); // ◀
-    keys_.emplace_back(new ForwardKey("Down", u8"\u25BC")); // ▼
-    keys_.emplace_back(new ForwardKey("Right", u8"\u25B6")); // ▶
+    keys_.emplace_back(new ArrowKey("Left", u8"\u2190"));
+    keys_.emplace_back(new ArrowKey("Down", u8"\u2193"));
+    keys_.emplace_back(new ArrowKey("Right", u8"\u2192"));
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new MarkKey("0", "0", "０")); keys_.back()->setCustomLayout(2.0);
+    keys_.emplace_back(new MarkKey("0", "0", "０"));
     keys_.emplace_back(new MarkKey("period", ".", "。"));
 }
 
@@ -217,7 +255,7 @@ void Keyboard::setMarkKeys() {
     keys_.emplace_back(new MarkKey("asterisk", "*", "＊"));
     keys_.emplace_back(new MarkKey("plus", "+", "＋"));
     keys_.emplace_back(new MarkKey("equal", "=", "＝"));
-    keys_.emplace_back(new ForwardKey("BackSpace", "Back")); keys_.back()->setCustomLayout(1.5);
+    keys_.emplace_back(new BackSpaceKey()); keys_.back()->setCustomLayout(1.5);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new MarkKey("7", "7", "７"));
     keys_.emplace_back(new MarkKey("8", "8", "８"));
@@ -233,7 +271,7 @@ void Keyboard::setMarkKeys() {
     keys_.emplace_back(new MarkKey("ampersand", "&", "＆"));
     keys_.emplace_back(new MarkKey("at", "@", "＠"));
     keys_.emplace_back(new MarkKey("yen", u8"\u00A5", "")); // `yen` does not work in Zenkaku
-    keys_.emplace_back(new ForwardKey("Return", "Enter")); keys_.back()->setCustomLayout(1.5);
+    keys_.emplace_back(new EnterKey()); keys_.back()->setCustomLayout(1.5);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new MarkKey("4", "4", "４"));
     keys_.emplace_back(new MarkKey("5", "5", "５"));
@@ -248,7 +286,7 @@ void Keyboard::setMarkKeys() {
     keys_.emplace_back(new MarkKey("less", "<", "＜"));
     keys_.emplace_back(new MarkKey("greater", ">", "＞"));
     keys_.emplace_back(new MarkKey("question", "?", "？"));
-    keys_.emplace_back(new ForwardKey("Up", u8"\u25B2")); keys_.back()->setCustomLayout(1.0); // ▲
+    keys_.emplace_back(new ArrowKey("Up", u8"\u2191"));
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(1.5);
     keys_.emplace_back(new MarkKey("1", "1", "１"));
     keys_.emplace_back(new MarkKey("2", "2", "２"));
@@ -256,14 +294,14 @@ void Keyboard::setMarkKeys() {
 
     keys_.emplace_back(new ModeSwitchKey()); keys_.back()->setCustomLayout(1.5);
     keys_.emplace_back(new MarkKey("comma", ",", "、"));
-    keys_.emplace_back(new MarkKey("space", " ", "")); keys_.back()->setCustomLayout(4.0);
+    keys_.emplace_back(new MarkKey("space", " ", "")); keys_.back()->setCustomLayout(4.0); keys_.back()->setCustomBackgroundColor({0.45, 0.45, 0.45});
     keys_.emplace_back(new MarkKey("period", ".", "。"));
     keys_.emplace_back(new MarkKey("exclam", "!", "！"));
-    keys_.emplace_back(new ForwardKey("Left", u8"\u25C0")); // ◀
-    keys_.emplace_back(new ForwardKey("Down", u8"\u25BC")); // ▼
-    keys_.emplace_back(new ForwardKey("Right", u8"\u25B6")); // ▶
+    keys_.emplace_back(new ArrowKey("Left", u8"\u2190"));
+    keys_.emplace_back(new ArrowKey("Down", u8"\u2193"));
+    keys_.emplace_back(new ArrowKey("Right", u8"\u2192"));
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new MarkKey("0", "0", "０")); keys_.back()->setCustomLayout(2.0);
+    keys_.emplace_back(new MarkKey("0", "0", "０"));
     keys_.emplace_back(new MarkKey("period", ".", "。"));
 }
 
@@ -273,6 +311,8 @@ void Keyboard::paint(cairo_t *cr, unsigned int offsetX, unsigned int offsetY) {
 
     cairo_save(cr);
     cairo_translate(cr, curX, curY);
+
+    paintBackground(cr);
 
     for (const auto &key : keys_)
     {
@@ -294,6 +334,14 @@ void Keyboard::paint(cairo_t *cr, unsigned int offsetX, unsigned int offsetY) {
     }
 
     cairo_restore(cr);
+}
+
+void Keyboard::paintBackground(cairo_t *cr) {
+    auto [keyboardWidth, keyboardHeight] = size();
+    cairo_set_source_rgb(cr, 0.95, 0.95, 0.95);
+    cairo_rectangle(cr, -marginX(), -marginY(),
+        keyboardWidth  + 2 * marginX(), keyboardHeight + 2 * marginY());
+    cairo_fill(cr);
 }
 
 std::pair<unsigned int, unsigned int> Keyboard::size() {
@@ -339,17 +387,15 @@ void Keyboard::paintOneKey(cairo_t *cr, Key *key) {
         cairo_set_source_rgb(cr, 0.7, 0.7, 0.7);
         cairo_rectangle(cr, 0, 0, key->width_, key->height_);
         cairo_fill(cr);
-        cairo_set_source_rgb(cr, 0, 0, 0);
+    } else if (key->useCustomBackgroundColor_) {
+        auto [r, g, b] = key->customBackgroundColorRgb_;
+        cairo_set_source_rgb(cr, r, g, b);
+        cairo_rectangle(cr, 0, 0, key->width_, key->height_);
+        cairo_fill(cr);
     }
-    cairo_rectangle(cr, 0, 0, key->width_, key->height_);
-    cairo_set_line_width(cr, 2);
     cairo_stroke(cr);
 
-    cairo_set_font_size(cr, key->fontSize_);
-    cairo_text_extents_t extents;
-    cairo_text_extents(cr, key->label(this), &extents);
-    cairo_translate(cr, (key->width_ - extents.width) / 2, (key->height_ - extents.y_bearing) / 2);
-    cairo_show_text(cr, key->label(this));
+    key->paintLabel(this, cr);
 
     cairo_restore(cr);
 }
