@@ -18,6 +18,11 @@
 namespace fcitx {
 namespace classicui {
 
+enum KeyLabelAlignVertical {
+    Center,
+    Bottom,
+};
+
 class Keyboard;
 class Key {
 public:
@@ -51,6 +56,22 @@ public:
         customBackgroundColorRgb_ = colorRgb;
     }
 
+    double labelOffsetX(cairo_text_extents_t extents) const {
+        return (width_ - extents.width) / 2 - extents.x_bearing;
+    }
+
+    double labelOffsetY(cairo_text_extents_t extents) const {
+        if (labelAlignVertical_ == KeyLabelAlignVertical::Bottom) {
+            const auto bottomMargin = 10;
+            return height_ - extents.height - extents.y_bearing - bottomMargin;
+        }
+        return (height_ - extents.height) / 2 - extents.y_bearing;
+    }
+
+    void setLabelAlign(KeyLabelAlignVertical vertical) {
+        labelAlignVertical_ = vertical;
+    }
+
     double width_ = 60;
     double height_ = 50;
     bool newLine_ = false;
@@ -60,6 +81,7 @@ protected:
     Rect region_;
     double fontSize_ = 22;
     std::tuple<double, double, double> fontColorRgb_ = {0.3, 0.35, 0.4};
+    KeyLabelAlignVertical labelAlignVertical_ = KeyLabelAlignVertical::Center;
     bool useCustomBackgroundColor_ = false;
     std::tuple<double, double, double> customBackgroundColorRgb_ = {0, 0, 0};
 };
