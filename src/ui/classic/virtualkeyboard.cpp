@@ -16,7 +16,8 @@ void Key::paintLabel(Keyboard *keyboard, cairo_t *cr) {
     cairo_set_font_size(cr, fontSize_);
     cairo_text_extents_t extents;
     cairo_text_extents(cr, label(keyboard), &extents);
-    cairo_translate(cr, (width_ - extents.width) / 2, (height_ - extents.y_bearing) / 2);
+    cairo_translate(cr, (width_ - extents.width) / 2 - extents.x_bearing,
+        (height_ - extents.height) / 2 - extents.y_bearing);
     cairo_show_text(cr, label(keyboard));
 }
 
