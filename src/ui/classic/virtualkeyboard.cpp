@@ -92,12 +92,12 @@ void MarkKey::click(Keyboard *keyboard, InputContext *inputContext, bool isRelea
 void ForwardKey::click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) const {
     FCITX_KEYBOARD() << "ForwardKey pushed: " << label(keyboard);
 
-    auto keyEvent = fcitx::KeyEvent(inputContext, convert(), isRelease);
+    auto keyEvent = fcitx::KeyEvent(inputContext, convert(keyboard->isShiftOn_), isRelease);
     auto hasProcessedInIME = inputContext->keyEvent(keyEvent);
     FCITX_KEYBOARD() << "key event result: " << hasProcessedInIME;
 
     if (!hasProcessedInIME) {
-        inputContext->forwardKey(convert(), isRelease);
+        inputContext->forwardKey(convert(keyboard->isShiftOn_), isRelease);
     }
 }
 

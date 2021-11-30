@@ -114,8 +114,17 @@ public:
 class KeyByName : public Key {
 protected:
     KeyByName(std::string keyName) : keyName_(keyName) {}
-    const char* keyName() const { return keyName_.c_str(); };
-    fcitx::Key convert() const { return fcitx::Key(keyName()); }
+
+    const char* keyName(bool withShift = false) const {
+        if (withShift) {
+            return ("SHIFT_" + keyName_).c_str();
+        }
+        return keyName_.c_str();
+    };
+
+    fcitx::Key convert(bool withShift = false) const {
+        return fcitx::Key(keyName(withShift));
+    }
 
     /*
      * Be used in converting to Fcitx::Key.
