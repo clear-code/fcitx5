@@ -157,7 +157,7 @@ public:
     void setMarkKeys();
     std::pair<unsigned int, unsigned int> size();
     unsigned int marginX() { return 15; }
-    unsigned int marginY() { return 5; }
+    unsigned int marginY() { return 6; }
 
 protected:
     void onKeyRepeat();

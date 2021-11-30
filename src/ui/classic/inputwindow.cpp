@@ -348,7 +348,7 @@ void InputWindow::update(InputContext *inputContext) {
                pango_layout_get_character_count(lowerLayout_.get());
 }
 
-std::pair<unsigned int, unsigned int> InputWindow::sizeHint(bool withKeyboard) {
+std::pair<unsigned int, unsigned int> InputWindow::sizeHint() {
     auto &theme = parent_->theme();
     auto *fontDesc =
         pango_font_description_from_string(parent_->config().font->c_str());
@@ -440,14 +440,14 @@ std::pair<unsigned int, unsigned int> InputWindow::sizeHint(bool withKeyboard) {
         }
     }
 
-    if (hasVirtualKeyboard() && withKeyboard) {
+    if (hasVirtualKeyboard()) {
         // TODO: Probably it's not correct yet
         auto pair = keyboard_->size();
         size_t borderWidth = 2;
         size_t keyboardWidth = pair.first + keyboard_->marginX() * 2;
         size_t keyboardHeight = pair.second + keyboard_->marginY() * 2;
         width = std::max(width, keyboardWidth + borderWidth * 2);
-        height = height + keyboardHeight + *textMargin.marginTop + *textMargin.marginBottom;
+        height += keyboardHeight;
     }
 
     return {width, height};
@@ -589,6 +589,7 @@ void InputWindow::paint(cairo_t *cr, unsigned int width, unsigned int height) {
             wholeH += vheight + extraH;
         } else {
             wholeW += candidateW + labelW + extraW;
+            wholeH = std::max(wholeH, static_cast<size_t>(vheight + extraH));
         }
         const auto &highlightMargin = *theme.inputPanel->highlight->margin;
         const auto &clickMargin = *theme.inputPanel->highlight->clickMargin;
@@ -635,9 +636,8 @@ void InputWindow::paint(cairo_t *cr, unsigned int width, unsigned int height) {
     }
 
     if (hasVirtualKeyboard()) {
-        auto pair = sizeHint(false);
-        unsigned int marginY = pair.second + keyboard_->marginY();
-        keyboard_->paint(cr, keyboard_->marginX(), marginY);
+        wholeH += currentHeight + keyboard_->marginY();
+        keyboard_->paint(cr, keyboard_->marginX(), wholeH);
     }
 
     cairo_restore(cr);
