@@ -192,18 +192,19 @@ class ZenkakuHankakuKey : public Key {
 public:
     ZenkakuHankakuKey() {
         setCustomBackgroundColor({0.3, 0.3, 0.3});
+        setFontSize(18);
     }
     const char* label(Keyboard *) const override { return "全角"; }
     void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) const override;
     void paintLabel(Keyboard *keyboard, cairo_t *cr) override;
 };
 
-class UpperToggleKey : public Key {
+class ShiftToggleKey : public Key {
 public:
-    UpperToggleKey() {
+    ShiftToggleKey() {
         setCustomBackgroundColor({0.3, 0.3, 0.3});
     }
-    const char* label(Keyboard *) const override { return "ABC"; }
+    const char* label(Keyboard *) const override { return u8"\u21E7"; }
     void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) const override;
     void paintLabel(Keyboard *keyboard, cairo_t *cr) override;
 };
@@ -213,14 +214,13 @@ public:
     ModeSwitchKey() {
         setCustomBackgroundColor({0.3, 0.3, 0.3});
     }
-    const char* label(Keyboard *) const override { return "あ A @"; }
+    const char* label(Keyboard *) const override { return "A#"; }
     void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) const override;
     void paintLabel(Keyboard *keyboard, cairo_t *cr) override;
 };
 
 enum class KeyboardMode {
-    ZenkakuText,
-    HankakuText,
+    Text,
     Mark,
 };
 
@@ -229,7 +229,7 @@ public:
     Keyboard(Instance *instance);
     void paint(cairo_t *cr, unsigned int offsetX, unsigned int offsetY);
     bool click(InputContext *inputContext, int x, int y, bool isRelease);
-    void setTextKeys(bool isZenkakuMode);
+    void setTextKeys();
     void setMarkKeys();
     std::pair<unsigned int, unsigned int> size();
     unsigned int marginX() { return 15; }
@@ -246,9 +246,9 @@ protected:
     int32_t repeatRate_ = 40, repeatDelay_ = 400;
 
 public: // TODO: Should be moved to protected
-    KeyboardMode mode_ = KeyboardMode::ZenkakuText;
-    bool useUpperHankakuText_ = false;
-    bool useZenkakuMark_ = false;
+    KeyboardMode mode_ = KeyboardMode::Text;
+    bool isShiftOn = false;
+    bool isZenkakuOn = true;
 
 private:
     std::tuple<Key *, bool> findClickedKey(int x, int y);
