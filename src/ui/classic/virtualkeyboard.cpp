@@ -11,6 +11,8 @@ FCITX_DEFINE_LOG_CATEGORY(keyboard, "keyboard")
 namespace fcitx::classicui {
 
 void Key::paintLabel(Keyboard *keyboard, cairo_t *cr) {
+    cairo_save(cr);
+
     auto [r, g, b] = fontColorRgb_;
     cairo_set_source_rgb(cr, r, g, b);
     cairo_set_font_size(cr, fontSize_);
@@ -18,9 +20,13 @@ void Key::paintLabel(Keyboard *keyboard, cairo_t *cr) {
     cairo_text_extents(cr, label(keyboard), &extents);
     cairo_translate(cr, labelOffsetX(extents), labelOffsetY(extents));
     cairo_show_text(cr, label(keyboard));
+
+    cairo_restore(cr);
 }
 
 void Key::paintBackground(cairo_t *cr, bool highlight) {
+    cairo_save(cr);
+
     if (highlight) {
         cairo_set_source_rgb(cr, 0.7, 0.7, 0.7);
         cairo_rectangle(cr, 0, 0, width_, height_);
@@ -35,6 +41,8 @@ void Key::paintBackground(cairo_t *cr, bool highlight) {
         // correctly move to the next position.
         cairo_stroke(cr);
     }
+
+    cairo_restore(cr);
 }
 
 const char* TextKey::label(Keyboard *keyboard) const {
@@ -102,6 +110,8 @@ void ZenkakuHankakuKey::click(Keyboard *keyboard, InputContext *, bool isRelease
 }
 
 void ZenkakuHankakuKey::paintLabel(Keyboard *keyboard, cairo_t *cr) {
+    cairo_save(cr);
+
     if (keyboard->useZenkakuMark_) {
         cairo_set_source_rgb(cr, 0.5, 0.9, 0.8);
     } else {
@@ -112,6 +122,8 @@ void ZenkakuHankakuKey::paintLabel(Keyboard *keyboard, cairo_t *cr) {
     cairo_text_extents(cr, label(keyboard), &extents);
     cairo_translate(cr, labelOffsetX(extents), labelOffsetY(extents));
     cairo_show_text(cr, label(keyboard));
+
+    cairo_restore(cr);
 }
 
 void UpperToggleKey::click(Keyboard *keyboard, InputContext *, bool isRelease) const {
@@ -123,6 +135,8 @@ void UpperToggleKey::click(Keyboard *keyboard, InputContext *, bool isRelease) c
 }
 
 void UpperToggleKey::paintLabel(Keyboard *keyboard, cairo_t *cr) {
+    cairo_save(cr);
+
     if (keyboard->useUpperHankakuText_) {
         cairo_set_source_rgb(cr, 0.5, 0.9, 0.8);
     } else {
@@ -133,6 +147,8 @@ void UpperToggleKey::paintLabel(Keyboard *keyboard, cairo_t *cr) {
     cairo_text_extents(cr, label(keyboard), &extents);
     cairo_translate(cr, labelOffsetX(extents), labelOffsetY(extents));
     cairo_show_text(cr, label(keyboard));
+
+    cairo_restore(cr);
 }
 
 void ModeSwitchKey::click(Keyboard *keyboard, InputContext *, bool isRelease) const {
@@ -157,6 +173,8 @@ void ModeSwitchKey::click(Keyboard *keyboard, InputContext *, bool isRelease) co
 }
 
 void ModeSwitchKey::paintLabel(Keyboard *keyboard, cairo_t *cr) {
+    cairo_save(cr);
+
     cairo_set_font_size(cr, fontSize_);
     cairo_text_extents_t extents;
     cairo_text_extents(cr, label(keyboard), &extents);
@@ -180,6 +198,8 @@ void ModeSwitchKey::paintLabel(Keyboard *keyboard, cairo_t *cr) {
         cairo_set_source_rgb(cr, 0.5, 0.9, 0.8);
         cairo_show_text(cr, "@");
     }
+
+    cairo_restore(cr);
 }
 
 Keyboard::Keyboard(Instance *instance) : instance_(instance) {
@@ -334,7 +354,9 @@ void Keyboard::paint(cairo_t *cr, unsigned int offsetX, unsigned int offsetY) {
     for (const auto &key : keys_)
     {
         if (key->visible_) {
-            paintOneKey(cr, key.get());
+            auto highlight = (pushingKey_ == key.get());
+            key->paintBackground(cr, highlight);
+            key->paintLabel(this, cr);
             key->setRegion(curX, curY);
         }
 
@@ -393,17 +415,6 @@ void Keyboard::onKeyRepeat() {
     repeatKeyTimer_->setNextInterval(1000000 / repeatRate_);
     repeatKeyTimer_->setOneShot();
     pushingKey_->click(this, inputContext, false);
-}
-
-void Keyboard::paintOneKey(cairo_t *cr, Key *key) {
-    auto highlight = (pushingKey_ == key);
-
-    cairo_save(cr);
-
-    key->paintBackground(cr, highlight);
-    key->paintLabel(this, cr);
-
-    cairo_restore(cr);
 }
 
 bool Keyboard::click(InputContext *inputContext, int x, int y, bool isRelease) {
