@@ -252,7 +252,6 @@ public: // TODO: Should be moved to protected
 
 private:
     std::tuple<Key *, bool> findClickedKey(int x, int y);
-    void paintOneKey(cairo_t *cr, Key *key);
     void paintBackground(cairo_t *cr);
 };
 
