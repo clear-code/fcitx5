@@ -247,8 +247,8 @@ protected:
 
 public: // TODO: Should be moved to protected
     KeyboardMode mode_ = KeyboardMode::Text;
-    bool isShiftOn = false;
-    bool isZenkakuOn = true;
+    bool isShiftOn_ = false;
+    bool isZenkakuOn_ = true;
 
 private:
     std::tuple<Key *, bool> findClickedKey(int x, int y);

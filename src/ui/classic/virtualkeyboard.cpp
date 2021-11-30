@@ -46,7 +46,7 @@ void Key::paintBackground(cairo_t *cr, bool highlight) {
 }
 
 const char* TextKey::label(Keyboard *keyboard) const {
-    if (!keyboard->isShiftOn || upperText_.empty()) {
+    if (!keyboard->isShiftOn_ || upperText_.empty()) {
         return text_.c_str();
     }
     return upperText_.c_str();
@@ -55,7 +55,7 @@ const char* TextKey::label(Keyboard *keyboard) const {
 void TextKey::click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) const {
     FCITX_KEYBOARD() << "TextKey pushed: " << label(keyboard);
 
-    if (!keyboard->isZenkakuOn) {
+    if (!keyboard->isZenkakuOn_) {
         if (!isRelease) {
             inputContext->commitString(label(keyboard));
         }
@@ -68,7 +68,7 @@ void TextKey::click(Keyboard *keyboard, InputContext *inputContext, bool isRelea
 }
 
 const char* MarkKey::label(Keyboard *keyboard) const {
-    if (keyboard->isZenkakuOn) {
+    if (keyboard->isZenkakuOn_) {
         return zenkakuMark_.c_str();
     }
     return hankakuMark_.c_str();
@@ -77,7 +77,7 @@ const char* MarkKey::label(Keyboard *keyboard) const {
 void MarkKey::click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) const {
     FCITX_KEYBOARD() << "MarkKey pushed: " << label(keyboard);
 
-    if (!keyboard->isZenkakuOn) {
+    if (!keyboard->isZenkakuOn_) {
         if (!isRelease) {
             inputContext->commitString(label(keyboard));
         }
@@ -106,13 +106,13 @@ void ZenkakuHankakuKey::click(Keyboard *keyboard, InputContext *, bool isRelease
     if (isRelease) {
         return;
     }
-    keyboard->isZenkakuOn = !keyboard->isZenkakuOn;
+    keyboard->isZenkakuOn_ = !keyboard->isZenkakuOn_;
 }
 
 void ZenkakuHankakuKey::paintLabel(Keyboard *keyboard, cairo_t *cr) {
     cairo_save(cr);
 
-    if (keyboard->isZenkakuOn) {
+    if (keyboard->isZenkakuOn_) {
         cairo_set_source_rgb(cr, 0.2, 0.7, 0.6);
     } else {
         cairo_set_source_rgb(cr, 0.8, 0.8, 0.8);
@@ -131,13 +131,13 @@ void ShiftToggleKey::click(Keyboard *keyboard, InputContext *, bool isRelease) c
     if (isRelease) {
         return;
     }
-    keyboard->isShiftOn = !keyboard->isShiftOn;
+    keyboard->isShiftOn_ = !keyboard->isShiftOn_;
 }
 
 void ShiftToggleKey::paintLabel(Keyboard *keyboard, cairo_t *cr) {
     cairo_save(cr);
 
-    if (keyboard->isShiftOn) {
+    if (keyboard->isShiftOn_) {
         cairo_set_source_rgb(cr, 0.2, 0.7, 0.6);
     } else {
         cairo_set_source_rgb(cr, 0.8, 0.8, 0.8);
