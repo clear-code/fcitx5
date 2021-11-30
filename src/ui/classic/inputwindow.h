@@ -54,7 +54,7 @@ class InputWindow {
 public:
     InputWindow(ClassicUI *parent);
     void update(InputContext *inputContext);
-    std::pair<unsigned int, unsigned int> sizeHint(bool withKeyboard = true);
+    std::pair<unsigned int, unsigned int> sizeHint();
     void paint(cairo_t *cr, unsigned int width, unsigned int height);
     void hide();
     bool visible() const { return visible_; }
