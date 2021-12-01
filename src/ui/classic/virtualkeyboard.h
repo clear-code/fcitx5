@@ -27,7 +27,7 @@ class Keyboard;
 class Key {
 public:
     virtual const char* label(Keyboard *keyboard) const = 0;
-    virtual void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) const = 0;
+    virtual void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) = 0;
     virtual void paintLabel(Keyboard *keyboard, cairo_t *cr);
     void paintBackground(cairo_t *cr, bool highlight);
 
@@ -95,7 +95,7 @@ public:
         visible_ = false;
     }
     const char* label(Keyboard *) const override { return ""; }
-    void click(Keyboard *, InputContext *, bool) const override {}
+    void click(Keyboard *, InputContext *, bool) override {}
 };
 
 /*
@@ -104,7 +104,7 @@ public:
 class EmptyKey : public Key {
 public:
     const char* label(Keyboard *) const override { return ""; }
-    void click(Keyboard *, InputContext *, bool) const override {}
+    void click(Keyboard *, InputContext *, bool) override {}
 };
 
 /*
@@ -138,7 +138,7 @@ public:
     TextKey(std::string keyName, std::string text, std::string upperText = "")
             : KeyByName(keyName), text_(text), upperText_(upperText) {};
     const char* label(Keyboard *keyboard) const override;
-    void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) const override;
+    void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) override;
 
 private:
     /*
@@ -153,7 +153,7 @@ public:
     MarkKey(std::string keyName, std::string hankakuMark, std::string zenkakuMark)
             : KeyByName(keyName), hankakuMark_(hankakuMark), zenkakuMark_(zenkakuMark) {};
     const char* label(Keyboard *keyboard) const override;
-    void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) const override;
+    void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) override;
 
 private:
     const std::string hankakuMark_;
@@ -167,10 +167,15 @@ class ForwardKey : public KeyByName {
 public:
     ForwardKey(std::string keyName, std::string label) : KeyByName(keyName), label_(label) {}
     const char* label(Keyboard *) const override { return label_.c_str(); }
-    void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) const override;
+    void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) override;
 
 private:
     const std::string label_;
+
+    /*
+     * Key release must be forwarded only when key push had been forwarded in advance.
+     */
+    bool canForwardKeyRelease_ = false;
 };
 
 class EnterKey : public ForwardKey {
@@ -204,7 +209,7 @@ public:
         setFontSize(18);
     }
     const char* label(Keyboard *) const override { return "全角"; }
-    void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) const override;
+    void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) override;
     void paintLabel(Keyboard *keyboard, cairo_t *cr) override;
 };
 
@@ -214,7 +219,7 @@ public:
         setCustomBackgroundColor({0.3, 0.3, 0.3});
     }
     const char* label(Keyboard *) const override { return u8"\u21E7"; }
-    void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) const override;
+    void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) override;
     void paintLabel(Keyboard *keyboard, cairo_t *cr) override;
 };
 
@@ -224,7 +229,7 @@ public:
         setCustomBackgroundColor({0.3, 0.3, 0.3});
     }
     const char* label(Keyboard *) const override { return "A#"; }
-    void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) const override;
+    void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) override;
     void paintLabel(Keyboard *keyboard, cairo_t *cr) override;
 };
 
