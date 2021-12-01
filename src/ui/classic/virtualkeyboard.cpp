@@ -55,7 +55,7 @@ const char* TextKey::label(Keyboard *keyboard) const {
 void TextKey::click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) {
     FCITX_KEYBOARD() << "TextKey pushed: " << label(keyboard);
 
-    if (!keyboard->isZenkakuOn_) {
+    if (!keyboard->isImeOn_) {
         if (!isRelease) {
             inputContext->commitString(label(keyboard));
         }
@@ -68,7 +68,7 @@ void TextKey::click(Keyboard *keyboard, InputContext *inputContext, bool isRelea
 }
 
 const char* MarkKey::label(Keyboard *keyboard) const {
-    if (keyboard->isZenkakuOn_) {
+    if (keyboard->isImeOn_) {
         return zenkakuMark_.c_str();
     }
     return hankakuMark_.c_str();
@@ -77,7 +77,7 @@ const char* MarkKey::label(Keyboard *keyboard) const {
 void MarkKey::click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) {
     FCITX_KEYBOARD() << "MarkKey pushed: " << label(keyboard);
 
-    if (!keyboard->isZenkakuOn_) {
+    if (!keyboard->isImeOn_) {
         if (!isRelease) {
             inputContext->commitString(label(keyboard));
         }
@@ -119,13 +119,13 @@ void ZenkakuHankakuKey::click(Keyboard *keyboard, InputContext *, bool isRelease
     if (isRelease) {
         return;
     }
-    keyboard->isZenkakuOn_ = !keyboard->isZenkakuOn_;
+    keyboard->toggleInputMethod();
 }
 
 void ZenkakuHankakuKey::paintLabel(Keyboard *keyboard, cairo_t *cr) {
     cairo_save(cr);
 
-    if (keyboard->isZenkakuOn_) {
+    if (keyboard->isImeOn_) {
         cairo_set_source_rgb(cr, 0.2, 0.7, 0.6);
     } else {
         cairo_set_source_rgb(cr, 0.8, 0.8, 0.8);
@@ -203,6 +203,25 @@ void ModeSwitchKey::paintLabel(Keyboard *keyboard, cairo_t *cr) {
     cairo_restore(cr);
 }
 
+const char* LanguageSwitchKey::label(Keyboard *keyboard) const {
+    switch (keyboard->type_) {
+    case KeyboardType::Anthy:
+        return "JP";
+    case KeyboardType::Pinyin:
+        return "CH";
+    default:
+        return "X";
+    }
+}
+
+void LanguageSwitchKey::click(Keyboard *keyboard, InputContext *, bool isRelease) {
+    FCITX_KEYBOARD() << "LanguageSwitchKey pushed";
+    if (isRelease) {
+        return;
+    }
+    keyboard->switchLanguage();
+}
+
 Keyboard::Keyboard(Instance *instance) : instance_(instance) {
     setTextKeys();
 
@@ -259,7 +278,8 @@ void Keyboard::setTextKeys() {
     keys_.emplace_back(new TextKey("m", "m", "M"));
     keys_.emplace_back(new MarkKey("minus", "-", "ー"));
     keys_.emplace_back(new ArrowKey("Up", u8"\u2191"));
-    keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(1.5);
+    keys_.emplace_back(new LanguageSwitchKey());
+    keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new MarkKey("1", "1", "１"));
     keys_.emplace_back(new MarkKey("2", "2", "２"));
     keys_.emplace_back(new MarkKey("3", "3", "３")); keys_.back()->setCustomLayout(1.0, true);
@@ -323,7 +343,8 @@ void Keyboard::setMarkKeys() {
     keys_.emplace_back(new MarkKey("greater", ">", "＞"));
     keys_.emplace_back(new MarkKey("minus", "-", "ー"));
     keys_.emplace_back(new ArrowKey("Up", u8"\u2191"));
-    keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(1.5);
+    keys_.emplace_back(new LanguageSwitchKey());
+    keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new MarkKey("1", "1", "１"));
     keys_.emplace_back(new MarkKey("2", "2", "２"));
     keys_.emplace_back(new MarkKey("3", "3", "３")); keys_.back()->setCustomLayout(1.0, true);
@@ -341,6 +362,47 @@ void Keyboard::setMarkKeys() {
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new MarkKey("0", "0", "０")); keys_.back()->setCustomLayout(2.0);
     keys_.emplace_back(new MarkKey("period", ".", "。")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+}
+
+void Keyboard::syncState() {
+    auto imName = instance_->currentInputMethod();
+    if (imName == imeNames[KeyboardType::Anthy]) {
+        type_ = KeyboardType::Anthy;
+        isImeOn_ = true;
+    } else if (imName == imeNames[KeyboardType::Pinyin]) {
+        type_ = KeyboardType::Pinyin;
+        isImeOn_ = true;
+    } else {
+        isImeOn_ = false;
+    }
+}
+
+void Keyboard::switchLanguage() {
+    // TODO generalization
+    instance_->enumerateGroup(true);
+    syncState();
+}
+
+void Keyboard::toggleInputMethod() {
+    isImeOn_ = !isImeOn_;
+    switch (type_) {
+    case KeyboardType::Anthy:
+        if (isImeOn_) {
+            instance_->setCurrentInputMethod(imeNames[KeyboardType::Anthy]);
+        } else {
+            instance_->setCurrentInputMethod(offKeyboardName);
+        }
+        break;
+    case KeyboardType::Pinyin:
+        if (isImeOn_) {
+            instance_->setCurrentInputMethod(imeNames[KeyboardType::Pinyin]);
+        } else {
+            instance_->setCurrentInputMethod(offKeyboardName);
+        }
+        break;
+    default:
+        break;
+    }
 }
 
 void Keyboard::paint(cairo_t *cr, unsigned int offsetX, unsigned int offsetY) {

@@ -272,6 +272,10 @@ void InputWindow::update(InputContext *inputContext) {
     auto &inputPanel = inputContext->inputPanel();
     inputContext_ = inputContext->watch();
 
+    if (hasVirtualKeyboard()) {
+        keyboard_->syncState();
+    }
+
     cursor_ = -1;
     auto preedit = instance->outputFilter(inputContext, inputPanel.preedit());
     auto auxUp = instance->outputFilter(inputContext, inputPanel.auxUp());

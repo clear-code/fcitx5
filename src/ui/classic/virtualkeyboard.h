@@ -233,10 +233,33 @@ public:
     void paintLabel(Keyboard *keyboard, cairo_t *cr) override;
 };
 
+class LanguageSwitchKey : public Key {
+public:
+    LanguageSwitchKey() {
+        setCustomBackgroundColor({0.3, 0.3, 0.3});
+        setFontColor({1.0, 1.0, 1.0});
+    }
+    const char* label(Keyboard *keyboard) const override;
+    void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) override;
+};
+
 enum class KeyboardMode {
     Text,
     Mark,
 };
+
+enum class KeyboardType {
+    Anthy,
+    Pinyin,
+};
+
+static std::map<KeyboardType, std::string> imeNames = {
+    {KeyboardType::Anthy, "anthy"},
+    {KeyboardType::Pinyin, "pinyin"},
+};
+
+static const std::string offKeyboardName = "keyboard-us";
+
 
 class Keyboard {
 public:
@@ -245,6 +268,9 @@ public:
     bool click(InputContext *inputContext, int x, int y, bool isRelease);
     void setTextKeys();
     void setMarkKeys();
+    void syncState();
+    void switchLanguage();
+    void toggleInputMethod();
     std::pair<unsigned int, unsigned int> size();
     unsigned int marginX() { return 15; }
     unsigned int marginY() { return 6; }
@@ -261,8 +287,9 @@ protected:
 
 public: // TODO: Should be moved to protected
     KeyboardMode mode_ = KeyboardMode::Text;
+    KeyboardType type_ = KeyboardType::Anthy;
     bool isShiftOn_ = false;
-    bool isZenkakuOn_ = true;
+    bool isImeOn_ = true;
 
 private:
     std::tuple<Key *, bool> findClickedKey(int x, int y);
