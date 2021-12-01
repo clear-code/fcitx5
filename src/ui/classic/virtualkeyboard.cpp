@@ -52,7 +52,7 @@ const char* TextKey::label(Keyboard *keyboard) const {
     return upperText_.c_str();
 }
 
-void TextKey::click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) const {
+void TextKey::click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) {
     FCITX_KEYBOARD() << "TextKey pushed: " << label(keyboard);
 
     if (!keyboard->isZenkakuOn_) {
@@ -74,7 +74,7 @@ const char* MarkKey::label(Keyboard *keyboard) const {
     return hankakuMark_.c_str();
 }
 
-void MarkKey::click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) const {
+void MarkKey::click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) {
     FCITX_KEYBOARD() << "MarkKey pushed: " << label(keyboard);
 
     if (!keyboard->isZenkakuOn_) {
@@ -89,19 +89,32 @@ void MarkKey::click(Keyboard *keyboard, InputContext *inputContext, bool isRelea
     FCITX_KEYBOARD() << "key event result: " << hasProcessedInIME;
 }
 
-void ForwardKey::click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) const {
+void ForwardKey::click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) {
     FCITX_KEYBOARD() << "ForwardKey pushed: " << label(keyboard);
 
     auto keyEvent = fcitx::KeyEvent(inputContext, convert(keyboard->isShiftOn_), isRelease);
     auto hasProcessedInIME = inputContext->keyEvent(keyEvent);
     FCITX_KEYBOARD() << "key event result: " << hasProcessedInIME;
 
-    if (!hasProcessedInIME) {
-        inputContext->forwardKey(convert(keyboard->isShiftOn_), isRelease);
+    if(hasProcessedInIME) {
+        canForwardKeyRelease_ = false;
+        return;
     }
+
+    if (!isRelease) {
+        inputContext->forwardKey(convert(keyboard->isShiftOn_), false);
+        canForwardKeyRelease_ = true;
+        return;
+    }
+
+    if (!canForwardKeyRelease_) {
+        return;
+    }
+
+    inputContext->forwardKey(convert(keyboard->isShiftOn_), true);
 }
 
-void ZenkakuHankakuKey::click(Keyboard *keyboard, InputContext *, bool isRelease) const {
+void ZenkakuHankakuKey::click(Keyboard *keyboard, InputContext *, bool isRelease) {
     FCITX_KEYBOARD() << "ZenkakuHankakuKey pushed: " << label(keyboard);
     if (isRelease) {
         return;
@@ -126,7 +139,7 @@ void ZenkakuHankakuKey::paintLabel(Keyboard *keyboard, cairo_t *cr) {
     cairo_restore(cr);
 }
 
-void ShiftToggleKey::click(Keyboard *keyboard, InputContext *, bool isRelease) const {
+void ShiftToggleKey::click(Keyboard *keyboard, InputContext *, bool isRelease) {
     FCITX_KEYBOARD() << "ShiftToggleKey pushed: " << label(keyboard);
     if (isRelease) {
         return;
@@ -151,7 +164,7 @@ void ShiftToggleKey::paintLabel(Keyboard *keyboard, cairo_t *cr) {
     cairo_restore(cr);
 }
 
-void ModeSwitchKey::click(Keyboard *keyboard, InputContext *, bool isRelease) const {
+void ModeSwitchKey::click(Keyboard *keyboard, InputContext *, bool isRelease) {
     FCITX_KEYBOARD() << "ModeSwitchKey pushed";
 
     if (isRelease) {
