@@ -12,6 +12,7 @@
 #include <pango/pango.h>
 #include "fcitx/instance.h"
 #include "fcitx/inputcontext.h"
+#include "fcitx/inputmethodmanager.h"
 #include <fcitx-utils/event.h>
 #include "fcitx-utils/log.h"
 
@@ -249,16 +250,18 @@ enum class KeyboardMode {
 };
 
 enum class KeyboardType {
+    Unknown,
     Anthy,
     Pinyin,
 };
 
 static std::map<KeyboardType, std::string> imeNames = {
+    {KeyboardType::Unknown, ""},
     {KeyboardType::Anthy, "anthy"},
     {KeyboardType::Pinyin, "pinyin"},
 };
 
-static const std::string offKeyboardName = "keyboard-us";
+static const std::string offImeName = "keyboard-us";
 
 
 class Keyboard {
@@ -268,7 +271,7 @@ public:
     bool click(InputContext *inputContext, int x, int y, bool isRelease);
     void setTextKeys();
     void setMarkKeys();
-    void syncState();
+    bool syncState();
     void switchLanguage();
     void toggleInputMethod();
     std::pair<unsigned int, unsigned int> size();

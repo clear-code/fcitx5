@@ -364,40 +364,65 @@ void Keyboard::setMarkKeys() {
     keys_.emplace_back(new MarkKey("period", ".", "。")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
 }
 
-void Keyboard::syncState() {
+bool Keyboard::syncState() {
+    // TODO judge current type more strictly.
+    // Ex. Anthy needs both of "anthy" and "keyboard-us".
+
     auto imName = instance_->currentInputMethod();
+
     if (imName == imeNames[KeyboardType::Anthy]) {
         type_ = KeyboardType::Anthy;
         isImeOn_ = true;
+        return true;
     } else if (imName == imeNames[KeyboardType::Pinyin]) {
         type_ = KeyboardType::Pinyin;
         isImeOn_ = true;
-    } else {
+        return true;
+    } else if (imName == offImeName) {
         isImeOn_ = false;
+        return true;
     }
+
+    type_ = KeyboardType::Unknown;
+    return false;
 }
 
 void Keyboard::switchLanguage() {
-    // TODO generalization
-    instance_->enumerateGroup(true);
-    syncState();
+    const auto maxTryCount = 10;
+    auto tryCount = 0;
+    do
+    {
+        if (instance_->inputMethodManager().groupCount() > 1) {
+            instance_->enumerateGroup(true);
+        } else {
+            instance_->enumerate(true);
+            if (instance_->currentInputMethod() == offImeName) {
+                instance_->enumerate(true);
+            }
+        }
+        tryCount ++;
+        if (maxTryCount <= tryCount) {
+            break;
+        }
+    } while (!syncState());
 }
 
 void Keyboard::toggleInputMethod() {
-    isImeOn_ = !isImeOn_;
     switch (type_) {
     case KeyboardType::Anthy:
+        isImeOn_ = !isImeOn_;
         if (isImeOn_) {
             instance_->setCurrentInputMethod(imeNames[KeyboardType::Anthy]);
         } else {
-            instance_->setCurrentInputMethod(offKeyboardName);
+            instance_->setCurrentInputMethod(offImeName);
         }
         break;
     case KeyboardType::Pinyin:
+        isImeOn_ = !isImeOn_;
         if (isImeOn_) {
             instance_->setCurrentInputMethod(imeNames[KeyboardType::Pinyin]);
         } else {
-            instance_->setCurrentInputMethod(offKeyboardName);
+            instance_->setCurrentInputMethod(offImeName);
         }
         break;
     default:

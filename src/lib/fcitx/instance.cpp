@@ -2334,6 +2334,7 @@ bool Instance::enumerateGroup(bool forward) {
         return false;
     }
     if (forward) {
+        // TODO fix this so that this can make moving next group.
         imManager.setCurrentGroup(groups[1]);
     } else {
         imManager.setCurrentGroup(groups.back());
