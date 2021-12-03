@@ -21,6 +21,7 @@ namespace fcitx {
 namespace classicui {
 
 enum KeyLabelAlignVertical {
+    Top,
     Center,
     Bottom,
 };
@@ -63,6 +64,10 @@ public:
     }
 
     double labelOffsetY(cairo_text_extents_t extents) const {
+        if (labelAlignVertical_ == KeyLabelAlignVertical::Top) {
+            const auto topMargin = 10;
+            return - extents.y_bearing + topMargin;
+        }
         if (labelAlignVertical_ == KeyLabelAlignVertical::Bottom) {
             const auto bottomMargin = 10;
             return height_ - extents.height - extents.y_bearing - bottomMargin;
