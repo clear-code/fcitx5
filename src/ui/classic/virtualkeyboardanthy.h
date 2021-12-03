@@ -42,8 +42,9 @@ private:
 
 class AnthyTextKey : public TextKey {
 public:
-    AnthyTextKey(std::string keyName, std::string text, std::string upperText = "")
-        : TextKey(keyName, text, upperText) {};
+    AnthyTextKey(std::string text, std::string upperText = "", std::string keyName = "",
+        std::string upperKeyName = "")
+        : TextKey(text, upperText, keyName, upperKeyName) {};
     void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
 
 private:

@@ -49,7 +49,7 @@ void AnthyTextKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, 
         return;
     }
 
-    auto keyEvent = fcitx::KeyEvent(inputContext, convert(), isRelease);
+    auto keyEvent = fcitx::KeyEvent(inputContext, convert(keyboard->isShiftOn_), isRelease);
     auto hasProcessedInIME = inputContext->keyEvent(keyEvent);
     FCITX_KEYBOARD() << "key event result: " << hasProcessedInIME;
 }
@@ -136,16 +136,16 @@ void AnthyModeSwitchKey::paintLabel(VirtualKeyboard *keyboard, cairo_t *cr) {
 
 void AnthyKeyboard::setTextKeys() {
     keys_.clear();
-    keys_.emplace_back(new AnthyTextKey("q", "q", "Q"));
-    keys_.emplace_back(new AnthyTextKey("w", "w", "W"));
-    keys_.emplace_back(new AnthyTextKey("e", "e", "E"));
-    keys_.emplace_back(new AnthyTextKey("r", "r", "R"));
-    keys_.emplace_back(new AnthyTextKey("t", "t", "T"));
-    keys_.emplace_back(new AnthyTextKey("y", "y", "Y"));
-    keys_.emplace_back(new AnthyTextKey("u", "u", "U"));
-    keys_.emplace_back(new AnthyTextKey("i", "i", "I"));
-    keys_.emplace_back(new AnthyTextKey("o", "o", "O"));
-    keys_.emplace_back(new AnthyTextKey("p", "p", "P"));
+    keys_.emplace_back(new AnthyTextKey("q", "Q"));
+    keys_.emplace_back(new AnthyTextKey("w", "W"));
+    keys_.emplace_back(new AnthyTextKey("e", "E"));
+    keys_.emplace_back(new AnthyTextKey("r", "R"));
+    keys_.emplace_back(new AnthyTextKey("t", "T"));
+    keys_.emplace_back(new AnthyTextKey("y", "Y"));
+    keys_.emplace_back(new AnthyTextKey("u", "U"));
+    keys_.emplace_back(new AnthyTextKey("i", "I"));
+    keys_.emplace_back(new AnthyTextKey("o", "O"));
+    keys_.emplace_back(new AnthyTextKey("p", "P"));
     keys_.emplace_back(new BackSpaceKey()); keys_.back()->setCustomLayout(1.0);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new AnthyMarkKey("7", "7", "７"));
@@ -153,15 +153,15 @@ void AnthyKeyboard::setTextKeys() {
     keys_.emplace_back(new AnthyMarkKey("9", "9", "９")); keys_.back()->setCustomLayout(1.0, true);
 
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new AnthyTextKey("a", "a", "A"));
-    keys_.emplace_back(new AnthyTextKey("s", "s", "S"));
-    keys_.emplace_back(new AnthyTextKey("d", "d", "D"));
-    keys_.emplace_back(new AnthyTextKey("f", "f", "F"));
-    keys_.emplace_back(new AnthyTextKey("g", "g", "G"));
-    keys_.emplace_back(new AnthyTextKey("h", "h", "H"));
-    keys_.emplace_back(new AnthyTextKey("j", "j", "J"));
-    keys_.emplace_back(new AnthyTextKey("k", "k", "K"));
-    keys_.emplace_back(new AnthyTextKey("l", "l", "L"));
+    keys_.emplace_back(new AnthyTextKey("a", "A"));
+    keys_.emplace_back(new AnthyTextKey("s", "S"));
+    keys_.emplace_back(new AnthyTextKey("d", "D"));
+    keys_.emplace_back(new AnthyTextKey("f", "F"));
+    keys_.emplace_back(new AnthyTextKey("g", "G"));
+    keys_.emplace_back(new AnthyTextKey("h", "H"));
+    keys_.emplace_back(new AnthyTextKey("j", "J"));
+    keys_.emplace_back(new AnthyTextKey("k", "K"));
+    keys_.emplace_back(new AnthyTextKey("l", "L"));
     keys_.emplace_back(new EnterKey()); keys_.back()->setCustomLayout(1.5);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new AnthyMarkKey("4", "4", "４"));
@@ -169,13 +169,13 @@ void AnthyKeyboard::setTextKeys() {
     keys_.emplace_back(new AnthyMarkKey("6", "6", "６")); keys_.back()->setCustomLayout(1.0, true);
 
     keys_.emplace_back(new ShiftToggleKey());
-    keys_.emplace_back(new AnthyTextKey("z", "z", "Z"));
-    keys_.emplace_back(new AnthyTextKey("x", "x", "X"));
-    keys_.emplace_back(new AnthyTextKey("c", "c", "C"));
-    keys_.emplace_back(new AnthyTextKey("v", "v", "V"));
-    keys_.emplace_back(new AnthyTextKey("b", "b", "B"));
-    keys_.emplace_back(new AnthyTextKey("n", "n", "N"));
-    keys_.emplace_back(new AnthyTextKey("m", "m", "M"));
+    keys_.emplace_back(new AnthyTextKey("z", "Z"));
+    keys_.emplace_back(new AnthyTextKey("x", "X"));
+    keys_.emplace_back(new AnthyTextKey("c", "C"));
+    keys_.emplace_back(new AnthyTextKey("v", "V"));
+    keys_.emplace_back(new AnthyTextKey("b", "B"));
+    keys_.emplace_back(new AnthyTextKey("n", "N"));
+    keys_.emplace_back(new AnthyTextKey("m", "M"));
     keys_.emplace_back(new AnthyMarkKey("minus", "-", "ー"));
     keys_.emplace_back(new ArrowKey("Up", u8"\u2191"));
     keys_.emplace_back(new LanguageSwitchKey());
