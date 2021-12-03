@@ -87,7 +87,6 @@ public:
     }
     const char* label(VirtualKeyboard *keyboard) const override;
     void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
-    // void paintLabel(VirtualKeyboard *keyboard, cairo_t *cr) override;
 };
 
 } // namespace classicui
