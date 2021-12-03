@@ -9,6 +9,7 @@
 
 #include "virtualkeyboard.h"
 #include "virtualkeyboardi18n.h"
+#include "virtualkeygeneral.h"
 
 namespace fcitx {
 namespace classicui {
