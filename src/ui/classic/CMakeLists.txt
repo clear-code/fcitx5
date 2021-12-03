@@ -20,7 +20,7 @@ if (ENABLE_X11)
 endif()
 
 add_library(classicui MODULE
-    classicui.cpp window.cpp theme.cpp inputwindow.cpp virtualkeyboard.cpp
+    classicui.cpp window.cpp theme.cpp inputwindow.cpp virtualkeyboard.cpp virtualkeygeneral.cpp
     virtualkeyboardi18n.cpp virtualkeyboardanthy.cpp virtualkeyboardpinyin.cpp
     ${CLASSICUI_WAYLAND_SRCS}
     )
