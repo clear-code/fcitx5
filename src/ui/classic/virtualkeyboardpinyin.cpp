@@ -69,7 +69,7 @@ void PinyinSpaceKey::click(VirtualKeyboard *keyboard, InputContext *inputContext
         return;
     }
 
-    auto keyEvent = fcitx::KeyEvent(inputContext, convert(keyboard->isShiftOn_), isRelease);
+    auto keyEvent = fcitx::KeyEvent(inputContext, convert(), isRelease);
     auto hasProcessedInIME = inputContext->keyEvent(keyEvent);
     FCITX_KEYBOARD() << "key event result: " << hasProcessedInIME;
 
