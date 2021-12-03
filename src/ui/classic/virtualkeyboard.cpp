@@ -108,6 +108,16 @@ void VirtualKeyboard::setCurrentInputMethod(std::string name) {
     instance_->setCurrentInputMethod(name);
 }
 
+bool VirtualKeyboard::isPreediting() {
+    auto inputContext = lastInputContext_.get();
+    if (!inputContext) {
+        return false;
+    }
+
+    auto candidateList = inputContext->inputPanel().candidateList();
+    return !!candidateList;
+}
+
 void VirtualKeyboard::paint(cairo_t *cr, unsigned int offsetX, unsigned int offsetY) {
     int curX = offsetX;
     int curY = offsetY;

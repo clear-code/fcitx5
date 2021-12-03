@@ -57,9 +57,8 @@ void PinyinMarkKey::click(VirtualKeyboard *keyboard, InputContext *inputContext,
     inputContext->commitString(label(keyboard));
 }
 
-const char* PinyinSpaceKey::label(VirtualKeyboard *) const {
-    // TODO display 选定 / 空格 depending on preediting or not preediting
-    return "";
+const char* PinyinSpaceKey::label(VirtualKeyboard *keyboard) const {
+    return keyboard->isPreediting() ? "选定" : "空格";
 }
 
 void PinyinSpaceKey::click(VirtualKeyboard *, InputContext *inputContext, bool isRelease) {
@@ -80,6 +79,9 @@ void PinyinSpaceKey::click(VirtualKeyboard *, InputContext *inputContext, bool i
     inputContext->commitString(" ");
 }
 
+const char* PinyinEnterKey::label(VirtualKeyboard *keyboard) const {
+    return keyboard->isPreediting() ? "确认" : "换行";
+}
 
 void PinyinModeSwitchKey::click(VirtualKeyboard *keyboard, InputContext *, bool isRelease) {
     FCITX_KEYBOARD() << "PinyinModeSwitchKey pushed";
@@ -157,7 +159,7 @@ void PinyinKeyboard::setTextKeys() {
     keys_.emplace_back(new PinyinTextKey("j", "J"));
     keys_.emplace_back(new PinyinTextKey("k", "K"));
     keys_.emplace_back(new PinyinTextKey("l", "L"));
-    keys_.emplace_back(new EnterKey()); keys_.back()->setCustomLayout(1.5);
+    keys_.emplace_back(new PinyinEnterKey()); keys_.back()->setCustomLayout(1.5);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new PinyinMarkKey("4"));
     keys_.emplace_back(new PinyinMarkKey("5"));
@@ -221,7 +223,7 @@ void PinyinKeyboard::setMarkKeys() {
     keys_.emplace_back(new PinyinMarkKey("—"));
     keys_.emplace_back(new PinyinMarkKey("…")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
     keys_.emplace_back(new PinyinMarkKey("@"));
-    keys_.emplace_back(new EnterKey()); keys_.back()->setCustomLayout(1.5);
+    keys_.emplace_back(new PinyinEnterKey()); keys_.back()->setCustomLayout(1.5);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new PinyinMarkKey("4"));
     keys_.emplace_back(new PinyinMarkKey("5"));
@@ -285,7 +287,7 @@ void PinyinKeyboard::setAdditionalMarkKeys() {
     keys_.emplace_back(new PinyinMarkKey("-"));
     keys_.emplace_back(new PinyinMarkKey("~"));
     keys_.emplace_back(new PinyinMarkKey("@"));
-    keys_.emplace_back(new EnterKey()); keys_.back()->setCustomLayout(1.5);
+    keys_.emplace_back(new PinyinEnterKey()); keys_.back()->setCustomLayout(1.5);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new PinyinMarkKey("4"));
     keys_.emplace_back(new PinyinMarkKey("5"));

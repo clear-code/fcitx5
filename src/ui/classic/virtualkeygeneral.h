@@ -88,7 +88,7 @@ private:
 class ForwardKey : public KeyByName {
 public:
     ForwardKey(std::string keyName, std::string label) : KeyByName(keyName), label_(label) {}
-    const char* label(VirtualKeyboard *) const override { return label_.c_str(); }
+    virtual const char* label(VirtualKeyboard *) const override { return label_.c_str(); }
     void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
 
 private:
