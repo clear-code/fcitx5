@@ -93,6 +93,7 @@ public:
 class PinyinMarkToggleKey : public VirtualKey {
 public:
     PinyinMarkToggleKey() {
+        setFontSize(18);
         setFontColor({1.0, 1.0, 1.0});
         setCustomBackgroundColor({0.3, 0.3, 0.3});
     }

@@ -95,9 +95,9 @@ void PinyinModeSwitchKey::click(VirtualKeyboard *keyboard, InputContext *, bool 
 
 const char* PinyinMarkToggleKey::label(VirtualKeyboard *keyboard) const {
     if (keyboard->i18nKeyboard<PinyinKeyboard>()->isAdditionalMarkOn()) {
-        return "“「《";
+        return "返回";
     }
-    return "[{+";
+    return "更多";
 }
 
 void PinyinMarkToggleKey::click(VirtualKeyboard *keyboard, InputContext *, bool isRelease) {
