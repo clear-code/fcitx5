@@ -55,38 +55,11 @@ const char* TextKey::label(Keyboard *keyboard) const {
 void TextKey::click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) {
     FCITX_KEYBOARD() << "TextKey pushed: " << label(keyboard);
 
-    if (!keyboard->isImeOn_) {
-        if (!isRelease) {
-            inputContext->commitString(label(keyboard));
-        }
+    if (isRelease) {
         return;
     }
 
-    auto keyEvent = fcitx::KeyEvent(inputContext, convert(), isRelease);
-    auto hasProcessedInIME = inputContext->keyEvent(keyEvent);
-    FCITX_KEYBOARD() << "key event result: " << hasProcessedInIME;
-}
-
-const char* MarkKey::label(Keyboard *keyboard) const {
-    if (keyboard->isImeOn_) {
-        return zenkakuMark_.c_str();
-    }
-    return hankakuMark_.c_str();
-}
-
-void MarkKey::click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) {
-    FCITX_KEYBOARD() << "MarkKey pushed: " << label(keyboard);
-
-    if (!keyboard->isImeOn_) {
-        if (!isRelease) {
-            inputContext->commitString(label(keyboard));
-        }
-        return;
-    }
-
-    auto keyEvent = fcitx::KeyEvent(inputContext, convert(), isRelease);
-    auto hasProcessedInIME = inputContext->keyEvent(keyEvent);
-    FCITX_KEYBOARD() << "key event result: " << hasProcessedInIME;
+    inputContext->commitString(label(keyboard));
 }
 
 void ForwardKey::click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) {
@@ -114,31 +87,6 @@ void ForwardKey::click(Keyboard *keyboard, InputContext *inputContext, bool isRe
     inputContext->forwardKey(convert(keyboard->isShiftOn_), true);
 }
 
-void ZenkakuHankakuKey::click(Keyboard *keyboard, InputContext *, bool isRelease) {
-    FCITX_KEYBOARD() << "ZenkakuHankakuKey pushed: " << label(keyboard);
-    if (isRelease) {
-        return;
-    }
-    keyboard->toggleInputMethod();
-}
-
-void ZenkakuHankakuKey::paintLabel(Keyboard *keyboard, cairo_t *cr) {
-    cairo_save(cr);
-
-    if (keyboard->isImeOn_) {
-        cairo_set_source_rgb(cr, 0.2, 0.7, 0.6);
-    } else {
-        cairo_set_source_rgb(cr, 0.8, 0.8, 0.8);
-    }
-    cairo_set_font_size(cr, fontSize_);
-    cairo_text_extents_t extents;
-    cairo_text_extents(cr, label(keyboard), &extents);
-    cairo_translate(cr, labelOffsetX(extents), labelOffsetY(extents));
-    cairo_show_text(cr, label(keyboard));
-
-    cairo_restore(cr);
-}
-
 void ShiftToggleKey::click(Keyboard *keyboard, InputContext *, bool isRelease) {
     FCITX_KEYBOARD() << "ShiftToggleKey pushed: " << label(keyboard);
     if (isRelease) {
@@ -164,47 +112,8 @@ void ShiftToggleKey::paintLabel(Keyboard *keyboard, cairo_t *cr) {
     cairo_restore(cr);
 }
 
-void ModeSwitchKey::click(Keyboard *keyboard, InputContext *, bool isRelease) {
-    FCITX_KEYBOARD() << "ModeSwitchKey pushed";
-
-    if (isRelease) {
-        return;
-    }
-
-    if (keyboard->mode_ == KeyboardMode::Text) {
-        keyboard->mode_ = KeyboardMode::Mark;
-        keyboard->setMarkKeys();
-    } else {
-        keyboard->mode_ = KeyboardMode::Text;
-        keyboard->setTextKeys();
-    }
-}
-
-void ModeSwitchKey::paintLabel(Keyboard *keyboard, cairo_t *cr) {
-    cairo_save(cr);
-
-    cairo_set_font_size(cr, fontSize_);
-    cairo_text_extents_t extents;
-    cairo_text_extents(cr, label(keyboard), &extents);
-    cairo_translate(cr, labelOffsetX(extents), labelOffsetY(extents));
-
-    if (keyboard->mode_ == KeyboardMode::Text) {
-        cairo_set_source_rgb(cr, 0.2, 0.7, 0.6);
-        cairo_show_text(cr, "A");
-        cairo_set_source_rgb(cr, 0.8, 0.8, 0.8);
-        cairo_show_text(cr, "#");
-    } else {
-        cairo_set_source_rgb(cr, 0.8, 0.8, 0.8);
-        cairo_show_text(cr, "A");
-        cairo_set_source_rgb(cr, 0.2, 0.7, 0.6);
-        cairo_show_text(cr, "#");
-    }
-
-    cairo_restore(cr);
-}
-
 const char* LanguageSwitchKey::label(Keyboard *keyboard) const {
-    switch (keyboard->type_) {
+    switch (keyboard->i18nKeyboard()->type()) {
     case KeyboardType::Anthy:
         return "JP";
     case KeyboardType::Pinyin:
@@ -223,8 +132,6 @@ void LanguageSwitchKey::click(Keyboard *keyboard, InputContext *, bool isRelease
 }
 
 Keyboard::Keyboard(Instance *instance) : instance_(instance) {
-    setTextKeys();
-
     repeatKeyTimer_ = instance_->eventLoop().addTimeEvent(
         CLOCK_MONOTONIC, now(CLOCK_MONOTONIC), 0,
         [this](EventSourceTime *, uint64_t) {
@@ -232,159 +139,38 @@ Keyboard::Keyboard(Instance *instance) : instance_(instance) {
             return true;
         });
     repeatKeyTimer_->setEnabled(false);
-}
 
-void Keyboard::setTextKeys() {
-    keys_.clear();
-    keys_.emplace_back(new TextKey("q", "q", "Q"));
-    keys_.emplace_back(new TextKey("w", "w", "W"));
-    keys_.emplace_back(new TextKey("e", "e", "E"));
-    keys_.emplace_back(new TextKey("r", "r", "R"));
-    keys_.emplace_back(new TextKey("t", "t", "T"));
-    keys_.emplace_back(new TextKey("y", "y", "Y"));
-    keys_.emplace_back(new TextKey("u", "u", "U"));
-    keys_.emplace_back(new TextKey("i", "i", "I"));
-    keys_.emplace_back(new TextKey("o", "o", "O"));
-    keys_.emplace_back(new TextKey("p", "p", "P"));
-    keys_.emplace_back(new BackSpaceKey()); keys_.back()->setCustomLayout(1.0);
-    keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new MarkKey("7", "7", "７"));
-    keys_.emplace_back(new MarkKey("8", "8", "８"));
-    keys_.emplace_back(new MarkKey("9", "9", "９")); keys_.back()->setCustomLayout(1.0, true);
-
-    keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new TextKey("a", "a", "A"));
-    keys_.emplace_back(new TextKey("s", "s", "S"));
-    keys_.emplace_back(new TextKey("d", "d", "D"));
-    keys_.emplace_back(new TextKey("f", "f", "F"));
-    keys_.emplace_back(new TextKey("g", "g", "G"));
-    keys_.emplace_back(new TextKey("h", "h", "H"));
-    keys_.emplace_back(new TextKey("j", "j", "J"));
-    keys_.emplace_back(new TextKey("k", "k", "K"));
-    keys_.emplace_back(new TextKey("l", "l", "L"));
-    keys_.emplace_back(new EnterKey()); keys_.back()->setCustomLayout(1.5);
-    keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new MarkKey("4", "4", "４"));
-    keys_.emplace_back(new MarkKey("5", "5", "５"));
-    keys_.emplace_back(new MarkKey("6", "6", "６")); keys_.back()->setCustomLayout(1.0, true);
-
-    keys_.emplace_back(new ShiftToggleKey());
-    keys_.emplace_back(new TextKey("z", "z", "Z"));
-    keys_.emplace_back(new TextKey("x", "x", "X"));
-    keys_.emplace_back(new TextKey("c", "c", "C"));
-    keys_.emplace_back(new TextKey("v", "v", "V"));
-    keys_.emplace_back(new TextKey("b", "b", "B"));
-    keys_.emplace_back(new TextKey("n", "n", "N"));
-    keys_.emplace_back(new TextKey("m", "m", "M"));
-    keys_.emplace_back(new MarkKey("minus", "-", "ー"));
-    keys_.emplace_back(new ArrowKey("Up", u8"\u2191"));
-    keys_.emplace_back(new LanguageSwitchKey());
-    keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new MarkKey("1", "1", "１"));
-    keys_.emplace_back(new MarkKey("2", "2", "２"));
-    keys_.emplace_back(new MarkKey("3", "3", "３")); keys_.back()->setCustomLayout(1.0, true);
-
-    keys_.emplace_back(new ModeSwitchKey());
-    keys_.emplace_back(new ZenkakuHankakuKey());
-    keys_.emplace_back(new MarkKey("comma", ",", "、")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-    keys_.emplace_back(new MarkKey("period", ".", "。")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-    keys_.emplace_back(new MarkKey("space", " ",  "")); keys_.back()->setCustomLayout(2.0); keys_.back()->setCustomBackgroundColor({0.3, 0.3, 0.3});
-    keys_.emplace_back(new MarkKey("exclam", "!", "！"));
-    keys_.emplace_back(new MarkKey("question", "?", "？"));
-    keys_.emplace_back(new ArrowKey("Left", u8"\u2190"));
-    keys_.emplace_back(new ArrowKey("Down", u8"\u2193"));
-    keys_.emplace_back(new ArrowKey("Right", u8"\u2192"));
-    keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new MarkKey("0", "0", "０")); keys_.back()->setCustomLayout(2.0);
-    keys_.emplace_back(new MarkKey("period", ".", "。")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-}
-
-void Keyboard::setMarkKeys() {
-    keys_.clear();
-    keys_.emplace_back(new MarkKey("bracketleft", "[", "「"));
-    keys_.emplace_back(new MarkKey("bracketright", "]", "」"));
-    keys_.emplace_back(new MarkKey("braceleft", "{", "｛"));
-    keys_.emplace_back(new MarkKey("braceright", "}", "｝"));
-    keys_.emplace_back(new MarkKey("numbersign", "#", "＃"));
-    keys_.emplace_back(new MarkKey("percent", "%", "％"));
-    keys_.emplace_back(new MarkKey("asciicircum", "^", "＾"));
-    keys_.emplace_back(new MarkKey("asterisk", "*", "＊"));
-    keys_.emplace_back(new MarkKey("plus", "+", "＋"));
-    keys_.emplace_back(new MarkKey("equal", "=", "＝"));
-    keys_.emplace_back(new BackSpaceKey());
-    keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new MarkKey("7", "7", "７"));
-    keys_.emplace_back(new MarkKey("8", "8", "８"));
-    keys_.emplace_back(new MarkKey("9", "9", "９")); keys_.back()->setCustomLayout(1.0, true);
-
-    keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new MarkKey("slash", "/", "・"));
-    keys_.emplace_back(new MarkKey("backslash", "\\", "＼"));
-    keys_.emplace_back(new MarkKey("colon", ":", "："));
-    keys_.emplace_back(new MarkKey("semicolon", ";", "；"));
-    keys_.emplace_back(new MarkKey("parenleft", "(", "（"));
-    keys_.emplace_back(new MarkKey("parenright", ")", "）"));
-    keys_.emplace_back(new MarkKey("ampersand", "&", "＆"));
-    keys_.emplace_back(new MarkKey("at", "@", "＠"));
-    keys_.emplace_back(new MarkKey("yen", u8"\u00A5", "")); // `yen` does not work in Zenkaku
-    keys_.emplace_back(new EnterKey()); keys_.back()->setCustomLayout(1.5);
-    keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new MarkKey("4", "4", "４"));
-    keys_.emplace_back(new MarkKey("5", "5", "５"));
-    keys_.emplace_back(new MarkKey("6", "6", "６")); keys_.back()->setCustomLayout(1.0, true);
-
-    keys_.emplace_back(new ShiftToggleKey());
-    keys_.emplace_back(new MarkKey("quotedbl", "\"", "”"));
-    keys_.emplace_back(new MarkKey("apostrophe", "\'", "’"));
-    keys_.emplace_back(new MarkKey("underscore", "_", "＿")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-    keys_.emplace_back(new MarkKey("bar", "|", "｜"));
-    keys_.emplace_back(new MarkKey("asciitilde", "~", "〜"));
-    keys_.emplace_back(new MarkKey("less", "<", "＜"));
-    keys_.emplace_back(new MarkKey("greater", ">", "＞"));
-    keys_.emplace_back(new MarkKey("minus", "-", "ー"));
-    keys_.emplace_back(new ArrowKey("Up", u8"\u2191"));
-    keys_.emplace_back(new LanguageSwitchKey());
-    keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new MarkKey("1", "1", "１"));
-    keys_.emplace_back(new MarkKey("2", "2", "２"));
-    keys_.emplace_back(new MarkKey("3", "3", "３")); keys_.back()->setCustomLayout(1.0, true);
-
-    keys_.emplace_back(new ModeSwitchKey());
-    keys_.emplace_back(new ZenkakuHankakuKey());
-    keys_.emplace_back(new MarkKey("comma", ",", "、")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-    keys_.emplace_back(new MarkKey("period", ".", "。")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-    keys_.emplace_back(new MarkKey("space", " ", "")); keys_.back()->setCustomLayout(2.0); keys_.back()->setCustomBackgroundColor({0.3, 0.3, 0.3});
-    keys_.emplace_back(new MarkKey("exclam", "!", "！"));
-    keys_.emplace_back(new MarkKey("question", "?", "？"));
-    keys_.emplace_back(new ArrowKey("Left", u8"\u2190"));
-    keys_.emplace_back(new ArrowKey("Down", u8"\u2193"));
-    keys_.emplace_back(new ArrowKey("Right", u8"\u2192"));
-    keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new MarkKey("0", "0", "０")); keys_.back()->setCustomLayout(2.0);
-    keys_.emplace_back(new MarkKey("period", ".", "。")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    syncState();
 }
 
 bool Keyboard::syncState() {
-    // TODO judge current type more strictly.
-    // Ex. Anthy needs both of "anthy" and "keyboard-us".
+    auto curImName = instance_->currentInputMethod();
+    auto imItems = instance_->inputMethodManager().currentGroup().inputMethodList();
 
-    auto imName = instance_->currentInputMethod();
+    auto newI18nKeyboard = i18nKeyboardSelector_.select(curImName, imItems);
 
-    if (imName == imeNames[KeyboardType::Anthy]) {
-        type_ = KeyboardType::Anthy;
-        isImeOn_ = true;
-        return true;
-    } else if (imName == imeNames[KeyboardType::Pinyin]) {
-        type_ = KeyboardType::Pinyin;
-        isImeOn_ = true;
-        return true;
-    } else if (imName == offImeName) {
-        isImeOn_ = false;
+    if (!i18nKeyboard_) {
+        if (!newI18nKeyboard) {
+            return false;
+        }
+        setI18nKeyboard(newI18nKeyboard);
         return true;
     }
 
-    type_ = KeyboardType::Unknown;
-    return false;
+    i18nKeyboard_->syncState(curImName);
+
+    if (!newI18nKeyboard || newI18nKeyboard->type() == i18nKeyboard_->type()) {
+        return false;
+    }
+
+    setI18nKeyboard(newI18nKeyboard);
+    return true;
+}
+
+void Keyboard::setI18nKeyboard(I18nKeyboard *i18nKeyboard) {
+    FCITX_KEYBOARD() << "Set I18nKeyboard:" << imeNames[i18nKeyboard->type()];
+    i18nKeyboard_.reset(i18nKeyboard);
+    i18nKeyboard_->updateKeys();
 }
 
 void Keyboard::switchLanguage() {
@@ -396,9 +182,6 @@ void Keyboard::switchLanguage() {
             instance_->enumerateGroup(true);
         } else {
             instance_->enumerate(true);
-            if (instance_->currentInputMethod() == offImeName) {
-                instance_->enumerate(true);
-            }
         }
         tryCount ++;
         if (maxTryCount <= tryCount) {
@@ -407,27 +190,8 @@ void Keyboard::switchLanguage() {
     } while (!syncState());
 }
 
-void Keyboard::toggleInputMethod() {
-    switch (type_) {
-    case KeyboardType::Anthy:
-        isImeOn_ = !isImeOn_;
-        if (isImeOn_) {
-            instance_->setCurrentInputMethod(imeNames[KeyboardType::Anthy]);
-        } else {
-            instance_->setCurrentInputMethod(offImeName);
-        }
-        break;
-    case KeyboardType::Pinyin:
-        isImeOn_ = !isImeOn_;
-        if (isImeOn_) {
-            instance_->setCurrentInputMethod(imeNames[KeyboardType::Pinyin]);
-        } else {
-            instance_->setCurrentInputMethod(offImeName);
-        }
-        break;
-    default:
-        break;
-    }
+void Keyboard::setCurrentInputMethod(std::string name) {
+    instance_->setCurrentInputMethod(name);
 }
 
 void Keyboard::paint(cairo_t *cr, unsigned int offsetX, unsigned int offsetY) {
@@ -439,7 +203,7 @@ void Keyboard::paint(cairo_t *cr, unsigned int offsetX, unsigned int offsetY) {
 
     paintBackground(cr);
 
-    for (const auto &key : keys_)
+    for (const auto &key : keys())
     {
         if (key->visible_) {
             auto highlight = (pushingKey_ == key.get());
@@ -474,7 +238,7 @@ void Keyboard::paintBackground(cairo_t *cr) {
 std::pair<unsigned int, unsigned int> Keyboard::size() {
     unsigned int width = 0, height = 0, w = 0;
 
-    for (const auto &key : keys_)
+    for (const auto &key : keys())
     {
         w += key->width_;
         if (height == 0)
@@ -530,7 +294,7 @@ bool Keyboard::click(InputContext *inputContext, int x, int y, bool isRelease) {
 }
 
 std::tuple<Key *, bool> Keyboard::findClickedKey(int x, int y) {
-    for (const auto &key : keys_)
+    for (const auto &key : keys())
     {
         if (!(key->visible_ && key->contains(x, y))) continue;
         return {key.get(), true};

@@ -8,6 +8,7 @@
 #define _FCITX_UI_CLASSIC_VIRTUALKEYBOARD_H_
 
 #include "common.h"
+#include "virtualkeyboardi18n.h"
 #include <cairo/cairo.h>
 #include <pango/pango.h>
 #include "fcitx/instance.h"
@@ -138,8 +139,8 @@ class TextKey : public KeyByName {
 public:
     TextKey(std::string keyName, std::string text, std::string upperText = "")
             : KeyByName(keyName), text_(text), upperText_(upperText) {};
-    const char* label(Keyboard *keyboard) const override;
-    void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) override;
+    virtual const char* label(Keyboard *keyboard) const override;
+    virtual void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) override;
 
 private:
     /*
@@ -147,18 +148,6 @@ private:
      */
     const std::string text_;
     const std::string upperText_;
-};
-
-class MarkKey : public KeyByName {
-public:
-    MarkKey(std::string keyName, std::string hankakuMark, std::string zenkakuMark)
-            : KeyByName(keyName), hankakuMark_(hankakuMark), zenkakuMark_(zenkakuMark) {};
-    const char* label(Keyboard *keyboard) const override;
-    void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) override;
-
-private:
-    const std::string hankakuMark_;
-    const std::string zenkakuMark_;
 };
 
 /*
@@ -203,33 +192,12 @@ public:
     };
 };
 
-class ZenkakuHankakuKey : public Key {
-public:
-    ZenkakuHankakuKey() {
-        setCustomBackgroundColor({0.3, 0.3, 0.3});
-        setFontSize(18);
-    }
-    const char* label(Keyboard *) const override { return "全角"; }
-    void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) override;
-    void paintLabel(Keyboard *keyboard, cairo_t *cr) override;
-};
-
 class ShiftToggleKey : public Key {
 public:
     ShiftToggleKey() {
         setCustomBackgroundColor({0.3, 0.3, 0.3});
     }
     const char* label(Keyboard *) const override { return u8"\u21E7"; }
-    void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) override;
-    void paintLabel(Keyboard *keyboard, cairo_t *cr) override;
-};
-
-class ModeSwitchKey : public Key {
-public:
-    ModeSwitchKey() {
-        setCustomBackgroundColor({0.3, 0.3, 0.3});
-    }
-    const char* label(Keyboard *) const override { return "A#"; }
     void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) override;
     void paintLabel(Keyboard *keyboard, cairo_t *cr) override;
 };
@@ -244,59 +212,48 @@ public:
     void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) override;
 };
 
-enum class KeyboardMode {
-    Text,
-    Mark,
-};
-
-enum class KeyboardType {
-    Unknown,
-    Anthy,
-    Pinyin,
-};
-
-static std::map<KeyboardType, std::string> imeNames = {
-    {KeyboardType::Unknown, ""},
-    {KeyboardType::Anthy, "anthy"},
-    {KeyboardType::Pinyin, "pinyin"},
-};
-
-static const std::string offImeName = "keyboard-us";
-
-
 class Keyboard {
 public:
     Keyboard(Instance *instance);
     void paint(cairo_t *cr, unsigned int offsetX, unsigned int offsetY);
     bool click(InputContext *inputContext, int x, int y, bool isRelease);
-    void setTextKeys();
-    void setMarkKeys();
     bool syncState();
     void switchLanguage();
-    void toggleInputMethod();
+    void setCurrentInputMethod(std::string name);
+
+    std::vector<std::unique_ptr<Key>> &keys() { return i18nKeyboard_->keys(); }
+    I18nKeyboard *i18nKeyboard() { return i18nKeyboard_.get(); }
+    template<class T>
+    T *i18nKeyboard() {
+        static_assert(std::is_base_of<I18nKeyboard, T>::value,
+            "type parameter of this function must derive from I18nKeyboard");
+        return static_cast<T *>(i18nKeyboard_.get());
+    }
+
     std::pair<unsigned int, unsigned int> size();
     unsigned int marginX() { return 15; }
     unsigned int marginY() { return 6; }
+
 
 protected:
     void onKeyRepeat();
 
     Instance *instance_;
-    std::vector<std::unique_ptr<Key>> keys_;
     Key *pushingKey_ = nullptr;
     TrackableObjectReference<InputContext> lastInputContext_;
     std::unique_ptr<EventSourceTime> repeatKeyTimer_;
     int32_t repeatRate_ = 40, repeatDelay_ = 400;
 
 public: // TODO: Should be moved to protected
-    KeyboardMode mode_ = KeyboardMode::Text;
-    KeyboardType type_ = KeyboardType::Anthy;
     bool isShiftOn_ = false;
-    bool isImeOn_ = true;
 
 private:
     std::tuple<Key *, bool> findClickedKey(int x, int y);
     void paintBackground(cairo_t *cr);
+    void setI18nKeyboard(I18nKeyboard *i18nKeyboard);
+
+    std::unique_ptr<I18nKeyboard> i18nKeyboard_;
+    I18nKeyboardSelector i18nKeyboardSelector_;
 };
 
 } // namespace classicui
