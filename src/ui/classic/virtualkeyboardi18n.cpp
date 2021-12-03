@@ -46,7 +46,7 @@ I18nKeyboard *I18nKeyboardSelector::select(std::string currentInputMethodName,
 }
 
 KeyboardType I18nKeyboardSelector::findType(std::string inputMethodName) {
-    for (const auto [type, name] : imeNames)
+    for (const auto &[type, name] : imeNames)
     {
         if (inputMethodName == name) {
             return type;
