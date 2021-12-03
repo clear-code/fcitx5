@@ -39,10 +39,14 @@ public:
  */
 class KeyByName : public VirtualKey {
 protected:
-    KeyByName(std::string keyName) : keyName_(keyName) {}
+    KeyByName(std::string keyName, std::string upperKeyName = "")
+        : keyName_(keyName), upperKeyName_(upperKeyName) {}
 
     const char* keyName(bool withShift = false) const {
         if (withShift) {
+            if (!upperKeyName_.empty()) {
+                return upperKeyName_.c_str();
+            }
             return ("SHIFT_" + keyName_).c_str();
         }
         return keyName_.c_str();
@@ -57,12 +61,16 @@ protected:
      * Corresponding to keyNameList in keynametable.h.
      */
     const std::string keyName_;
+    const std::string upperKeyName_;
 };
 
 class TextKey : public KeyByName {
 public:
-    TextKey(std::string keyName, std::string text, std::string upperText = "")
-            : KeyByName(keyName), text_(text), upperText_(upperText) {};
+    TextKey(std::string text, std::string upperText = "", std::string keyName = "",
+        std::string upperKeyName = "")
+        : KeyByName(keyName.empty() ? text : keyName,
+            upperKeyName.empty() ? upperText : upperKeyName),
+          text_(text), upperText_(upperText) {};
     virtual const char* label(VirtualKeyboard *keyboard) const override;
     virtual void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
 
