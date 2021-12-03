@@ -8,14 +8,14 @@
 
 namespace fcitx::classicui {
 
-const char* TextKey::label(Keyboard *keyboard) const {
+const char* TextKey::label(VirtualKeyboard *keyboard) const {
     if (!keyboard->isShiftOn_ || upperText_.empty()) {
         return text_.c_str();
     }
     return upperText_.c_str();
 }
 
-void TextKey::click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) {
+void TextKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) {
     FCITX_KEYBOARD() << "TextKey pushed: " << label(keyboard);
 
     if (isRelease) {
@@ -25,7 +25,7 @@ void TextKey::click(Keyboard *keyboard, InputContext *inputContext, bool isRelea
     inputContext->commitString(label(keyboard));
 }
 
-void ForwardKey::click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) {
+void ForwardKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) {
     FCITX_KEYBOARD() << "ForwardKey pushed: " << label(keyboard);
 
     auto keyEvent = fcitx::KeyEvent(inputContext, convert(keyboard->isShiftOn_), isRelease);
@@ -50,7 +50,7 @@ void ForwardKey::click(Keyboard *keyboard, InputContext *inputContext, bool isRe
     inputContext->forwardKey(convert(keyboard->isShiftOn_), true);
 }
 
-void ShiftToggleKey::click(Keyboard *keyboard, InputContext *, bool isRelease) {
+void ShiftToggleKey::click(VirtualKeyboard *keyboard, InputContext *, bool isRelease) {
     FCITX_KEYBOARD() << "ShiftToggleKey pushed: " << label(keyboard);
     if (isRelease) {
         return;
@@ -58,7 +58,7 @@ void ShiftToggleKey::click(Keyboard *keyboard, InputContext *, bool isRelease) {
     keyboard->isShiftOn_ = !keyboard->isShiftOn_;
 }
 
-void ShiftToggleKey::paintLabel(Keyboard *keyboard, cairo_t *cr) {
+void ShiftToggleKey::paintLabel(VirtualKeyboard *keyboard, cairo_t *cr) {
     cairo_save(cr);
 
     if (keyboard->isShiftOn_) {
@@ -75,7 +75,7 @@ void ShiftToggleKey::paintLabel(Keyboard *keyboard, cairo_t *cr) {
     cairo_restore(cr);
 }
 
-const char* LanguageSwitchKey::label(Keyboard *keyboard) const {
+const char* LanguageSwitchKey::label(VirtualKeyboard *keyboard) const {
     switch (keyboard->i18nKeyboard()->type()) {
     case KeyboardType::Anthy:
         return "JP";
@@ -86,7 +86,7 @@ const char* LanguageSwitchKey::label(Keyboard *keyboard) const {
     }
 }
 
-void LanguageSwitchKey::click(Keyboard *keyboard, InputContext *, bool isRelease) {
+void LanguageSwitchKey::click(VirtualKeyboard *keyboard, InputContext *, bool isRelease) {
     FCITX_KEYBOARD() << "LanguageSwitchKey pushed";
     if (isRelease) {
         return;

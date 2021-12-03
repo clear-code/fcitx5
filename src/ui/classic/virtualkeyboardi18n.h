@@ -25,16 +25,16 @@ static std::map<KeyboardType, std::string> imeNames = {
     {KeyboardType::Pinyin, "pinyin"},
 };
 
-class Key;
+class VirtualKey;
 class I18nKeyboard {
 public:
     virtual KeyboardType type() const = 0;
     virtual void updateKeys() = 0;
     virtual std::vector<std::string> otherNecessaryImeList() { return {}; }
     virtual void syncState(std::string currentInputMethodName);
-    std::vector<std::unique_ptr<Key>> &keys() { return keys_; }
+    std::vector<std::unique_ptr<VirtualKey>> &keys() { return keys_; }
 protected:
-    std::vector<std::unique_ptr<Key>> keys_;
+    std::vector<std::unique_ptr<VirtualKey>> keys_;
 };
 
 class I18nKeyboardSelector {
