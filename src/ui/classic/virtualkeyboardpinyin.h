@@ -64,10 +64,20 @@ private:
 class PinyinSpaceKey : public KeyByName {
 public:
     PinyinSpaceKey() : KeyByName("space") {
+        setFontSize(18);
+        setFontColor({1.0, 1.0, 1.0});
         setCustomBackgroundColor({0.3, 0.3, 0.3});
     }
     const char* label(VirtualKeyboard *keyboard) const override;
     void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
+};
+
+class PinyinEnterKey : public EnterKey {
+public:
+    PinyinEnterKey() {
+        setFontSize(18);
+    }
+    const char* label(VirtualKeyboard *keyboard) const override;
 };
 
 class PinyinModeSwitchKey : public VirtualKey {

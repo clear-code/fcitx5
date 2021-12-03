@@ -14,6 +14,7 @@
 #include "fcitx/instance.h"
 #include "fcitx/inputcontext.h"
 #include "fcitx/inputmethodmanager.h"
+#include "fcitx/inputpanel.h"
 #include <fcitx-utils/event.h>
 #include "fcitx-utils/log.h"
 
@@ -101,6 +102,7 @@ public:
     bool syncState();
     void switchLanguage();
     void setCurrentInputMethod(std::string name);
+    bool isPreediting();
 
     std::vector<std::unique_ptr<VirtualKey>> &keys() { return i18nKeyboard_->keys(); }
     I18nKeyboard *i18nKeyboard() { return i18nKeyboard_.get(); }
