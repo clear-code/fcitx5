@@ -234,8 +234,8 @@ void AnthyKeyboard::setMarkKeys() {
     keys_.emplace_back(new AnthyMarkKey("6", "6", "６")); keys_.back()->setCustomLayout(1.0, true);
 
     keys_.emplace_back(new ShiftToggleKey());
-    keys_.emplace_back(new AnthyMarkKey("quotedbl", "\"", "”"));
-    keys_.emplace_back(new AnthyMarkKey("apostrophe", "\'", "’"));
+    keys_.emplace_back(new AnthyMarkKey("quotedbl", "\"", "”")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Top);
+    keys_.emplace_back(new AnthyMarkKey("apostrophe", "\'", "’")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Top);
     keys_.emplace_back(new AnthyMarkKey("underscore", "_", "＿")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
     keys_.emplace_back(new AnthyMarkKey("bar", "|", "｜"));
     keys_.emplace_back(new AnthyMarkKey("asciitilde", "~", "〜"));
