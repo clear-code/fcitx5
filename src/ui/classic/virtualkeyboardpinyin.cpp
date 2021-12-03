@@ -11,6 +11,10 @@ namespace fcitx::classicui {
 void PinyinKeyboard::updateKeys() {
     if (mode_ == PinyinKeyboardMode::Text) {
         setTextKeys();
+        return;
+    }
+    if (isAdditionalMarkOn()) {
+        setAdditionalMarkKeys();
     } else {
         setMarkKeys();
     }
@@ -23,6 +27,11 @@ void PinyinKeyboard::switchMode() {
         mode_ = PinyinKeyboardMode::Text;
     }
 
+    updateKeys();
+}
+
+void PinyinKeyboard::toggleMark() {
+    isAdditionalMarkOn_ = !isAdditionalMarkOn_;
     updateKeys();
 }
 
@@ -41,10 +50,36 @@ const char* PinyinMarkKey::label(VirtualKeyboard *) const {
 void PinyinMarkKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) {
     FCITX_KEYBOARD() << "PinyinMarkKey pushed: " << label(keyboard);
 
-    auto keyEvent = fcitx::KeyEvent(inputContext, convert(), isRelease);
+    if (isRelease) {
+        return;
+    }
+
+    inputContext->commitString(label(keyboard));
+}
+
+const char* PinyinSpaceKey::label(VirtualKeyboard *) const {
+    // TODO display 选定 / 空格 depending on preediting or not preediting
+    return "";
+}
+
+void PinyinSpaceKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) {
+    FCITX_KEYBOARD() << "PinyinSpaceKey pushed";
+
+    if (isRelease) {
+        return;
+    }
+
+    auto keyEvent = fcitx::KeyEvent(inputContext, convert(keyboard->isShiftOn_), isRelease);
     auto hasProcessedInIME = inputContext->keyEvent(keyEvent);
     FCITX_KEYBOARD() << "key event result: " << hasProcessedInIME;
+
+    if(hasProcessedInIME) {
+        return;
+    }
+
+    inputContext->commitString(" ");
 }
+
 
 void PinyinModeSwitchKey::click(VirtualKeyboard *keyboard, InputContext *, bool isRelease) {
     FCITX_KEYBOARD() << "PinyinModeSwitchKey pushed";
@@ -54,6 +89,21 @@ void PinyinModeSwitchKey::click(VirtualKeyboard *keyboard, InputContext *, bool 
     }
 
     keyboard->i18nKeyboard<PinyinKeyboard>()->switchMode();
+}
+
+const char* PinyinMarkToggleKey::label(VirtualKeyboard *keyboard) const {
+    if (keyboard->i18nKeyboard<PinyinKeyboard>()->isAdditionalMarkOn()) {
+        return "“「《";
+    }
+    return "[{+";
+}
+
+void PinyinMarkToggleKey::click(VirtualKeyboard *keyboard, InputContext *, bool isRelease) {
+    FCITX_KEYBOARD() << "PinyinMarkToggleKey pushed: " << label(keyboard);
+    if (isRelease) {
+        return;
+    }
+    keyboard->i18nKeyboard<PinyinKeyboard>()->toggleMark();
 }
 
 void PinyinModeSwitchKey::paintLabel(VirtualKeyboard *keyboard, cairo_t *cr) {
@@ -80,7 +130,6 @@ void PinyinModeSwitchKey::paintLabel(VirtualKeyboard *keyboard, cairo_t *cr) {
 }
 
 void PinyinKeyboard::setTextKeys() {
-    // TODO fix for pinyin
     keys_.clear();
     keys_.emplace_back(new PinyinTextKey("q", "q", "Q"));
     keys_.emplace_back(new PinyinTextKey("w", "w", "W"));
@@ -94,9 +143,9 @@ void PinyinKeyboard::setTextKeys() {
     keys_.emplace_back(new PinyinTextKey("p", "p", "P"));
     keys_.emplace_back(new BackSpaceKey()); keys_.back()->setCustomLayout(1.0);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new PinyinMarkKey("7", "7"));
-    keys_.emplace_back(new PinyinMarkKey("8", "8"));
-    keys_.emplace_back(new PinyinMarkKey("9", "9")); keys_.back()->setCustomLayout(1.0, true);
+    keys_.emplace_back(new PinyinMarkKey("7"));
+    keys_.emplace_back(new PinyinMarkKey("8"));
+    keys_.emplace_back(new PinyinMarkKey("9")); keys_.back()->setCustomLayout(1.0, true);
 
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new PinyinTextKey("a", "a", "A"));
@@ -110,9 +159,9 @@ void PinyinKeyboard::setTextKeys() {
     keys_.emplace_back(new PinyinTextKey("l", "l", "L"));
     keys_.emplace_back(new EnterKey()); keys_.back()->setCustomLayout(1.5);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new PinyinMarkKey("4", "4"));
-    keys_.emplace_back(new PinyinMarkKey("5", "5"));
-    keys_.emplace_back(new PinyinMarkKey("6", "6")); keys_.back()->setCustomLayout(1.0, true);
+    keys_.emplace_back(new PinyinMarkKey("4"));
+    keys_.emplace_back(new PinyinMarkKey("5"));
+    keys_.emplace_back(new PinyinMarkKey("6")); keys_.back()->setCustomLayout(1.0, true);
 
     keys_.emplace_back(new ShiftToggleKey());
     keys_.emplace_back(new PinyinTextKey("z", "z", "Z"));
@@ -122,91 +171,154 @@ void PinyinKeyboard::setTextKeys() {
     keys_.emplace_back(new PinyinTextKey("b", "b", "B"));
     keys_.emplace_back(new PinyinTextKey("n", "n", "N"));
     keys_.emplace_back(new PinyinTextKey("m", "m", "M"));
-    keys_.emplace_back(new PinyinMarkKey("minus", "-"));
+    keys_.emplace_back(new PinyinMarkKey("、")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
     keys_.emplace_back(new ArrowKey("Up", u8"\u2191"));
     keys_.emplace_back(new LanguageSwitchKey());
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new PinyinMarkKey("1", "1"));
-    keys_.emplace_back(new PinyinMarkKey("2", "2"));
-    keys_.emplace_back(new PinyinMarkKey("3", "3")); keys_.back()->setCustomLayout(1.0, true);
+    keys_.emplace_back(new PinyinMarkKey("1"));
+    keys_.emplace_back(new PinyinMarkKey("2"));
+    keys_.emplace_back(new PinyinMarkKey("3")); keys_.back()->setCustomLayout(1.0, true);
 
     keys_.emplace_back(new PinyinModeSwitchKey()); keys_.back()->setCustomLayout(2.0);
-    keys_.emplace_back(new PinyinMarkKey("comma", ",")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-    keys_.emplace_back(new PinyinMarkKey("period", ".")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-    keys_.emplace_back(new PinyinMarkKey("space", "")); keys_.back()->setCustomLayout(2.0); keys_.back()->setCustomBackgroundColor({0.3, 0.3, 0.3});
-    keys_.emplace_back(new PinyinMarkKey("exclam", "!"));
-    keys_.emplace_back(new PinyinMarkKey("question", "?"));
+    keys_.emplace_back(new PinyinMarkKey("。")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new PinyinMarkKey("，")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new PinyinSpaceKey()); keys_.back()->setCustomLayout(2.0);
+    keys_.emplace_back(new PinyinMarkKey("！"));
+    keys_.emplace_back(new PinyinMarkKey("？"));
     keys_.emplace_back(new ArrowKey("Left", u8"\u2190"));
     keys_.emplace_back(new ArrowKey("Down", u8"\u2193"));
     keys_.emplace_back(new ArrowKey("Right", u8"\u2192"));
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new PinyinMarkKey("0", "0")); keys_.back()->setCustomLayout(2.0);
-    keys_.emplace_back(new PinyinMarkKey("period", ".")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new PinyinMarkKey("0")); keys_.back()->setCustomLayout(2.0);
+    keys_.emplace_back(new PinyinMarkKey(".")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
 }
 
 void PinyinKeyboard::setMarkKeys() {
-    // TODO fix for pinyin
     keys_.clear();
-    keys_.emplace_back(new PinyinMarkKey("bracketleft", "["));
-    keys_.emplace_back(new PinyinMarkKey("bracketright", "]"));
-    keys_.emplace_back(new PinyinMarkKey("braceleft", "{"));
-    keys_.emplace_back(new PinyinMarkKey("braceright", "}"));
-    keys_.emplace_back(new PinyinMarkKey("numbersign", "#"));
-    keys_.emplace_back(new PinyinMarkKey("percent", "%"));
-    keys_.emplace_back(new PinyinMarkKey("asciicircum", "^"));
-    keys_.emplace_back(new PinyinMarkKey("asterisk", "*"));
-    keys_.emplace_back(new PinyinMarkKey("plus", "+"));
-    keys_.emplace_back(new PinyinMarkKey("equal", "="));
+    keys_.emplace_back(new PinyinMarkKey("“"));
+    keys_.emplace_back(new PinyinMarkKey("”"));
+    keys_.emplace_back(new PinyinMarkKey("‘"));
+    keys_.emplace_back(new PinyinMarkKey("’"));
+    keys_.emplace_back(new PinyinMarkKey("（"));
+    keys_.emplace_back(new PinyinMarkKey("）"));
+    keys_.emplace_back(new PinyinMarkKey("「"));
+    keys_.emplace_back(new PinyinMarkKey("」"));
+    keys_.emplace_back(new PinyinMarkKey("『"));
+    keys_.emplace_back(new PinyinMarkKey("』"));
     keys_.emplace_back(new BackSpaceKey());
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new PinyinMarkKey("7", "7"));
-    keys_.emplace_back(new PinyinMarkKey("8", "8"));
-    keys_.emplace_back(new PinyinMarkKey("9", "9")); keys_.back()->setCustomLayout(1.0, true);
+    keys_.emplace_back(new PinyinMarkKey("7"));
+    keys_.emplace_back(new PinyinMarkKey("8"));
+    keys_.emplace_back(new PinyinMarkKey("9")); keys_.back()->setCustomLayout(1.0, true);
 
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new PinyinMarkKey("slash", "/"));
-    keys_.emplace_back(new PinyinMarkKey("backslash", "\\"));
-    keys_.emplace_back(new PinyinMarkKey("colon", ":"));
-    keys_.emplace_back(new PinyinMarkKey("semicolon", ";"));
-    keys_.emplace_back(new PinyinMarkKey("parenleft", "("));
-    keys_.emplace_back(new PinyinMarkKey("parenright", ")"));
-    keys_.emplace_back(new PinyinMarkKey("ampersand", "&"));
-    keys_.emplace_back(new PinyinMarkKey("at", "@"));
-    keys_.emplace_back(new PinyinMarkKey("yen", u8"\u00A5"));
+    keys_.emplace_back(new PinyinMarkKey("《"));
+    keys_.emplace_back(new PinyinMarkKey("》"));
+    keys_.emplace_back(new PinyinMarkKey("〈"));
+    keys_.emplace_back(new PinyinMarkKey("〉"));
+    keys_.emplace_back(new PinyinMarkKey("："));
+    keys_.emplace_back(new PinyinMarkKey("；"));
+    keys_.emplace_back(new PinyinMarkKey("—"));
+    keys_.emplace_back(new PinyinMarkKey("…")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new PinyinMarkKey("@"));
     keys_.emplace_back(new EnterKey()); keys_.back()->setCustomLayout(1.5);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new PinyinMarkKey("4", "4"));
-    keys_.emplace_back(new PinyinMarkKey("5", "5"));
-    keys_.emplace_back(new PinyinMarkKey("6", "6")); keys_.back()->setCustomLayout(1.0, true);
+    keys_.emplace_back(new PinyinMarkKey("4"));
+    keys_.emplace_back(new PinyinMarkKey("5"));
+    keys_.emplace_back(new PinyinMarkKey("6")); keys_.back()->setCustomLayout(1.0, true);
 
-    keys_.emplace_back(new ShiftToggleKey());
-    keys_.emplace_back(new PinyinMarkKey("quotedbl", "\""));
-    keys_.emplace_back(new PinyinMarkKey("apostrophe", "\'"));
-    keys_.emplace_back(new PinyinMarkKey("underscore", "_")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-    keys_.emplace_back(new PinyinMarkKey("bar", "|"));
-    keys_.emplace_back(new PinyinMarkKey("asciitilde", "~"));
-    keys_.emplace_back(new PinyinMarkKey("less", "<"));
-    keys_.emplace_back(new PinyinMarkKey("greater", ">"));
-    keys_.emplace_back(new PinyinMarkKey("minus", "-"));
+    keys_.emplace_back(new PinyinMarkToggleKey());
+    keys_.emplace_back(new PinyinMarkKey("·"));
+    keys_.emplace_back(new PinyinMarkKey("～"));
+    keys_.emplace_back(new PinyinMarkKey("￥"));
+    keys_.emplace_back(new PinyinMarkKey("$"));
+    keys_.emplace_back(new PinyinMarkKey("&"));
+    keys_.emplace_back(new PinyinMarkKey("|"));
+    keys_.emplace_back(new PinyinMarkKey("_")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new PinyinMarkKey("、")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
     keys_.emplace_back(new ArrowKey("Up", u8"\u2191"));
     keys_.emplace_back(new LanguageSwitchKey());
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new PinyinMarkKey("1", "1"));
-    keys_.emplace_back(new PinyinMarkKey("2", "2"));
-    keys_.emplace_back(new PinyinMarkKey("3", "3")); keys_.back()->setCustomLayout(1.0, true);
+    keys_.emplace_back(new PinyinMarkKey("1"));
+    keys_.emplace_back(new PinyinMarkKey("2"));
+    keys_.emplace_back(new PinyinMarkKey("3")); keys_.back()->setCustomLayout(1.0, true);
 
     keys_.emplace_back(new PinyinModeSwitchKey());  keys_.back()->setCustomLayout(2.0);
-    keys_.emplace_back(new PinyinMarkKey("comma", ",")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-    keys_.emplace_back(new PinyinMarkKey("period", ".")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-    keys_.emplace_back(new PinyinMarkKey("space", "")); keys_.back()->setCustomLayout(2.0); keys_.back()->setCustomBackgroundColor({0.3, 0.3, 0.3});
-    keys_.emplace_back(new PinyinMarkKey("exclam", "!"));
-    keys_.emplace_back(new PinyinMarkKey("question", "?"));
+    keys_.emplace_back(new PinyinMarkKey("。")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new PinyinMarkKey("，")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new PinyinSpaceKey()); keys_.back()->setCustomLayout(2.0);
+    keys_.emplace_back(new PinyinMarkKey("！"));
+    keys_.emplace_back(new PinyinMarkKey("？"));
     keys_.emplace_back(new ArrowKey("Left", u8"\u2190"));
     keys_.emplace_back(new ArrowKey("Down", u8"\u2193"));
     keys_.emplace_back(new ArrowKey("Right", u8"\u2192"));
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new PinyinMarkKey("0", "0")); keys_.back()->setCustomLayout(2.0);
-    keys_.emplace_back(new PinyinMarkKey("period", ".")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new PinyinMarkKey("0")); keys_.back()->setCustomLayout(2.0);
+    keys_.emplace_back(new PinyinMarkKey(".")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+}
+
+void PinyinKeyboard::setAdditionalMarkKeys() {
+    keys_.clear();
+    keys_.emplace_back(new PinyinMarkKey("["));
+    keys_.emplace_back(new PinyinMarkKey("]"));
+    keys_.emplace_back(new PinyinMarkKey("{"));
+    keys_.emplace_back(new PinyinMarkKey("}"));
+    keys_.emplace_back(new PinyinMarkKey("#"));
+    keys_.emplace_back(new PinyinMarkKey("%"));
+    keys_.emplace_back(new PinyinMarkKey("^"));
+    keys_.emplace_back(new PinyinMarkKey("*"));
+    keys_.emplace_back(new PinyinMarkKey("+"));
+    keys_.emplace_back(new PinyinMarkKey("="));
+    keys_.emplace_back(new BackSpaceKey());
+    keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
+    keys_.emplace_back(new PinyinMarkKey("7"));
+    keys_.emplace_back(new PinyinMarkKey("8"));
+    keys_.emplace_back(new PinyinMarkKey("9")); keys_.back()->setCustomLayout(1.0, true);
+
+    keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
+    keys_.emplace_back(new PinyinMarkKey("/"));
+    keys_.emplace_back(new PinyinMarkKey("\\"));
+    keys_.emplace_back(new PinyinMarkKey(":"));
+    keys_.emplace_back(new PinyinMarkKey(";"));
+    keys_.emplace_back(new PinyinMarkKey("("));
+    keys_.emplace_back(new PinyinMarkKey(")"));
+    keys_.emplace_back(new PinyinMarkKey("-"));
+    keys_.emplace_back(new PinyinMarkKey("~"));
+    keys_.emplace_back(new PinyinMarkKey("@"));
+    keys_.emplace_back(new EnterKey()); keys_.back()->setCustomLayout(1.5);
+    keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
+    keys_.emplace_back(new PinyinMarkKey("4"));
+    keys_.emplace_back(new PinyinMarkKey("5"));
+    keys_.emplace_back(new PinyinMarkKey("6")); keys_.back()->setCustomLayout(1.0, true);
+
+    keys_.emplace_back(new PinyinMarkToggleKey());
+    keys_.emplace_back(new PinyinMarkKey("\""));
+    keys_.emplace_back(new PinyinMarkKey("\'"));
+    keys_.emplace_back(new PinyinMarkKey(u8"\u00A5"));
+    keys_.emplace_back(new PinyinMarkKey("!"));
+    keys_.emplace_back(new PinyinMarkKey("?"));
+    keys_.emplace_back(new PinyinMarkKey("<"));
+    keys_.emplace_back(new PinyinMarkKey(">"));
+    keys_.emplace_back(new PinyinMarkKey("、")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new ArrowKey("Up", u8"\u2191"));
+    keys_.emplace_back(new LanguageSwitchKey());
+    keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
+    keys_.emplace_back(new PinyinMarkKey("1"));
+    keys_.emplace_back(new PinyinMarkKey("2"));
+    keys_.emplace_back(new PinyinMarkKey("3")); keys_.back()->setCustomLayout(1.0, true);
+
+    keys_.emplace_back(new PinyinModeSwitchKey());  keys_.back()->setCustomLayout(2.0);
+    keys_.emplace_back(new PinyinMarkKey("。")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new PinyinMarkKey("，")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new PinyinSpaceKey()); keys_.back()->setCustomLayout(2.0);
+    keys_.emplace_back(new PinyinMarkKey("！"));
+    keys_.emplace_back(new PinyinMarkKey("？"));
+    keys_.emplace_back(new ArrowKey("Left", u8"\u2190"));
+    keys_.emplace_back(new ArrowKey("Down", u8"\u2193"));
+    keys_.emplace_back(new ArrowKey("Right", u8"\u2192"));
+    keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
+    keys_.emplace_back(new PinyinMarkKey("0")); keys_.back()->setCustomLayout(2.0);
+    keys_.emplace_back(new PinyinMarkKey(".")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
 }
 
 }

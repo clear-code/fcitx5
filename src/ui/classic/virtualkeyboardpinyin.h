@@ -25,10 +25,15 @@ public:
     void updateKeys() override;
     void switchMode();
     PinyinKeyboardMode mode() const { return mode_; }
+    bool isAdditionalMarkOn() const { return isAdditionalMarkOn_; }
+    void toggleMark();
+
 private:
     void setTextKeys();
     void setMarkKeys();
+    void setAdditionalMarkKeys();
     PinyinKeyboardMode mode_ = PinyinKeyboardMode::Text;
+    bool isAdditionalMarkOn_ = false;
 };
 
 class PinyinTextKey : public TextKey {
@@ -45,15 +50,23 @@ private:
     const std::string upperText_;
 };
 
-class PinyinMarkKey : public KeyByName {
+class PinyinMarkKey : public VirtualKey {
 public:
-    PinyinMarkKey(std::string keyName, std::string mark)
-        : KeyByName(keyName), mark_(mark) {};
+    PinyinMarkKey(std::string mark) : mark_(mark) {}
     const char* label(VirtualKeyboard *keyboard) const override;
     void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
 
 private:
-    const std::string mark_;
+    std::string mark_;
+};
+
+class PinyinSpaceKey : public KeyByName {
+public:
+    PinyinSpaceKey() : KeyByName("space") {
+        setCustomBackgroundColor({0.3, 0.3, 0.3});
+    }
+    const char* label(VirtualKeyboard *keyboard) const override;
+    void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
 };
 
 class PinyinModeSwitchKey : public VirtualKey {
@@ -64,6 +77,17 @@ public:
     const char* label(VirtualKeyboard *) const override { return "A#"; }
     void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
     void paintLabel(VirtualKeyboard *keyboard, cairo_t *cr) override;
+};
+
+class PinyinMarkToggleKey : public VirtualKey {
+public:
+    PinyinMarkToggleKey() {
+        setFontColor({1.0, 1.0, 1.0});
+        setCustomBackgroundColor({0.3, 0.3, 0.3});
+    }
+    const char* label(VirtualKeyboard *keyboard) const override;
+    void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
+    // void paintLabel(VirtualKeyboard *keyboard, cairo_t *cr) override;
 };
 
 } // namespace classicui
