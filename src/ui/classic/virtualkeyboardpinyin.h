@@ -35,7 +35,7 @@ class PinyinTextKey : public TextKey {
 public:
     PinyinTextKey(std::string keyName, std::string text, std::string upperText = "")
         : TextKey(keyName, text, upperText) {};
-    void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) override;
+    void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
 
 private:
     /*
@@ -49,21 +49,21 @@ class PinyinMarkKey : public KeyByName {
 public:
     PinyinMarkKey(std::string keyName, std::string mark)
         : KeyByName(keyName), mark_(mark) {};
-    const char* label(Keyboard *keyboard) const override;
-    void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) override;
+    const char* label(VirtualKeyboard *keyboard) const override;
+    void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
 
 private:
     const std::string mark_;
 };
 
-class PinyinModeSwitchKey : public Key {
+class PinyinModeSwitchKey : public VirtualKey {
 public:
     PinyinModeSwitchKey() {
         setCustomBackgroundColor({0.3, 0.3, 0.3});
     }
-    const char* label(Keyboard *) const override { return "A#"; }
-    void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) override;
-    void paintLabel(Keyboard *keyboard, cairo_t *cr) override;
+    const char* label(VirtualKeyboard *) const override { return "A#"; }
+    void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
+    void paintLabel(VirtualKeyboard *keyboard, cairo_t *cr) override;
 };
 
 } // namespace classicui

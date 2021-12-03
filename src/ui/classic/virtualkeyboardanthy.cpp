@@ -30,7 +30,7 @@ void AnthyKeyboard::switchMode() {
     updateKeys();
 }
 
-void AnthyKeyboard::toggleZenkakuHankaku(Keyboard *keyboard) {
+void AnthyKeyboard::toggleZenkakuHankaku(VirtualKeyboard *keyboard) {
     isZenkakuOn_ = !isZenkakuOn_;
     if (isZenkakuOn_) {
         keyboard->setCurrentInputMethod(imeNames[type()]);
@@ -39,7 +39,7 @@ void AnthyKeyboard::toggleZenkakuHankaku(Keyboard *keyboard) {
     }
 }
 
-void AnthyTextKey::click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) {
+void AnthyTextKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) {
     FCITX_KEYBOARD() << "AnthyTextKey pushed: " << label(keyboard);
 
     if (!keyboard->i18nKeyboard<AnthyKeyboard>()->isZenkakuOn()) {
@@ -54,14 +54,14 @@ void AnthyTextKey::click(Keyboard *keyboard, InputContext *inputContext, bool is
     FCITX_KEYBOARD() << "key event result: " << hasProcessedInIME;
 }
 
-const char* AnthyMarkKey::label(Keyboard *keyboard) const {
+const char* AnthyMarkKey::label(VirtualKeyboard *keyboard) const {
     if (keyboard->i18nKeyboard<AnthyKeyboard>()->isZenkakuOn()) {
         return zenkakuMark_.c_str();
     }
     return hankakuMark_.c_str();
 }
 
-void AnthyMarkKey::click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) {
+void AnthyMarkKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) {
     FCITX_KEYBOARD() << "AnthyMarkKey pushed: " << label(keyboard);
 
     if (!keyboard->i18nKeyboard<AnthyKeyboard>()->isZenkakuOn()) {
@@ -76,7 +76,7 @@ void AnthyMarkKey::click(Keyboard *keyboard, InputContext *inputContext, bool is
     FCITX_KEYBOARD() << "key event result: " << hasProcessedInIME;
 }
 
-void ZenkakuHankakuKey::click(Keyboard *keyboard, InputContext *, bool isRelease) {
+void ZenkakuHankakuKey::click(VirtualKeyboard *keyboard, InputContext *, bool isRelease) {
     FCITX_KEYBOARD() << "ZenkakuHankakuKey pushed: " << label(keyboard);
     if (isRelease) {
         return;
@@ -84,7 +84,7 @@ void ZenkakuHankakuKey::click(Keyboard *keyboard, InputContext *, bool isRelease
     keyboard->i18nKeyboard<AnthyKeyboard>()->toggleZenkakuHankaku(keyboard);
 }
 
-void ZenkakuHankakuKey::paintLabel(Keyboard *keyboard, cairo_t *cr) {
+void ZenkakuHankakuKey::paintLabel(VirtualKeyboard *keyboard, cairo_t *cr) {
     cairo_save(cr);
 
     if (keyboard->i18nKeyboard<AnthyKeyboard>()->isZenkakuOn()) {
@@ -101,7 +101,7 @@ void ZenkakuHankakuKey::paintLabel(Keyboard *keyboard, cairo_t *cr) {
     cairo_restore(cr);
 }
 
-void AnthyModeSwitchKey::click(Keyboard *keyboard, InputContext *, bool isRelease) {
+void AnthyModeSwitchKey::click(VirtualKeyboard *keyboard, InputContext *, bool isRelease) {
     FCITX_KEYBOARD() << "AnthyModeSwitchKey pushed";
 
     if (isRelease) {
@@ -111,7 +111,7 @@ void AnthyModeSwitchKey::click(Keyboard *keyboard, InputContext *, bool isReleas
     keyboard->i18nKeyboard<AnthyKeyboard>()->switchMode();
 }
 
-void AnthyModeSwitchKey::paintLabel(Keyboard *keyboard, cairo_t *cr) {
+void AnthyModeSwitchKey::paintLabel(VirtualKeyboard *keyboard, cairo_t *cr) {
     cairo_save(cr);
 
     cairo_set_font_size(cr, fontSize_);

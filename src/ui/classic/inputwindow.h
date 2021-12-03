@@ -87,7 +87,7 @@ protected:
     std::vector<MultilineLayout> labelLayouts_;
     std::vector<MultilineLayout> candidateLayouts_;
     std::vector<Rect> candidateRegions_;
-    std::unique_ptr<Keyboard> keyboard_;
+    std::unique_ptr<VirtualKeyboard> keyboard_;
     TrackableObjectReference<InputContext> inputContext_;
     bool visible_ = false;
     int cursor_ = 0;

@@ -10,7 +10,7 @@ FCITX_DEFINE_LOG_CATEGORY(keyboard, "keyboard")
 
 namespace fcitx::classicui {
 
-void Key::paintLabel(Keyboard *keyboard, cairo_t *cr) {
+void VirtualKey::paintLabel(VirtualKeyboard *keyboard, cairo_t *cr) {
     cairo_save(cr);
 
     auto [r, g, b] = fontColorRgb_;
@@ -24,7 +24,7 @@ void Key::paintLabel(Keyboard *keyboard, cairo_t *cr) {
     cairo_restore(cr);
 }
 
-void Key::paintBackground(cairo_t *cr, bool highlight) {
+void VirtualKey::paintBackground(cairo_t *cr, bool highlight) {
     cairo_save(cr);
 
     cairo_set_source_rgb(cr, 0.8, 0.8, 0.8);
@@ -45,7 +45,7 @@ void Key::paintBackground(cairo_t *cr, bool highlight) {
     cairo_restore(cr);
 }
 
-Keyboard::Keyboard(Instance *instance) : instance_(instance) {
+VirtualKeyboard::VirtualKeyboard(Instance *instance) : instance_(instance) {
     repeatKeyTimer_ = instance_->eventLoop().addTimeEvent(
         CLOCK_MONOTONIC, now(CLOCK_MONOTONIC), 0,
         [this](EventSourceTime *, uint64_t) {
@@ -57,7 +57,7 @@ Keyboard::Keyboard(Instance *instance) : instance_(instance) {
     syncState();
 }
 
-bool Keyboard::syncState() {
+bool VirtualKeyboard::syncState() {
     auto curImName = instance_->currentInputMethod();
     auto imItems = instance_->inputMethodManager().currentGroup().inputMethodList();
 
@@ -81,13 +81,13 @@ bool Keyboard::syncState() {
     return true;
 }
 
-void Keyboard::setI18nKeyboard(I18nKeyboard *i18nKeyboard) {
+void VirtualKeyboard::setI18nKeyboard(I18nKeyboard *i18nKeyboard) {
     FCITX_KEYBOARD() << "Set I18nKeyboard:" << imeNames[i18nKeyboard->type()];
     i18nKeyboard_.reset(i18nKeyboard);
     i18nKeyboard_->updateKeys();
 }
 
-void Keyboard::switchLanguage() {
+void VirtualKeyboard::switchLanguage() {
     const auto maxTryCount = 10;
     auto tryCount = 0;
     do
@@ -104,11 +104,11 @@ void Keyboard::switchLanguage() {
     } while (!syncState());
 }
 
-void Keyboard::setCurrentInputMethod(std::string name) {
+void VirtualKeyboard::setCurrentInputMethod(std::string name) {
     instance_->setCurrentInputMethod(name);
 }
 
-void Keyboard::paint(cairo_t *cr, unsigned int offsetX, unsigned int offsetY) {
+void VirtualKeyboard::paint(cairo_t *cr, unsigned int offsetX, unsigned int offsetY) {
     int curX = offsetX;
     int curY = offsetY;
 
@@ -141,7 +141,7 @@ void Keyboard::paint(cairo_t *cr, unsigned int offsetX, unsigned int offsetY) {
     cairo_restore(cr);
 }
 
-void Keyboard::paintBackground(cairo_t *cr) {
+void VirtualKeyboard::paintBackground(cairo_t *cr) {
     auto [keyboardWidth, keyboardHeight] = size();
     cairo_set_source_rgb(cr, 0.95, 0.95, 0.95);
     cairo_rectangle(cr, -marginX(), -marginY(),
@@ -149,7 +149,7 @@ void Keyboard::paintBackground(cairo_t *cr) {
     cairo_fill(cr);
 }
 
-std::pair<unsigned int, unsigned int> Keyboard::size() {
+std::pair<unsigned int, unsigned int> VirtualKeyboard::size() {
     unsigned int width = 0, height = 0, w = 0;
 
     for (const auto &key : keys())
@@ -168,7 +168,7 @@ std::pair<unsigned int, unsigned int> Keyboard::size() {
     return {width, height};
 }
 
-void Keyboard::onKeyRepeat() {
+void VirtualKeyboard::onKeyRepeat() {
     if (!pushingKey_) {
         return;
     }
@@ -183,7 +183,7 @@ void Keyboard::onKeyRepeat() {
     pushingKey_->click(this, inputContext, false);
 }
 
-bool Keyboard::click(InputContext *inputContext, int x, int y, bool isRelease) {
+bool VirtualKeyboard::click(InputContext *inputContext, int x, int y, bool isRelease) {
     lastInputContext_ = inputContext->watch();
 
     if (isRelease) {
@@ -207,7 +207,7 @@ bool Keyboard::click(InputContext *inputContext, int x, int y, bool isRelease) {
     return true;
 }
 
-std::tuple<Key *, bool> Keyboard::findClickedKey(int x, int y) {
+std::tuple<VirtualKey *, bool> VirtualKeyboard::findClickedKey(int x, int y) {
     for (const auto &key : keys())
     {
         if (!(key->visible_ && key->contains(x, y))) continue;

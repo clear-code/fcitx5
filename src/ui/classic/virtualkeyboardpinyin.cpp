@@ -26,7 +26,7 @@ void PinyinKeyboard::switchMode() {
     updateKeys();
 }
 
-void PinyinTextKey::click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) {
+void PinyinTextKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) {
     FCITX_KEYBOARD() << "PinyinTextKey pushed: " << label(keyboard);
 
     auto keyEvent = fcitx::KeyEvent(inputContext, convert(), isRelease);
@@ -34,11 +34,11 @@ void PinyinTextKey::click(Keyboard *keyboard, InputContext *inputContext, bool i
     FCITX_KEYBOARD() << "key event result: " << hasProcessedInIME;
 }
 
-const char* PinyinMarkKey::label(Keyboard *) const {
+const char* PinyinMarkKey::label(VirtualKeyboard *) const {
     return mark_.c_str();
 }
 
-void PinyinMarkKey::click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) {
+void PinyinMarkKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) {
     FCITX_KEYBOARD() << "PinyinMarkKey pushed: " << label(keyboard);
 
     auto keyEvent = fcitx::KeyEvent(inputContext, convert(), isRelease);
@@ -46,7 +46,7 @@ void PinyinMarkKey::click(Keyboard *keyboard, InputContext *inputContext, bool i
     FCITX_KEYBOARD() << "key event result: " << hasProcessedInIME;
 }
 
-void PinyinModeSwitchKey::click(Keyboard *keyboard, InputContext *, bool isRelease) {
+void PinyinModeSwitchKey::click(VirtualKeyboard *keyboard, InputContext *, bool isRelease) {
     FCITX_KEYBOARD() << "PinyinModeSwitchKey pushed";
 
     if (isRelease) {
@@ -56,7 +56,7 @@ void PinyinModeSwitchKey::click(Keyboard *keyboard, InputContext *, bool isRelea
     keyboard->i18nKeyboard<PinyinKeyboard>()->switchMode();
 }
 
-void PinyinModeSwitchKey::paintLabel(Keyboard *keyboard, cairo_t *cr) {
+void PinyinModeSwitchKey::paintLabel(VirtualKeyboard *keyboard, cairo_t *cr) {
     cairo_save(cr);
 
     cairo_set_font_size(cr, fontSize_);

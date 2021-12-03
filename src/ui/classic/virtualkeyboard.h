@@ -25,12 +25,12 @@ enum KeyLabelAlignVertical {
     Bottom,
 };
 
-class Keyboard;
-class Key {
+class VirtualKeyboard;
+class VirtualKey {
 public:
-    virtual const char* label(Keyboard *keyboard) const = 0;
-    virtual void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) = 0;
-    virtual void paintLabel(Keyboard *keyboard, cairo_t *cr);
+    virtual const char* label(VirtualKeyboard *keyboard) const = 0;
+    virtual void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) = 0;
+    virtual void paintLabel(VirtualKeyboard *keyboard, cairo_t *cr);
     void paintBackground(cairo_t *cr, bool highlight);
 
     void setRegion(int x, int y) {
@@ -88,16 +88,16 @@ protected:
     std::tuple<double, double, double> customBackgroundColorRgb_ = {0, 0, 0};
 };
 
-class Keyboard {
+class VirtualKeyboard {
 public:
-    Keyboard(Instance *instance);
+    VirtualKeyboard(Instance *instance);
     void paint(cairo_t *cr, unsigned int offsetX, unsigned int offsetY);
     bool click(InputContext *inputContext, int x, int y, bool isRelease);
     bool syncState();
     void switchLanguage();
     void setCurrentInputMethod(std::string name);
 
-    std::vector<std::unique_ptr<Key>> &keys() { return i18nKeyboard_->keys(); }
+    std::vector<std::unique_ptr<VirtualKey>> &keys() { return i18nKeyboard_->keys(); }
     I18nKeyboard *i18nKeyboard() { return i18nKeyboard_.get(); }
     template<class T>
     T *i18nKeyboard() {
@@ -115,7 +115,7 @@ protected:
     void onKeyRepeat();
 
     Instance *instance_;
-    Key *pushingKey_ = nullptr;
+    VirtualKey *pushingKey_ = nullptr;
     TrackableObjectReference<InputContext> lastInputContext_;
     std::unique_ptr<EventSourceTime> repeatKeyTimer_;
     int32_t repeatRate_ = 40, repeatDelay_ = 400;
@@ -124,7 +124,7 @@ public: // TODO: Should be moved to protected
     bool isShiftOn_ = false;
 
 private:
-    std::tuple<Key *, bool> findClickedKey(int x, int y);
+    std::tuple<VirtualKey *, bool> findClickedKey(int x, int y);
     void paintBackground(cairo_t *cr);
     void setI18nKeyboard(I18nKeyboard *i18nKeyboard);
 

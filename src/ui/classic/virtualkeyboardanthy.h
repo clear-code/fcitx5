@@ -31,7 +31,7 @@ public:
     void switchMode();
     AnthyKeyboardMode mode() const { return mode_; }
     bool isZenkakuOn() const { return isZenkakuOn_; }
-    void toggleZenkakuHankaku(Keyboard *keyboard);
+    void toggleZenkakuHankaku(VirtualKeyboard *keyboard);
 
 private:
     void setTextKeys();
@@ -44,7 +44,7 @@ class AnthyTextKey : public TextKey {
 public:
     AnthyTextKey(std::string keyName, std::string text, std::string upperText = "")
         : TextKey(keyName, text, upperText) {};
-    void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) override;
+    void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
 
 private:
     /*
@@ -58,33 +58,33 @@ class AnthyMarkKey : public KeyByName {
 public:
     AnthyMarkKey(std::string keyName, std::string hankakuMark, std::string zenkakuMark)
         : KeyByName(keyName), hankakuMark_(hankakuMark), zenkakuMark_(zenkakuMark) {};
-    const char* label(Keyboard *keyboard) const override;
-    void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) override;
+    const char* label(VirtualKeyboard *keyboard) const override;
+    void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
 
 private:
     const std::string hankakuMark_;
     const std::string zenkakuMark_;
 };
 
-class ZenkakuHankakuKey : public Key {
+class ZenkakuHankakuKey : public VirtualKey {
 public:
     ZenkakuHankakuKey() {
         setCustomBackgroundColor({0.3, 0.3, 0.3});
         setFontSize(18);
     }
-    const char* label(Keyboard *) const override { return "全角"; }
-    void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) override;
-    void paintLabel(Keyboard *keyboard, cairo_t *cr) override;
+    const char* label(VirtualKeyboard *) const override { return "全角"; }
+    void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
+    void paintLabel(VirtualKeyboard *keyboard, cairo_t *cr) override;
 };
 
-class AnthyModeSwitchKey : public Key {
+class AnthyModeSwitchKey : public VirtualKey {
 public:
     AnthyModeSwitchKey() {
         setCustomBackgroundColor({0.3, 0.3, 0.3});
     }
-    const char* label(Keyboard *) const override { return "A#"; }
-    void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) override;
-    void paintLabel(Keyboard *keyboard, cairo_t *cr) override;
+    const char* label(VirtualKeyboard *) const override { return "A#"; }
+    void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
+    void paintLabel(VirtualKeyboard *keyboard, cairo_t *cr) override;
 };
 
 } // namespace classicui

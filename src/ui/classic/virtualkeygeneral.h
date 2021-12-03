@@ -15,29 +15,29 @@ namespace classicui {
 /*
  * For making empty space in keyboard layout.
  */
-class DummyKey : public Key {
+class DummyKey : public VirtualKey {
 public:
     DummyKey() {
         visible_ = false;
     }
-    const char* label(Keyboard *) const override { return ""; }
-    void click(Keyboard *, InputContext *, bool) override {}
+    const char* label(VirtualKeyboard *) const override { return ""; }
+    void click(VirtualKeyboard *, InputContext *, bool) override {}
 };
 
 /*
  * Key that is visible, but do not work.
  */
-class EmptyKey : public Key {
+class EmptyKey : public VirtualKey {
 public:
-    const char* label(Keyboard *) const override { return ""; }
-    void click(Keyboard *, InputContext *, bool) override {}
+    const char* label(VirtualKeyboard *) const override { return ""; }
+    void click(VirtualKeyboard *, InputContext *, bool) override {}
 };
 
 /*
  * Base class that provides function to convert to fcitx::key by keyname in keynametable.h.
  * Keyname corresponds to keysym, but not to keycode.
  */
-class KeyByName : public Key {
+class KeyByName : public VirtualKey {
 protected:
     KeyByName(std::string keyName) : keyName_(keyName) {}
 
@@ -63,8 +63,8 @@ class TextKey : public KeyByName {
 public:
     TextKey(std::string keyName, std::string text, std::string upperText = "")
             : KeyByName(keyName), text_(text), upperText_(upperText) {};
-    virtual const char* label(Keyboard *keyboard) const override;
-    virtual void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) override;
+    virtual const char* label(VirtualKeyboard *keyboard) const override;
+    virtual void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
 
 private:
     /*
@@ -80,8 +80,8 @@ private:
 class ForwardKey : public KeyByName {
 public:
     ForwardKey(std::string keyName, std::string label) : KeyByName(keyName), label_(label) {}
-    const char* label(Keyboard *) const override { return label_.c_str(); }
-    void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) override;
+    const char* label(VirtualKeyboard *) const override { return label_.c_str(); }
+    void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
 
 private:
     const std::string label_;
@@ -116,24 +116,24 @@ public:
     };
 };
 
-class ShiftToggleKey : public Key {
+class ShiftToggleKey : public VirtualKey {
 public:
     ShiftToggleKey() {
         setCustomBackgroundColor({0.3, 0.3, 0.3});
     }
-    const char* label(Keyboard *) const override { return u8"\u21E7"; }
-    void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) override;
-    void paintLabel(Keyboard *keyboard, cairo_t *cr) override;
+    const char* label(VirtualKeyboard *) const override { return u8"\u21E7"; }
+    void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
+    void paintLabel(VirtualKeyboard *keyboard, cairo_t *cr) override;
 };
 
-class LanguageSwitchKey : public Key {
+class LanguageSwitchKey : public VirtualKey {
 public:
     LanguageSwitchKey() {
         setCustomBackgroundColor({0.3, 0.3, 0.3});
         setFontColor({1.0, 1.0, 1.0});
     }
-    const char* label(Keyboard *keyboard) const override;
-    void click(Keyboard *keyboard, InputContext *inputContext, bool isRelease) override;
+    const char* label(VirtualKeyboard *keyboard) const override;
+    void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
 };
 
 } // namespace classicui
