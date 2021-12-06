@@ -22,6 +22,7 @@ enum class PinyinKeyboardMode {
 class PinyinKeyboard : public I18nKeyboard {
 public:
     KeyboardType type() const override { return KeyboardType::Pinyin; };
+    const char *label() const override { return "CH"; }
     void updateKeys() override;
     void switchMode();
     PinyinKeyboardMode mode() const { return mode_; }
