@@ -45,21 +45,14 @@ class AnthyTextKey : public TextKey {
 public:
     AnthyTextKey(std::string text, std::string upperText = "", std::string keyName = "",
         std::string upperKeyName = "")
-        : TextKey(text, upperText, keyName, upperKeyName) {};
+        : TextKey(text, upperText, keyName, upperKeyName) {}
     void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
-
-private:
-    /*
-     * Text for display, and commit-string.
-     */
-    const std::string text_;
-    const std::string upperText_;
 };
 
 class AnthyMarkKey : public KeyByName {
 public:
     AnthyMarkKey(std::string keyName, std::string hankakuMark, std::string zenkakuMark)
-        : KeyByName(keyName), hankakuMark_(hankakuMark), zenkakuMark_(zenkakuMark) {};
+        : KeyByName(keyName), hankakuMark_(hankakuMark), zenkakuMark_(zenkakuMark) {}
     const char* label(VirtualKeyboard *keyboard) const override;
     void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
 
