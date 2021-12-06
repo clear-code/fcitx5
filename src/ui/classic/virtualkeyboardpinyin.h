@@ -41,15 +41,8 @@ class PinyinTextKey : public TextKey {
 public:
     PinyinTextKey(std::string text, std::string upperText = "", std::string keyName = "",
         std::string upperKeyName = "")
-        : TextKey(text, upperText, keyName, upperKeyName) {};
+        : TextKey(text, upperText, keyName, upperKeyName) {}
     void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
-
-private:
-    /*
-     * Text for display, and commit-string.
-     */
-    const std::string text_;
-    const std::string upperText_;
 };
 
 class PinyinMarkKey : public VirtualKey {

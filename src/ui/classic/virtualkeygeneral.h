@@ -70,7 +70,7 @@ public:
         std::string upperKeyName = "")
         : KeyByName(keyName.empty() ? text : keyName,
             upperKeyName.empty() ? upperText : upperKeyName),
-          text_(text), upperText_(upperText) {};
+          text_(text), upperText_(upperText) {}
     virtual const char* label(VirtualKeyboard *keyboard) const override;
     virtual void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
 
