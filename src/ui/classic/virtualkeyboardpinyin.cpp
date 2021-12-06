@@ -83,16 +83,6 @@ const char* PinyinEnterKey::label(VirtualKeyboard *keyboard) const {
     return keyboard->isPreediting() ? "确认" : "换行";
 }
 
-void PinyinModeSwitchKey::click(VirtualKeyboard *keyboard, InputContext *, bool isRelease) {
-    FCITX_KEYBOARD() << "PinyinModeSwitchKey pushed";
-
-    if (isRelease) {
-        return;
-    }
-
-    keyboard->i18nKeyboard<PinyinKeyboard>()->switchMode();
-}
-
 const char* PinyinMarkToggleKey::label(VirtualKeyboard *keyboard) const {
     if (keyboard->i18nKeyboard<PinyinKeyboard>()->isAdditionalMarkOn()) {
         return "返回";
@@ -106,6 +96,16 @@ void PinyinMarkToggleKey::click(VirtualKeyboard *keyboard, InputContext *, bool 
         return;
     }
     keyboard->i18nKeyboard<PinyinKeyboard>()->toggleMark();
+}
+
+void PinyinModeSwitchKey::click(VirtualKeyboard *keyboard, InputContext *, bool isRelease) {
+    FCITX_KEYBOARD() << "PinyinModeSwitchKey pushed";
+
+    if (isRelease) {
+        return;
+    }
+
+    keyboard->i18nKeyboard<PinyinKeyboard>()->switchMode();
 }
 
 void PinyinModeSwitchKey::paintLabel(VirtualKeyboard *keyboard, cairo_t *cr) {
