@@ -74,14 +74,17 @@ public:
     const char* label(VirtualKeyboard *keyboard) const override;
 };
 
-class PinyinModeSwitchKey : public VirtualKey {
+class PinyinModeSwitchKey : public SwitchKey {
 public:
-    PinyinModeSwitchKey() {
-        setCustomBackgroundColor({0.3, 0.3, 0.3});
-    }
+    PinyinModeSwitchKey() : SwitchKey() {}
     const char* label(VirtualKeyboard *) const override { return "A#"; }
-    void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
-    void paintLabel(VirtualKeyboard *keyboard, cairo_t *cr) override;
+
+protected:
+    const char *stateLabel(int index) const override {
+        return index == 0 ? "A" : "#";
+    }
+    void switchState(VirtualKeyboard *keyboard, InputContext *inputContext) override;
+    int currentIndex(VirtualKeyboard *keyboard) override;
 };
 
 class PinyinMarkToggleKey : public VirtualKey {

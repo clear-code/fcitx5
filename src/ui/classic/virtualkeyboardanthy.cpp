@@ -84,37 +84,15 @@ bool ZenkakuHankakuKey::isOn(VirtualKeyboard *keyboard) {
     return keyboard->i18nKeyboard<AnthyKeyboard>()->isZenkakuOn();
 }
 
-void AnthyModeSwitchKey::click(VirtualKeyboard *keyboard, InputContext *, bool isRelease) {
-    FCITX_KEYBOARD() << "AnthyModeSwitchKey pushed";
-
-    if (isRelease) {
-        return;
-    }
-
+void AnthyModeSwitchKey::switchState(VirtualKeyboard *keyboard, InputContext *) {
     keyboard->i18nKeyboard<AnthyKeyboard>()->switchMode();
 }
 
-void AnthyModeSwitchKey::paintLabel(VirtualKeyboard *keyboard, cairo_t *cr) {
-    cairo_save(cr);
-
-    cairo_set_font_size(cr, fontSize_);
-    cairo_text_extents_t extents;
-    cairo_text_extents(cr, label(keyboard), &extents);
-    cairo_translate(cr, labelOffsetX(extents), labelOffsetY(extents));
-
+int AnthyModeSwitchKey::currentIndex(VirtualKeyboard *keyboard) {
     if (keyboard->i18nKeyboard<AnthyKeyboard>()->mode() == AnthyKeyboardMode::Text) {
-        cairo_set_source_rgb(cr, 0.2, 0.7, 0.6);
-        cairo_show_text(cr, "A");
-        cairo_set_source_rgb(cr, 0.8, 0.8, 0.8);
-        cairo_show_text(cr, "#");
-    } else {
-        cairo_set_source_rgb(cr, 0.8, 0.8, 0.8);
-        cairo_show_text(cr, "A");
-        cairo_set_source_rgb(cr, 0.2, 0.7, 0.6);
-        cairo_show_text(cr, "#");
+        return 0;
     }
-
-    cairo_restore(cr);
+    return 1;
 }
 
 void AnthyKeyboard::setTextKeys() {

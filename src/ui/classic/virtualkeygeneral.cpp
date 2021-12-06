@@ -88,6 +88,39 @@ bool ShiftToggleKey::isOn(VirtualKeyboard *keyboard) {
     return keyboard->isShiftOn_;
 }
 
+void SwitchKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) {
+    FCITX_KEYBOARD() << "SwitchKey pushed: " << label(keyboard);
+
+    if (isRelease) {
+        return;
+    }
+
+    switchState(keyboard, inputContext);
+}
+
+void SwitchKey::paintLabel(VirtualKeyboard *keyboard, cairo_t *cr) {
+    const auto keyLabel = label(keyboard);
+
+    cairo_save(cr);
+
+    cairo_set_font_size(cr, fontSize_);
+    cairo_text_extents_t extents;
+    cairo_text_extents(cr, keyLabel, &extents);
+    cairo_translate(cr, labelOffsetX(extents), labelOffsetY(extents));
+
+    for (size_t i = 0; i < strlen(keyLabel); i++)
+    {
+        if (i == (unsigned long)currentIndex(keyboard)) {
+            cairo_set_source_rgb(cr, 0.2, 0.7, 0.6);
+        } else {
+            cairo_set_source_rgb(cr, 0.8, 0.8, 0.8);
+        }
+        cairo_show_text(cr, stateLabel(i));
+    }
+
+    cairo_restore(cr);
+}
+
 const char *LanguageSwitchKey::label(VirtualKeyboard *keyboard) const {
     return keyboard->i18nKeyboard()->label();
 }
