@@ -60,13 +60,13 @@ void ToggleKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, boo
     if (isRelease) {
         return;
     }
-    toggle_(keyboard, inputContext);
+    toggle(keyboard, inputContext);
 }
 
 void ToggleKey::paintLabel(VirtualKeyboard *keyboard, cairo_t *cr) {
     cairo_save(cr);
 
-    if (isOn_(keyboard)) {
+    if (isOn(keyboard)) {
         cairo_set_source_rgb(cr, 0.2, 0.7, 0.6);
     } else {
         cairo_set_source_rgb(cr, 0.8, 0.8, 0.8);

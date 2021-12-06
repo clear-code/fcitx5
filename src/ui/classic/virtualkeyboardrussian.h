@@ -72,14 +72,14 @@ public:
 
 class RussianTextToggleKey : public ToggleKey {
 public:
-    RussianTextToggleKey() : ToggleKey(toggle, isOn) {
+    RussianTextToggleKey() {
         setFontSize(18);
     }
     const char* label(VirtualKeyboard *) const override { return "Latin"; }
 
-private:
-    static void toggle(VirtualKeyboard *keyboard, InputContext *inputContext);
-    static bool isOn(VirtualKeyboard *keyboard);
+protected:
+    void toggle(VirtualKeyboard *keyboard, InputContext *inputContext) override;
+    bool isOn(VirtualKeyboard *keyboard) override;
 };
 
 } // namespace classicui
