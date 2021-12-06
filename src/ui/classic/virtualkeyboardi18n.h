@@ -43,12 +43,21 @@ protected:
 class I18nKeyboardSelector {
 public:
     I18nKeyboard *selectType(KeyboardType type);
-    I18nKeyboard *select(std::string inputMethodName,
+    std::tuple<I18nKeyboard *, bool> select(std::string inputMethodName,
         std::vector<fcitx::InputMethodGroupItem> &inputMethodItems);
 private:
     KeyboardType findType(std::string inputMethodName);
     bool containInputMethod(std::vector<fcitx::InputMethodGroupItem> &items,
                             std::string name);
+};
+
+class NullI18nKeyboard : public I18nKeyboard {
+public:
+    KeyboardType type() const override { return KeyboardType::Unknown; };
+    const char *label() const override { return "X"; }
+    void updateKeys() override {
+        // do nothing
+    }
 };
 
 } // namespace classicui
