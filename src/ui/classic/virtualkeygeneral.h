@@ -87,12 +87,14 @@ private:
  */
 class ForwardKey : public KeyByName {
 public:
-    ForwardKey(std::string keyName, std::string label) : KeyByName(keyName), label_(label) {}
+    ForwardKey(std::string keyName, std::string label, bool tryToSendKeyEventFirst = true)
+        : KeyByName(keyName), label_(label), tryToSendKeyEventFirst_(tryToSendKeyEventFirst) {}
     virtual const char* label(VirtualKeyboard *) const override { return label_.c_str(); }
     void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
 
 private:
     const std::string label_;
+    bool tryToSendKeyEventFirst_ = true;
 
     /*
      * Key release must be forwarded only when key push had been forwarded in advance.
@@ -102,7 +104,8 @@ private:
 
 class EnterKey : public ForwardKey {
 public:
-    EnterKey() : ForwardKey("Return", "Enter") {
+    EnterKey(bool tryToSendKeyEventFirst = true)
+        : ForwardKey("Return", "Enter", tryToSendKeyEventFirst) {
         setCustomBackgroundColor({0.2, 0.7, 0.6});
         setFontColor({1.0, 1.0, 1.0});
     };
@@ -110,7 +113,8 @@ public:
 
 class BackSpaceKey : public ForwardKey {
 public:
-    BackSpaceKey() : ForwardKey("BackSpace", "Back") {
+    BackSpaceKey(bool tryToSendKeyEventFirst = true)
+        : ForwardKey("BackSpace", "Back", tryToSendKeyEventFirst) {
         setCustomBackgroundColor({0.3, 0.3, 0.3});
         setFontColor({1.0, 1.0, 1.0});
     };
@@ -118,7 +122,8 @@ public:
 
 class ArrowKey : public ForwardKey {
 public:
-    ArrowKey(std::string keyName, std::string label) : ForwardKey(keyName, label) {
+    ArrowKey(std::string keyName, std::string label, bool tryToSendKeyEventFirst = true)
+        : ForwardKey(keyName, label, tryToSendKeyEventFirst) {
         setCustomBackgroundColor({0.3, 0.3, 0.3});
         setFontColor({1.0, 1.0, 1.0});
     };

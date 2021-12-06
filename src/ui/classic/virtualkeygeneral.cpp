@@ -28,6 +28,11 @@ void TextKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, bool 
 void ForwardKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) {
     FCITX_KEYBOARD() << "ForwardKey pushed: " << label(keyboard);
 
+    if (!tryToSendKeyEventFirst_) {
+        inputContext->forwardKey(convert(keyboard->isShiftOn_), isRelease);
+        return;
+    }
+
     auto keyEvent = fcitx::KeyEvent(inputContext, convert(keyboard->isShiftOn_), isRelease);
     auto hasProcessedInIME = inputContext->keyEvent(keyEvent);
     FCITX_KEYBOARD() << "key event result: " << hasProcessedInIME;
