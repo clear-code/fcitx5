@@ -153,6 +153,21 @@ protected:
     bool isOn(VirtualKeyboard *keyboard) override;
 };
 
+class SwitchKey : public VirtualKey {
+public:
+    SwitchKey() {
+        setCustomBackgroundColor({0.3, 0.3, 0.3});
+    }
+    virtual const char *label(VirtualKeyboard *) const = 0;
+    void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
+    void paintLabel(VirtualKeyboard *keyboard, cairo_t *cr) override;
+
+protected:
+    virtual const char *stateLabel(int index) const = 0;
+    virtual void switchState(VirtualKeyboard *keyboard, InputContext *inputContext) = 0;
+    virtual int currentIndex(VirtualKeyboard *keyboard) = 0;
+};
+
 class LanguageSwitchKey : public VirtualKey {
 public:
     LanguageSwitchKey() {

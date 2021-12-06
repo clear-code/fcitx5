@@ -35,37 +35,15 @@ void RussianKeyboard::toggleText() {
     updateKeys();
 }
 
-void RussianModeSwitchKey::click(VirtualKeyboard *keyboard, InputContext *, bool isRelease) {
-    FCITX_KEYBOARD() << "RussianModeSwitchKey pushed";
-
-    if (isRelease) {
-        return;
-    }
-
+void RussianModeSwitchKey::switchState(VirtualKeyboard *keyboard, InputContext *) {
     keyboard->i18nKeyboard<RussianKeyboard>()->switchMode();
 }
 
-void RussianModeSwitchKey::paintLabel(VirtualKeyboard *keyboard, cairo_t *cr) {
-    cairo_save(cr);
-
-    cairo_set_font_size(cr, fontSize_);
-    cairo_text_extents_t extents;
-    cairo_text_extents(cr, label(keyboard), &extents);
-    cairo_translate(cr, labelOffsetX(extents), labelOffsetY(extents));
-
+int RussianModeSwitchKey::currentIndex(VirtualKeyboard *keyboard) {
     if (keyboard->i18nKeyboard<RussianKeyboard>()->mode() == RussianKeyboardMode::Text) {
-        cairo_set_source_rgb(cr, 0.2, 0.7, 0.6);
-        cairo_show_text(cr, "A");
-        cairo_set_source_rgb(cr, 0.8, 0.8, 0.8);
-        cairo_show_text(cr, "#");
-    } else {
-        cairo_set_source_rgb(cr, 0.8, 0.8, 0.8);
-        cairo_show_text(cr, "A");
-        cairo_set_source_rgb(cr, 0.2, 0.7, 0.6);
-        cairo_show_text(cr, "#");
+        return 0;
     }
-
-    cairo_restore(cr);
+    return 1;
 }
 
 void RussianTextToggleKey::toggle(VirtualKeyboard *keyboard, InputContext *) {

@@ -98,37 +98,15 @@ void PinyinMarkToggleKey::click(VirtualKeyboard *keyboard, InputContext *, bool 
     keyboard->i18nKeyboard<PinyinKeyboard>()->toggleMark();
 }
 
-void PinyinModeSwitchKey::click(VirtualKeyboard *keyboard, InputContext *, bool isRelease) {
-    FCITX_KEYBOARD() << "PinyinModeSwitchKey pushed";
-
-    if (isRelease) {
-        return;
-    }
-
+void PinyinModeSwitchKey::switchState(VirtualKeyboard *keyboard, InputContext *) {
     keyboard->i18nKeyboard<PinyinKeyboard>()->switchMode();
 }
 
-void PinyinModeSwitchKey::paintLabel(VirtualKeyboard *keyboard, cairo_t *cr) {
-    cairo_save(cr);
-
-    cairo_set_font_size(cr, fontSize_);
-    cairo_text_extents_t extents;
-    cairo_text_extents(cr, label(keyboard), &extents);
-    cairo_translate(cr, labelOffsetX(extents), labelOffsetY(extents));
-
+int PinyinModeSwitchKey::currentIndex(VirtualKeyboard *keyboard) {
     if (keyboard->i18nKeyboard<PinyinKeyboard>()->mode() == PinyinKeyboardMode::Text) {
-        cairo_set_source_rgb(cr, 0.2, 0.7, 0.6);
-        cairo_show_text(cr, "A");
-        cairo_set_source_rgb(cr, 0.8, 0.8, 0.8);
-        cairo_show_text(cr, "#");
-    } else {
-        cairo_set_source_rgb(cr, 0.8, 0.8, 0.8);
-        cairo_show_text(cr, "A");
-        cairo_set_source_rgb(cr, 0.2, 0.7, 0.6);
-        cairo_show_text(cr, "#");
+        return 0;
     }
-
-    cairo_restore(cr);
+    return 1;
 }
 
 void PinyinKeyboard::setTextKeys() {

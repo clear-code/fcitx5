@@ -73,14 +73,17 @@ protected:
     bool isOn(VirtualKeyboard *keyboard) override;
 };
 
-class AnthyModeSwitchKey : public VirtualKey {
+class AnthyModeSwitchKey : public SwitchKey {
 public:
-    AnthyModeSwitchKey() {
-        setCustomBackgroundColor({0.3, 0.3, 0.3});
-    }
+    AnthyModeSwitchKey() : SwitchKey() {}
     const char* label(VirtualKeyboard *) const override { return "A#"; }
-    void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
-    void paintLabel(VirtualKeyboard *keyboard, cairo_t *cr) override;
+
+protected:
+    const char *stateLabel(int index) const override {
+        return index == 0 ? "A" : "#";
+    }
+    void switchState(VirtualKeyboard *keyboard, InputContext *inputContext) override;
+    int currentIndex(VirtualKeyboard *keyboard) override;
 };
 
 } // namespace classicui
