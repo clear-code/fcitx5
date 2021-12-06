@@ -70,15 +70,16 @@ public:
     void paintLabel(VirtualKeyboard *keyboard, cairo_t *cr) override;
 };
 
-class RussianTextToggleKey : public VirtualKey {
+class RussianTextToggleKey : public ToggleKey {
 public:
-    RussianTextToggleKey() {
+    RussianTextToggleKey() : ToggleKey(toggle, isOn) {
         setFontSize(18);
-        setCustomBackgroundColor({0.3, 0.3, 0.3});
     }
     const char* label(VirtualKeyboard *) const override { return "Latin"; }
-    void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
-    void paintLabel(VirtualKeyboard *keyboard, cairo_t *cr) override;
+
+private:
+    static void toggle(VirtualKeyboard *keyboard, InputContext *inputContext);
+    static bool isOn(VirtualKeyboard *keyboard);
 };
 
 } // namespace classicui

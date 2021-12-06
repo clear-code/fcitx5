@@ -129,14 +129,31 @@ public:
     };
 };
 
-class ShiftToggleKey : public VirtualKey {
+class ToggleKey : public VirtualKey {
 public:
-    ShiftToggleKey() {
+    ToggleKey(  
+        std::function<void(VirtualKeyboard *keyboard, InputContext *inputContext)> toggleCallback,
+        std::function<bool(VirtualKeyboard *keyboard)> isOnCallback
+        ) : toggle_(toggleCallback), isOn_(isOnCallback) {
         setCustomBackgroundColor({0.3, 0.3, 0.3});
     }
-    const char* label(VirtualKeyboard *) const override { return u8"\u21E7"; }
+    virtual const char* label(VirtualKeyboard *) const = 0;
     void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
     void paintLabel(VirtualKeyboard *keyboard, cairo_t *cr) override;
+
+private:
+    std::function<void(VirtualKeyboard *keyboard, InputContext *inputContext)> toggle_;
+    std::function<bool(VirtualKeyboard *keyboard)> isOn_;
+};
+
+class ShiftToggleKey : public ToggleKey {
+public:
+    ShiftToggleKey() : ToggleKey(toggle, isOn) {}
+    const char* label(VirtualKeyboard *) const override { return u8"\u21E7"; }
+
+private:
+    static void toggle(VirtualKeyboard *keyboard, InputContext *inputContext);
+    static bool isOn(VirtualKeyboard *keyboard);
 };
 
 class LanguageSwitchKey : public VirtualKey {
