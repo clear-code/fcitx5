@@ -8,6 +8,7 @@
 #include "virtualkeyboard.h"
 #include "virtualkeyboardanthy.h"
 #include "virtualkeyboardpinyin.h"
+#include "virtualkeyboardrussian.h"
 
 namespace fcitx::classicui {
 
@@ -20,6 +21,8 @@ I18nKeyboard *I18nKeyboardSelector::selectType(KeyboardType type) {
         return new AnthyKeyboard();
     case KeyboardType::Pinyin:
         return new PinyinKeyboard();
+    case KeyboardType::Russian:
+        return new RussianKeyboard();
     default:
         break;
     }

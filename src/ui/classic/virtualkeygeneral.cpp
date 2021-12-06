@@ -81,6 +81,8 @@ const char* LanguageSwitchKey::label(VirtualKeyboard *keyboard) const {
         return "JP";
     case KeyboardType::Pinyin:
         return "CH";
+    case KeyboardType::Russian:
+        return "RU";
     default:
         return "X";
     }

@@ -61,6 +61,8 @@ bool VirtualKeyboard::syncState() {
     auto curImName = instance_->currentInputMethod();
     auto imItems = instance_->inputMethodManager().currentGroup().inputMethodList();
 
+    FCITX_KEYBOARD() << "Try to sync state. IM: " << curImName;
+
     auto newI18nKeyboard = i18nKeyboardSelector_.select(curImName, imItems);
 
     if (!i18nKeyboard_) {

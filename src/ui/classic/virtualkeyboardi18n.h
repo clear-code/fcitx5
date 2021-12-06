@@ -17,12 +17,14 @@ enum class KeyboardType {
     Unknown,
     Anthy,
     Pinyin,
+    Russian,
 };
 
 static std::map<KeyboardType, std::string> imeNames = {
     {KeyboardType::Unknown, ""},
     {KeyboardType::Anthy, "anthy"},
     {KeyboardType::Pinyin, "pinyin"},
+    {KeyboardType::Russian, "keyboard-ru"},
 };
 
 class VirtualKey;
