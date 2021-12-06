@@ -61,15 +61,16 @@ private:
     const std::string zenkakuMark_;
 };
 
-class ZenkakuHankakuKey : public VirtualKey {
+class ZenkakuHankakuKey : public ToggleKey {
 public:
-    ZenkakuHankakuKey() {
-        setCustomBackgroundColor({0.3, 0.3, 0.3});
+    ZenkakuHankakuKey() : ToggleKey(toggle, isOn) {
         setFontSize(18);
     }
     const char* label(VirtualKeyboard *) const override { return "全角"; }
-    void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
-    void paintLabel(VirtualKeyboard *keyboard, cairo_t *cr) override;
+
+private:
+    static void toggle(VirtualKeyboard *keyboard, InputContext *inputContext);
+    static bool isOn(VirtualKeyboard *keyboard);
 };
 
 class AnthyModeSwitchKey : public VirtualKey {

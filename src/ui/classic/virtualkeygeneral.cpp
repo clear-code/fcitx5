@@ -55,18 +55,18 @@ void ForwardKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, bo
     inputContext->forwardKey(convert(keyboard->isShiftOn_), true);
 }
 
-void ShiftToggleKey::click(VirtualKeyboard *keyboard, InputContext *, bool isRelease) {
-    FCITX_KEYBOARD() << "ShiftToggleKey pushed: " << label(keyboard);
+void ToggleKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) {
+    FCITX_KEYBOARD() << "ToggleKey pushed: " << label(keyboard);
     if (isRelease) {
         return;
     }
-    keyboard->isShiftOn_ = !keyboard->isShiftOn_;
+    toggle_(keyboard, inputContext);
 }
 
-void ShiftToggleKey::paintLabel(VirtualKeyboard *keyboard, cairo_t *cr) {
+void ToggleKey::paintLabel(VirtualKeyboard *keyboard, cairo_t *cr) {
     cairo_save(cr);
 
-    if (keyboard->isShiftOn_) {
+    if (isOn_(keyboard)) {
         cairo_set_source_rgb(cr, 0.2, 0.7, 0.6);
     } else {
         cairo_set_source_rgb(cr, 0.8, 0.8, 0.8);
@@ -78,6 +78,14 @@ void ShiftToggleKey::paintLabel(VirtualKeyboard *keyboard, cairo_t *cr) {
     cairo_show_text(cr, label(keyboard));
 
     cairo_restore(cr);
+}
+
+void ShiftToggleKey::toggle(VirtualKeyboard *keyboard, InputContext *) {
+    keyboard->isShiftOn_ = !keyboard->isShiftOn_;
+}
+
+bool ShiftToggleKey::isOn(VirtualKeyboard *keyboard) {
+    return keyboard->isShiftOn_;
 }
 
 const char *LanguageSwitchKey::label(VirtualKeyboard *keyboard) const {

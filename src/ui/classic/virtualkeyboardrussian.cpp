@@ -68,29 +68,12 @@ void RussianModeSwitchKey::paintLabel(VirtualKeyboard *keyboard, cairo_t *cr) {
     cairo_restore(cr);
 }
 
-void RussianTextToggleKey::click(VirtualKeyboard *keyboard, InputContext *, bool isRelease) {
-    FCITX_KEYBOARD() << "RussianTextToggleKey pushed.";
-    if (isRelease) {
-        return;
-    }
+void RussianTextToggleKey::toggle(VirtualKeyboard *keyboard, InputContext *) {
     keyboard->i18nKeyboard<RussianKeyboard>()->toggleText();
 }
 
-void RussianTextToggleKey::paintLabel(VirtualKeyboard *keyboard, cairo_t *cr) {
-    cairo_save(cr);
-
-    if (keyboard->i18nKeyboard<RussianKeyboard>()->isLatinTextOn()) {
-        cairo_set_source_rgb(cr, 0.2, 0.7, 0.6);
-    } else {
-        cairo_set_source_rgb(cr, 0.8, 0.8, 0.8);
-    }
-    cairo_set_font_size(cr, fontSize_);
-    cairo_text_extents_t extents;
-    cairo_text_extents(cr, label(keyboard), &extents);
-    cairo_translate(cr, labelOffsetX(extents), labelOffsetY(extents));
-    cairo_show_text(cr, label(keyboard));
-
-    cairo_restore(cr);
+bool RussianTextToggleKey::isOn(VirtualKeyboard *keyboard) {
+    return keyboard->i18nKeyboard<RussianKeyboard>()->isLatinTextOn();
 }
 
 void RussianKeyboard::setCyrillicTextKeys() {
