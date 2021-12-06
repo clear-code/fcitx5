@@ -53,7 +53,7 @@ private:
 
 class NullI18nKeyboard : public I18nKeyboard {
 public:
-    KeyboardType type() const override { return KeyboardType::Unknown; };
+    KeyboardType type() const override { return KeyboardType::Unknown; }
     const char *label() const override { return "X"; }
     void updateKeys() override {
         // do nothing
