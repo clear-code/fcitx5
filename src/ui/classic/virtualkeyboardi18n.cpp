@@ -12,7 +12,9 @@
 
 namespace fcitx::classicui {
 
-void I18nKeyboard::syncState(std::string) {}
+void I18nKeyboard::syncState(std::string) {
+    // do nothing
+}
 
 I18nKeyboard *I18nKeyboardSelector::selectType(KeyboardType type) {
     // Add case here when adding new keyboard type.
