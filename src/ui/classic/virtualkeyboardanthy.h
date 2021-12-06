@@ -63,14 +63,14 @@ private:
 
 class ZenkakuHankakuKey : public ToggleKey {
 public:
-    ZenkakuHankakuKey() : ToggleKey(toggle, isOn) {
+    ZenkakuHankakuKey() {
         setFontSize(18);
     }
     const char* label(VirtualKeyboard *) const override { return "全角"; }
 
-private:
-    static void toggle(VirtualKeyboard *keyboard, InputContext *inputContext);
-    static bool isOn(VirtualKeyboard *keyboard);
+protected:
+    void toggle(VirtualKeyboard *keyboard, InputContext *inputContext) override;
+    bool isOn(VirtualKeyboard *keyboard) override;
 };
 
 class AnthyModeSwitchKey : public VirtualKey {
