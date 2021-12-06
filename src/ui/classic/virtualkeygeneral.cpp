@@ -76,7 +76,6 @@ void ShiftToggleKey::paintLabel(VirtualKeyboard *keyboard, cairo_t *cr) {
 }
 
 const char *LanguageSwitchKey::label(VirtualKeyboard *keyboard) const {
-    // TODO null check
     return keyboard->i18nKeyboard()->label();
 }
 

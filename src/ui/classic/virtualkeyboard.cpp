@@ -53,6 +53,7 @@ VirtualKeyboard::VirtualKeyboard(Instance *instance) : instance_(instance) {
             return true;
         });
     repeatKeyTimer_->setEnabled(false);
+    i18nKeyboard_.reset(new NullI18nKeyboard());
 
     syncState();
 }
@@ -63,19 +64,11 @@ bool VirtualKeyboard::syncState() {
 
     FCITX_KEYBOARD() << "Try to sync state. IM: " << curImName;
 
-    auto newI18nKeyboard = i18nKeyboardSelector_.select(curImName, imItems);
-
-    if (!i18nKeyboard_) {
-        if (!newI18nKeyboard) {
-            return false;
-        }
-        setI18nKeyboard(newI18nKeyboard);
-        return true;
-    }
-
     i18nKeyboard_->syncState(curImName);
 
-    if (!newI18nKeyboard || newI18nKeyboard->type() == i18nKeyboard_->type()) {
+    auto [newI18nKeyboard, hasFound] = i18nKeyboardSelector_.select(curImName, imItems);
+
+    if (!hasFound || newI18nKeyboard->type() == i18nKeyboard_->type()) {
         return false;
     }
 

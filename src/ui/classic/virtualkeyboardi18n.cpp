@@ -26,14 +26,14 @@ I18nKeyboard *I18nKeyboardSelector::selectType(KeyboardType type) {
     default:
         break;
     }
-    return nullptr;
+    return new NullI18nKeyboard();
 }
 
-I18nKeyboard *I18nKeyboardSelector::select(std::string currentInputMethodName,
+std::tuple<I18nKeyboard *, bool> I18nKeyboardSelector::select(std::string currentInputMethodName,
                                            std::vector<fcitx::InputMethodGroupItem> &inputMethodItems) {
     auto foundType = findType(currentInputMethodName);
     if (foundType == KeyboardType::Unknown) {
-        return nullptr;
+        return {new NullI18nKeyboard(), false};
     }
 
     auto i18nKeyboard = selectType(foundType);
@@ -41,11 +41,11 @@ I18nKeyboard *I18nKeyboardSelector::select(std::string currentInputMethodName,
     for (const auto &anotherIme : i18nKeyboard->otherNecessaryImeList())
     {
         if (!containInputMethod(inputMethodItems, anotherIme)) {
-            return nullptr;
+            return {new NullI18nKeyboard(), false};
         }
     }
 
-    return i18nKeyboard;
+    return {i18nKeyboard, true};
 }
 
 KeyboardType I18nKeyboardSelector::findType(std::string inputMethodName) {
