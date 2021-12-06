@@ -107,7 +107,7 @@ void RussianKeyboard::setCyrillicTextKeys() {
     keys_.emplace_back(new RussianTextKey("з", "З"));
     keys_.emplace_back(new RussianTextKey("х", "Х"));
     keys_.emplace_back(new RussianTextKey("ъ", "Ъ"));
-    keys_.emplace_back(new BackSpaceKey()); keys_.back()->setCustomLayout(1.0);
+    keys_.emplace_back(new BackSpaceKey(false)); keys_.back()->setCustomLayout(1.0);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new TextKey("7"));
     keys_.emplace_back(new TextKey("8"));
@@ -125,7 +125,7 @@ void RussianKeyboard::setCyrillicTextKeys() {
     keys_.emplace_back(new RussianTextKey("д", "Д"));
     keys_.emplace_back(new RussianTextKey("ж", "Ж"));
     keys_.emplace_back(new RussianTextKey("э", "Э"));
-    keys_.emplace_back(new EnterKey()); keys_.back()->setCustomLayout(1.5);
+    keys_.emplace_back(new EnterKey(false)); keys_.back()->setCustomLayout(1.5);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new TextKey("4"));
     keys_.emplace_back(new TextKey("5"));
@@ -142,7 +142,7 @@ void RussianKeyboard::setCyrillicTextKeys() {
     keys_.emplace_back(new RussianTextKey("б", "Б"));
     keys_.emplace_back(new RussianTextKey("ю", "Ю"));
     keys_.emplace_back(new RussianTextKey("ё", "Ё"));
-    keys_.emplace_back(new ArrowKey("Up", u8"\u2191"));
+    keys_.emplace_back(new ArrowKey("Up", u8"\u2191", false));
     keys_.emplace_back(new LanguageSwitchKey());
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new TextKey("1"));
@@ -156,9 +156,9 @@ void RussianKeyboard::setCyrillicTextKeys() {
     keys_.emplace_back(new TextKey(" ")); keys_.back()->setCustomLayout(2.0); keys_.back()->setCustomBackgroundColor({0.3, 0.3, 0.3});
     keys_.emplace_back(new TextKey("!"));
     keys_.emplace_back(new TextKey("?"));
-    keys_.emplace_back(new ArrowKey("Left", u8"\u2190"));
-    keys_.emplace_back(new ArrowKey("Down", u8"\u2193"));
-    keys_.emplace_back(new ArrowKey("Right", u8"\u2192"));
+    keys_.emplace_back(new ArrowKey("Left", u8"\u2190", false));
+    keys_.emplace_back(new ArrowKey("Down", u8"\u2193", false));
+    keys_.emplace_back(new ArrowKey("Right", u8"\u2192", false));
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new TextKey("0")); keys_.back()->setCustomLayout(2.0);
     keys_.emplace_back(new TextKey(".")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
@@ -176,7 +176,7 @@ void RussianKeyboard::setLatinTextKeys() {
     keys_.emplace_back(new TextKey("i", "I"));
     keys_.emplace_back(new TextKey("o", "O"));
     keys_.emplace_back(new TextKey("p", "P"));
-    keys_.emplace_back(new BackSpaceKey()); keys_.back()->setCustomLayout(1.0);
+    keys_.emplace_back(new BackSpaceKey(false)); keys_.back()->setCustomLayout(1.0);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new TextKey("7"));
     keys_.emplace_back(new TextKey("8"));
@@ -192,7 +192,7 @@ void RussianKeyboard::setLatinTextKeys() {
     keys_.emplace_back(new TextKey("j", "J"));
     keys_.emplace_back(new TextKey("k", "K"));
     keys_.emplace_back(new TextKey("l", "L"));
-    keys_.emplace_back(new EnterKey()); keys_.back()->setCustomLayout(1.5);
+    keys_.emplace_back(new EnterKey(false)); keys_.back()->setCustomLayout(1.5);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new TextKey("4"));
     keys_.emplace_back(new TextKey("5"));
@@ -207,7 +207,7 @@ void RussianKeyboard::setLatinTextKeys() {
     keys_.emplace_back(new TextKey("n", "N"));
     keys_.emplace_back(new TextKey("m", "M"));
     keys_.emplace_back(new TextKey("-"));
-    keys_.emplace_back(new ArrowKey("Up", u8"\u2191"));
+    keys_.emplace_back(new ArrowKey("Up", u8"\u2191", false));
     keys_.emplace_back(new LanguageSwitchKey());
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new TextKey("1"));
@@ -221,9 +221,9 @@ void RussianKeyboard::setLatinTextKeys() {
     keys_.emplace_back(new TextKey(" ")); keys_.back()->setCustomLayout(2.0); keys_.back()->setCustomBackgroundColor({0.3, 0.3, 0.3});
     keys_.emplace_back(new TextKey("!"));
     keys_.emplace_back(new TextKey("?"));
-    keys_.emplace_back(new ArrowKey("Left", u8"\u2190"));
-    keys_.emplace_back(new ArrowKey("Down", u8"\u2193"));
-    keys_.emplace_back(new ArrowKey("Right", u8"\u2192"));
+    keys_.emplace_back(new ArrowKey("Left", u8"\u2190", false));
+    keys_.emplace_back(new ArrowKey("Down", u8"\u2193", false));
+    keys_.emplace_back(new ArrowKey("Right", u8"\u2192", false));
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new TextKey("0")); keys_.back()->setCustomLayout(2.0);
     keys_.emplace_back(new TextKey(".")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
@@ -241,7 +241,7 @@ void RussianKeyboard::setMarkKeys() {
     keys_.emplace_back(new TextKey("*"));
     keys_.emplace_back(new TextKey("+"));
     keys_.emplace_back(new TextKey("="));
-    keys_.emplace_back(new BackSpaceKey());
+    keys_.emplace_back(new BackSpaceKey(false));
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new TextKey("7"));
     keys_.emplace_back(new TextKey("8"));
@@ -257,7 +257,7 @@ void RussianKeyboard::setMarkKeys() {
     keys_.emplace_back(new TextKey("&"));
     keys_.emplace_back(new TextKey("@"));
     keys_.emplace_back(new TextKey("￥"));
-    keys_.emplace_back(new EnterKey()); keys_.back()->setCustomLayout(1.5);
+    keys_.emplace_back(new EnterKey(false)); keys_.back()->setCustomLayout(1.5);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new TextKey("4"));
     keys_.emplace_back(new TextKey("5"));
@@ -272,7 +272,7 @@ void RussianKeyboard::setMarkKeys() {
     keys_.emplace_back(new TextKey("<"));
     keys_.emplace_back(new TextKey(">"));
     keys_.emplace_back(new TextKey("-"));
-    keys_.emplace_back(new ArrowKey("Up", u8"\u2191"));
+    keys_.emplace_back(new ArrowKey("Up", u8"\u2191", false));
     keys_.emplace_back(new LanguageSwitchKey());
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new TextKey("1"));
@@ -285,9 +285,9 @@ void RussianKeyboard::setMarkKeys() {
     keys_.emplace_back(new TextKey(" ")); keys_.back()->setCustomLayout(2.0); keys_.back()->setCustomBackgroundColor({0.3, 0.3, 0.3});
     keys_.emplace_back(new TextKey("!"));
     keys_.emplace_back(new TextKey("?"));
-    keys_.emplace_back(new ArrowKey("Left", u8"\u2190"));
-    keys_.emplace_back(new ArrowKey("Down", u8"\u2193"));
-    keys_.emplace_back(new ArrowKey("Right", u8"\u2192"));
+    keys_.emplace_back(new ArrowKey("Left", u8"\u2190", false));
+    keys_.emplace_back(new ArrowKey("Down", u8"\u2193", false));
+    keys_.emplace_back(new ArrowKey("Right", u8"\u2192", false));
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new TextKey("0")); keys_.back()->setCustomLayout(2.0);
     keys_.emplace_back(new TextKey(".")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
