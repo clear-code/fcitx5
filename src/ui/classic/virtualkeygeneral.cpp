@@ -75,17 +75,9 @@ void ShiftToggleKey::paintLabel(VirtualKeyboard *keyboard, cairo_t *cr) {
     cairo_restore(cr);
 }
 
-const char* LanguageSwitchKey::label(VirtualKeyboard *keyboard) const {
-    switch (keyboard->i18nKeyboard()->type()) {
-    case KeyboardType::Anthy:
-        return "JP";
-    case KeyboardType::Pinyin:
-        return "CH";
-    case KeyboardType::Russian:
-        return "RU";
-    default:
-        return "X";
-    }
+const char *LanguageSwitchKey::label(VirtualKeyboard *keyboard) const {
+    // TODO null check
+    return keyboard->i18nKeyboard()->label();
 }
 
 void LanguageSwitchKey::click(VirtualKeyboard *keyboard, InputContext *, bool isRelease) {

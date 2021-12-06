@@ -22,6 +22,7 @@ enum class RussianKeyboardMode {
 class RussianKeyboard : public I18nKeyboard {
 public:
     KeyboardType type() const override { return KeyboardType::Russian; };
+    const char *label() const override { return "RU"; }
     void updateKeys() override;
     void switchMode();
     RussianKeyboardMode mode() const { return mode_; }

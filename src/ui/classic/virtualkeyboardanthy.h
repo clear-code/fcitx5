@@ -24,6 +24,7 @@ static const std::string hankakuImeName = "keyboard-us";
 class AnthyKeyboard : public I18nKeyboard {
 public:
     KeyboardType type() const override { return KeyboardType::Anthy; };
+    const char *label() const override { return "JP"; }
     void updateKeys() override;
     std::vector<std::string> otherNecessaryImeList() override { return { hankakuImeName }; }
     void syncState(std::string currentInputMethodName) override;

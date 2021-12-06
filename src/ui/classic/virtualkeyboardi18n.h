@@ -31,6 +31,7 @@ class VirtualKey;
 class I18nKeyboard {
 public:
     virtual KeyboardType type() const = 0;
+    virtual const char *label() const = 0;
     virtual void updateKeys() = 0;
     virtual std::vector<std::string> otherNecessaryImeList() { return {}; }
     virtual void syncState(std::string currentInputMethodName);
