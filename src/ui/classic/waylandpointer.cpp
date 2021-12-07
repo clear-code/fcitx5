@@ -71,17 +71,22 @@ void WaylandPointer::initPointer() {
 
 void WaylandPointer::initTouch() {
     touch_->down().connect(
-        [this](uint32_t, uint32_t, wayland::WlSurface *, int, wl_fixed_t sx, wl_fixed_t sy) {
-            if (auto *window = focus_.get()) {
-                focusX_ = wl_fixed_to_int(sx);
-                focusY_ = wl_fixed_to_int(sy);
-                window->click()(focusX_, focusY_, 0x110, WL_POINTER_BUTTON_STATE_PRESSED);
+        [this](uint32_t, uint32_t, wayland::WlSurface *surface, int, wl_fixed_t sx, wl_fixed_t sy) {
+            auto *window = static_cast<WaylandWindow *>(surface->userData());
+            if (!window) {
+                return;
             }
+            focus_ = window->watch();
+            focusX_ = wl_fixed_to_int(sx);
+            focusY_ = wl_fixed_to_int(sy);
+            window->click()(focusX_, focusY_, 0x110, WL_POINTER_BUTTON_STATE_PRESSED);
         });
     touch_->up().connect(
         [this](uint32_t, uint32_t, int) {
             if (auto *window = focus_.get()) {
                 window->click()(focusX_, focusY_, 0x110, WL_POINTER_BUTTON_STATE_RELEASED);
+                focus_.unwatch();
+                window->leave()();
             }
         });
 }
