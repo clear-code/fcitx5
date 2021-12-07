@@ -79,12 +79,12 @@ void WaylandPointer::initTouch() {
             focus_ = window->watch();
             focusX_ = wl_fixed_to_int(sx);
             focusY_ = wl_fixed_to_int(sy);
-            window->click()(focusX_, focusY_, 0x110, WL_POINTER_BUTTON_STATE_PRESSED);
+            window->touchDown()(focusX_, focusY_);
         });
     touch_->up().connect(
         [this](uint32_t, uint32_t, int) {
             if (auto *window = focus_.get()) {
-                window->click()(focusX_, focusY_, 0x110, WL_POINTER_BUTTON_STATE_RELEASED);
+                window->touchUp()(focusX_, focusY_);
                 focus_.unwatch();
                 window->leave()();
             }
