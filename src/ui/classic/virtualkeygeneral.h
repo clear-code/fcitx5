@@ -163,6 +163,7 @@ public:
     void paintLabel(VirtualKeyboard *keyboard, cairo_t *cr) override;
 
 protected:
+    virtual int numberOfStates() const = 0;
     virtual const char *stateLabel(int index) const = 0;
     virtual void switchState(VirtualKeyboard *keyboard, InputContext *inputContext) = 0;
     virtual int currentIndex(VirtualKeyboard *keyboard) = 0;
