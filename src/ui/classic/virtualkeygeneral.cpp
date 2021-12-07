@@ -99,18 +99,16 @@ void SwitchKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, boo
 }
 
 void SwitchKey::paintLabel(VirtualKeyboard *keyboard, cairo_t *cr) {
-    const auto keyLabel = label(keyboard);
-
     cairo_save(cr);
 
     cairo_set_font_size(cr, fontSize_);
     cairo_text_extents_t extents;
-    cairo_text_extents(cr, keyLabel, &extents);
+    cairo_text_extents(cr, label(keyboard), &extents);
     cairo_translate(cr, labelOffsetX(extents), labelOffsetY(extents));
 
-    for (size_t i = 0; i < strlen(keyLabel); i++)
+    for (int i = 0; i < numberOfStates(); i++)
     {
-        if (i == (unsigned long)currentIndex(keyboard)) {
+        if (i == currentIndex(keyboard)) {
             cairo_set_source_rgb(cr, 0.2, 0.7, 0.6);
         } else {
             cairo_set_source_rgb(cr, 0.8, 0.8, 0.8);

@@ -79,6 +79,7 @@ public:
     const char* label(VirtualKeyboard *) const override { return "A#"; }
 
 protected:
+    int numberOfStates() const override { return 2; }
     const char *stateLabel(int index) const override {
         return index == 0 ? "A" : "#";
     }

@@ -36,11 +36,12 @@ private:
 class HangulModeSwitchKey : public SwitchKey {
 public:
     HangulModeSwitchKey() : SwitchKey() {}
-    const char* label(VirtualKeyboard *) const override { return "A#"; }
+    const char* label(VirtualKeyboard *) const override { return "한#"; }
 
 protected:
+    int numberOfStates() const override { return 2; }
     const char *stateLabel(int index) const override {
-        return index == 0 ? "A" : "#";
+        return index == 0 ? "한" : "#";
     }
     void switchState(VirtualKeyboard *keyboard, InputContext *inputContext) override;
     int currentIndex(VirtualKeyboard *keyboard) override;
