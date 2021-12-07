@@ -11,7 +11,6 @@
 #include <pango/pangocairo.h>
 #include "fcitx-utils/color.h"
 #include "fcitx-utils/log.h"
-#include "fcitx/inputmethodengine.h"
 #include "fcitx/inputmethodentry.h"
 #include "fcitx/inputpanel.h"
 #include "fcitx/instance.h"
