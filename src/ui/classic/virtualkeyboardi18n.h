@@ -18,6 +18,7 @@ enum class KeyboardType {
     Anthy,
     Pinyin,
     Russian,
+    Hangul,
 };
 
 static std::map<KeyboardType, std::string> imeNames = {
@@ -25,6 +26,7 @@ static std::map<KeyboardType, std::string> imeNames = {
     {KeyboardType::Anthy, "anthy"},
     {KeyboardType::Pinyin, "pinyin"},
     {KeyboardType::Russian, "keyboard-ru"},
+    {KeyboardType::Hangul, "hangul"},
 };
 
 class VirtualKey;
