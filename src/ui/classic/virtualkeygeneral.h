@@ -90,7 +90,7 @@ public:
     ForwardKey(std::string keyName, std::string label, bool tryToSendKeyEventFirst = true)
         : KeyByName(keyName), label_(label), tryToSendKeyEventFirst_(tryToSendKeyEventFirst) {}
     virtual const char* label(VirtualKeyboard *) const override { return label_.c_str(); }
-    void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
+    virtual void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
 
 private:
     const std::string label_;

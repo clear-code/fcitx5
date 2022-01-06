@@ -10,6 +10,7 @@
 #include "virtualkeyboardpinyin.h"
 #include "virtualkeyboardrussian.h"
 #include "virtualkeyboardhangul.h"
+#include "virtualkeyboardchewing.h"
 
 namespace fcitx::classicui {
 
@@ -28,6 +29,8 @@ I18nKeyboard *I18nKeyboardSelector::selectType(KeyboardType type) {
         return new RussianKeyboard();
     case KeyboardType::Hangul:
         return new HangulKeyboard();
+    case KeyboardType::Chewing:
+        return new ChewingKeyboard();
     default:
         break;
     }

@@ -103,6 +103,8 @@ public:
     void switchLanguage();
     void setCurrentInputMethod(std::string name);
     bool isPreediting();
+    bool isSeletingCandidates();
+    void updateInputPanel();
 
     std::vector<std::unique_ptr<VirtualKey>> &keys() { return i18nKeyboard_->keys(); }
     I18nKeyboard *i18nKeyboard() { return i18nKeyboard_.get(); }

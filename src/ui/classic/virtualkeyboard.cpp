@@ -109,6 +109,24 @@ bool VirtualKeyboard::isPreediting() {
         return false;
     }
 
+    return !inputContext->inputPanel().empty();
+}
+
+void VirtualKeyboard::updateInputPanel() {
+    auto inputContext = lastInputContext_.get();
+    if (!inputContext) {
+        return;
+    }
+
+    inputContext->updateUserInterface(UserInterfaceComponent::InputPanel);
+}
+
+bool VirtualKeyboard::isSeletingCandidates() {
+    auto inputContext = lastInputContext_.get();
+    if (!inputContext) {
+        return false;
+    }
+
     auto candidateList = inputContext->inputPanel().candidateList();
     return !!candidateList;
 }

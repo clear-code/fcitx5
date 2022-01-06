@@ -22,7 +22,7 @@ endif()
 add_library(classicui MODULE
     classicui.cpp window.cpp theme.cpp inputwindow.cpp virtualkeyboard.cpp virtualkeygeneral.cpp
     virtualkeyboardi18n.cpp virtualkeyboardanthy.cpp virtualkeyboardpinyin.cpp virtualkeyboardrussian.cpp
-    virtualkeyboardhangul.cpp ${CLASSICUI_WAYLAND_SRCS}
+    virtualkeyboardhangul.cpp virtualkeyboardchewing.cpp ${CLASSICUI_WAYLAND_SRCS}
     )
 
 if (CAIRO_EGL_FOUND)
