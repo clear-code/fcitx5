@@ -102,6 +102,7 @@ public:
     bool syncState();
     void switchLanguage();
     void setCurrentInputMethod(std::string name);
+    void enumerateGroup();
     bool isPreediting();
     bool isSeletingCandidates();
     void updateInputPanel();

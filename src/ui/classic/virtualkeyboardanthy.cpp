@@ -16,7 +16,7 @@ void AnthyKeyboard::updateKeys() {
     }
 }
 
-void AnthyKeyboard::syncState(std::string currentInputMethodName) {
+void AnthyKeyboard::syncState(const std::string &currentInputMethodName) {
     isZenkakuOn_ = currentInputMethodName != hankakuImeName;
 }
 

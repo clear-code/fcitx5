@@ -59,39 +59,37 @@ VirtualKeyboard::VirtualKeyboard(Instance *instance) : instance_(instance) {
 }
 
 bool VirtualKeyboard::syncState() {
-    auto curImName = instance_->currentInputMethod();
+    FCITX_KEYBOARD() << "Try to sync state.";
     auto imItems = instance_->inputMethodManager().currentGroup().inputMethodList();
 
-    FCITX_KEYBOARD() << "Try to sync state. IM: " << curImName;
-
-    i18nKeyboard_->syncState(curImName);
-
-    auto [newI18nKeyboard, hasFound] = i18nKeyboardSelector_.select(curImName, imItems);
-
-    if (!hasFound || newI18nKeyboard->type() == i18nKeyboard_->type()) {
-        return false;
+    auto [newI18nKeyboard, hasFound] = i18nKeyboardSelector_.select(imItems);
+    if (hasFound && newI18nKeyboard->type() != i18nKeyboard_->type()) {
+        setI18nKeyboard(newI18nKeyboard);
+        return true;
     }
 
-    setI18nKeyboard(newI18nKeyboard);
-    return true;
+    auto curImName = instance_->currentInputMethod();
+
+    i18nKeyboard_->syncState(curImName);
+    return false;
 }
 
 void VirtualKeyboard::setI18nKeyboard(I18nKeyboard *i18nKeyboard) {
     FCITX_KEYBOARD() << "Set I18nKeyboard:" << imeNames[i18nKeyboard->type()];
+    setCurrentInputMethod(imeNames[i18nKeyboard->type()]);
     i18nKeyboard_.reset(i18nKeyboard);
     i18nKeyboard_->updateKeys();
 }
 
 void VirtualKeyboard::switchLanguage() {
+    if (instance_->inputMethodManager().groupCount() < 2) return;
+
     const auto maxTryCount = 10;
     auto tryCount = 0;
     do
     {
-        if (instance_->inputMethodManager().groupCount() > 1) {
-            instance_->enumerateGroup(true);
-        } else {
-            instance_->enumerate(true);
-        }
+        enumerateGroup();
+
         tryCount ++;
         if (maxTryCount <= tryCount) {
             break;
@@ -101,6 +99,25 @@ void VirtualKeyboard::switchLanguage() {
 
 void VirtualKeyboard::setCurrentInputMethod(std::string name) {
     instance_->setCurrentInputMethod(name);
+}
+
+void VirtualKeyboard::enumerateGroup() {
+    // TODO this can't select the third and later groups.
+    instance_->enumerateGroup(true);
+
+    // Another way to enumerate group is bellow.
+
+    // auto keys = instance_->globalConfig().enumerateGroupForwardKeys();
+    // if (keys.empty()) return;
+
+    // auto inputContext = lastInputContext_.get();
+    // if (!inputContext) return;
+
+    // auto keyEvent = fcitx::KeyEvent(inputContext, keys[0], false);
+    // inputContext->keyEvent(keyEvent);
+
+    // keyEvent = fcitx::KeyEvent(inputContext, fcitx::Key(FcitxKey_Control_L), true);
+    // inputContext->keyEvent(keyEvent);
 }
 
 bool VirtualKeyboard::isPreediting() {

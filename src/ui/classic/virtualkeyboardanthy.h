@@ -26,13 +26,15 @@ public:
     KeyboardType type() const override { return KeyboardType::Anthy; };
     const char *label() const override { return "JP"; }
     void updateKeys() override;
-    std::vector<std::string> otherNecessaryImeList() override { return { hankakuImeName }; }
-    void syncState(std::string currentInputMethodName) override;
+    void syncState(const std::string &currentInputMethodName) override;
 
     void switchMode();
     AnthyKeyboardMode mode() const { return mode_; }
     bool isZenkakuOn() const { return isZenkakuOn_; }
     void toggleZenkakuHankaku(VirtualKeyboard *keyboard);
+
+protected:
+    std::vector<std::string> otherNecessaryImeList() override { return { hankakuImeName }; }
 
 private:
     void setTextKeys();

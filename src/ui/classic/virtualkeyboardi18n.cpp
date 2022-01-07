@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  *
  */
+#include "fcitx-utils/stringutils.h"
 #include "virtualkeyboardi18n.h"
 #include "virtualkeyboard.h"
 #include "virtualkeyboardanthy.h"
@@ -14,49 +15,54 @@
 
 namespace fcitx::classicui {
 
-void I18nKeyboard::syncState(std::string) {
-    // do nothing
-}
-
-I18nKeyboard *I18nKeyboardSelector::selectType(KeyboardType type) {
+std::tuple<I18nKeyboard *, bool> I18nKeyboardSelector::selectByType(KeyboardType type) {
     // Add case here when adding new keyboard type.
     switch (type) {
     case KeyboardType::Anthy:
-        return new AnthyKeyboard();
+        return {new AnthyKeyboard(), true};
     case KeyboardType::Pinyin:
-        return new PinyinKeyboard();
+        return {new PinyinKeyboard(), true};
     case KeyboardType::Russian:
-        return new RussianKeyboard();
+        return {new RussianKeyboard(), true};
     case KeyboardType::Hangul:
-        return new HangulKeyboard();
+        return {new HangulKeyboard(), true};
     case KeyboardType::Chewing:
-        return new ChewingKeyboard();
+        return {new ChewingKeyboard(), true};
     default:
         break;
     }
-    return new NullI18nKeyboard();
+    return {new NullI18nKeyboard(), false};
 }
 
-std::tuple<I18nKeyboard *, bool> I18nKeyboardSelector::select(std::string currentInputMethodName,
-                                           std::vector<fcitx::InputMethodGroupItem> &inputMethodItems) {
-    auto foundType = findType(currentInputMethodName);
-    if (foundType == KeyboardType::Unknown) {
-        return {new NullI18nKeyboard(), false};
-    }
-
-    auto i18nKeyboard = selectType(foundType);
-
-    for (const auto &anotherIme : i18nKeyboard->otherNecessaryImeList())
+std::tuple<I18nKeyboard *, bool> I18nKeyboardSelector::select(
+    std::vector<fcitx::InputMethodGroupItem> &inputMethodItems
+) {
+    // First, select from addon imes such as `anthy` or `pinyin`.
+    for (const auto &ime : inputMethodItems)
     {
-        if (!containInputMethod(inputMethodItems, anotherIme)) {
-            return {new NullI18nKeyboard(), false};
+        auto isSimpleKeyboard = stringutils::startsWith(ime.name(), "keyboard-");
+        if (isSimpleKeyboard) continue;
+
+        if (canSelect(inputMethodItems, ime.name())) {
+            return selectByType(getTypeByName(ime.name()));
         }
     }
 
-    return {i18nKeyboard, true};
+    // Second, select from simple keyboards such as `keyboard-us`.
+    for (const auto &ime : inputMethodItems)
+    {
+        auto isSimpleKeyboard = stringutils::startsWith(ime.name(), "keyboard-");
+        if (!isSimpleKeyboard) continue;
+
+        if (canSelect(inputMethodItems, ime.name())) {
+            return selectByType(getTypeByName(ime.name()));
+        }
+    }
+
+    return selectByType(KeyboardType::Unknown);
 }
 
-KeyboardType I18nKeyboardSelector::findType(std::string inputMethodName) {
+KeyboardType I18nKeyboardSelector::getTypeByName(const std::string &inputMethodName) {
     for (const auto &[type, name] : imeNames)
     {
         if (inputMethodName == name) {
@@ -66,13 +72,44 @@ KeyboardType I18nKeyboardSelector::findType(std::string inputMethodName) {
     return KeyboardType::Unknown;
 }
 
-bool I18nKeyboardSelector::containInputMethod(std::vector<fcitx::InputMethodGroupItem> &items,
-                                              std::string name) {
+bool I18nKeyboardSelector::canSelect(
+    std::vector<fcitx::InputMethodGroupItem> &allItems,
+    const std::string &inputMethodNameToSelect
+) {
+    auto type = getTypeByName(inputMethodNameToSelect);
+    if (type == KeyboardType::Unknown) return false;
+
+    auto [keyboard, hasFound] = selectByType(type);
+    if (!hasFound) return false;
+    return keyboard->checkOtherNecessaryImesExist(allItems);
+}
+
+bool I18nKeyboard::checkOtherNecessaryImesExist(
+    std::vector<fcitx::InputMethodGroupItem> &allItems
+) {
+    for (const auto &anotherIme : otherNecessaryImeList())
+    {
+        if (!containInputMethod(allItems, anotherIme)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool I18nKeyboard::containInputMethod(
+    std::vector<fcitx::InputMethodGroupItem> &items,
+    const std::string &name
+) {
     auto iter = std::find_if(items.begin(), items.end(),
         [&name](const InputMethodGroupItem &item) {
             return item.name() == name;
         });
     return iter != items.end();
+}
+
+void I18nKeyboard::syncState(const std::string &) {
+    // do nothing
+    // override this if need to use multiple input methods in one keyboard, such as anthy.
 }
 
 }

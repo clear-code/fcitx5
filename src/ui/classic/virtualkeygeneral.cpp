@@ -125,7 +125,7 @@ const char *LanguageSwitchKey::label(VirtualKeyboard *keyboard) const {
 
 void LanguageSwitchKey::click(VirtualKeyboard *keyboard, InputContext *, bool isRelease) {
     FCITX_KEYBOARD() << "LanguageSwitchKey pushed";
-    if (isRelease) {
+    if (!isRelease) {
         return;
     }
     keyboard->switchLanguage();

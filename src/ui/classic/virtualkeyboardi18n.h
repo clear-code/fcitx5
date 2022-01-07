@@ -37,22 +37,27 @@ public:
     virtual KeyboardType type() const = 0;
     virtual const char *label() const = 0;
     virtual void updateKeys() = 0;
-    virtual std::vector<std::string> otherNecessaryImeList() { return {}; }
-    virtual void syncState(std::string currentInputMethodName);
+    virtual void syncState(const std::string &currentInputMethodName);
     std::vector<std::unique_ptr<VirtualKey>> &keys() { return keys_; }
+    bool checkOtherNecessaryImesExist(std::vector<fcitx::InputMethodGroupItem> &allItems);
 protected:
+    virtual std::vector<std::string> otherNecessaryImeList() { return {}; }
     std::vector<std::unique_ptr<VirtualKey>> keys_;
+private:
+    bool containInputMethod(std::vector<fcitx::InputMethodGroupItem> &items,
+                            const std::string &name);
 };
 
 class I18nKeyboardSelector {
 public:
-    I18nKeyboard *selectType(KeyboardType type);
-    std::tuple<I18nKeyboard *, bool> select(std::string inputMethodName,
-        std::vector<fcitx::InputMethodGroupItem> &inputMethodItems);
+    std::tuple<I18nKeyboard *, bool> select(std::vector<fcitx::InputMethodGroupItem> &inputMethodItems);
 private:
-    KeyboardType findType(std::string inputMethodName);
-    bool containInputMethod(std::vector<fcitx::InputMethodGroupItem> &items,
-                            std::string name);
+    KeyboardType getTypeByName(const std::string &inputMethodName);
+    std::tuple<I18nKeyboard *, bool> selectByType(KeyboardType type);
+    bool canSelect(
+        std::vector<fcitx::InputMethodGroupItem> &allItems,
+        const std::string &inputMethodNameToSelect
+    );
 };
 
 class NullI18nKeyboard : public I18nKeyboard {
