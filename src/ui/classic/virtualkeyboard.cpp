@@ -102,22 +102,7 @@ void VirtualKeyboard::setCurrentInputMethod(std::string name) {
 }
 
 void VirtualKeyboard::enumerateGroup() {
-    // TODO this can't select the third and later groups.
     instance_->enumerateGroup(true);
-
-    // Another way to enumerate group is bellow.
-
-    // auto keys = instance_->globalConfig().enumerateGroupForwardKeys();
-    // if (keys.empty()) return;
-
-    // auto inputContext = lastInputContext_.get();
-    // if (!inputContext) return;
-
-    // auto keyEvent = fcitx::KeyEvent(inputContext, keys[0], false);
-    // inputContext->keyEvent(keyEvent);
-
-    // keyEvent = fcitx::KeyEvent(inputContext, fcitx::Key(FcitxKey_Control_L), true);
-    // inputContext->keyEvent(keyEvent);
 }
 
 bool VirtualKeyboard::isPreediting() {

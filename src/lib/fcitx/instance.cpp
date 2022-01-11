@@ -2307,15 +2307,10 @@ void Instance::deactivateInputMethod(InputContextEvent &event) {
 
 bool Instance::enumerateGroup(bool forward) {
     auto &imManager = inputMethodManager();
-    auto groups = imManager.groups();
-    if (groups.size() <= 1) {
+    if (imManager.groupCount() <= 1) {
         return false;
     }
-    if (forward) {
-        imManager.setCurrentGroup(groups[1]);
-    } else {
-        imManager.setCurrentGroup(groups.back());
-    }
+    imManager.enumerateGroup(forward);
     return true;
 }
 
