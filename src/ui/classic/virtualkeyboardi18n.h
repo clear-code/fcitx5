@@ -15,6 +15,7 @@ namespace classicui {
 
 enum class KeyboardType {
     Unknown,
+    Us,
     Anthy,
     Pinyin,
     Russian,
@@ -24,6 +25,7 @@ enum class KeyboardType {
 
 static std::map<KeyboardType, std::string> imeNames = {
     {KeyboardType::Unknown, ""},
+    {KeyboardType::Us, "keyboard-us"},
     {KeyboardType::Anthy, "anthy"},
     {KeyboardType::Pinyin, "pinyin"},
     {KeyboardType::Russian, "keyboard-ru"},

@@ -7,6 +7,7 @@
 #include "fcitx-utils/stringutils.h"
 #include "virtualkeyboardi18n.h"
 #include "virtualkeyboard.h"
+#include "virtualkeyboardus.h"
 #include "virtualkeyboardanthy.h"
 #include "virtualkeyboardpinyin.h"
 #include "virtualkeyboardrussian.h"
@@ -18,6 +19,8 @@ namespace fcitx::classicui {
 std::tuple<I18nKeyboard *, bool> I18nKeyboardSelector::selectByType(KeyboardType type) {
     // Add case here when adding new keyboard type.
     switch (type) {
+    case KeyboardType::Us:
+        return {new UsKeyboard(), true};
     case KeyboardType::Anthy:
         return {new AnthyKeyboard(), true};
     case KeyboardType::Pinyin:
