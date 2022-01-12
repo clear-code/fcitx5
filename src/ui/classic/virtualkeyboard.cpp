@@ -102,7 +102,7 @@ void VirtualKeyboard::setCurrentInputMethod(std::string name) {
 }
 
 void VirtualKeyboard::enumerateGroup() {
-    instance_->enumerateGroup(true);
+    instance_->inputMethodManager().enumerateGroup(true);
 }
 
 bool VirtualKeyboard::isPreediting() {

@@ -84,6 +84,7 @@ public:
     /// Return the current group.
     const InputMethodGroup &currentGroup() const;
 
+    /// Enumerate input method groups.
     void enumerateGroup(bool forward);
 
     /**
