@@ -8,6 +8,34 @@
 
 namespace fcitx::classicui {
 
+const char* NormalKey::label(VirtualKeyboard *keyboard) const {
+    if (!keyboard->isShiftOn_ || upperLabel_.empty()) {
+        return label_.c_str();
+    }
+    return upperLabel_.c_str();
+}
+
+void NormalKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) {
+    FCITX_KEYBOARD() << "NormalKey pushed: " << label(keyboard);
+
+    auto keyEvent = fcitx::KeyEvent(inputContext, convert(keyboard->isShiftOn_), isRelease);
+    inputContext->virtualKeyEvent(keyEvent);
+}
+
+const char* MarkKey::label(VirtualKeyboard *) const {
+    return label_.c_str();
+}
+
+void MarkKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) {
+    FCITX_KEYBOARD() << "MarkKey pushed: " << label(keyboard);
+
+    if (isRelease) {
+        return;
+    }
+
+    inputContext->commitString(label(keyboard));
+}
+
 const char* TextKey::label(VirtualKeyboard *keyboard) const {
     if (!keyboard->isShiftOn_ || upperText_.empty()) {
         return text_.c_str();

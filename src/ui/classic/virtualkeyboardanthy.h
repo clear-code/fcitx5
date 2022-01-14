@@ -43,22 +43,20 @@ private:
     bool isZenkakuOn_ = true;
 };
 
-class AnthyTextKey : public TextKey {
+class AnthyMarkKey : public VirtualKey {
 public:
-    AnthyTextKey(std::string text, std::string upperText = "", std::string keyName = "",
-        std::string upperKeyName = "")
-        : TextKey(text, upperText, keyName, upperKeyName) {}
-    void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
-};
-
-class AnthyMarkKey : public KeyByName {
-public:
-    AnthyMarkKey(std::string keyName, std::string hankakuMark, std::string zenkakuMark)
-        : KeyByName(keyName), hankakuMark_(hankakuMark), zenkakuMark_(zenkakuMark) {}
+    AnthyMarkKey(
+        const std::string &name,
+        const std::string &hankakuMark,
+        const std::string &zenkakuMark
+    ) : name_(name),
+        hankakuMark_(hankakuMark),
+        zenkakuMark_(zenkakuMark) {}
     const char* label(VirtualKeyboard *keyboard) const override;
     void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
 
 private:
+    const std::string name_;
     const std::string hankakuMark_;
     const std::string zenkakuMark_;
 };

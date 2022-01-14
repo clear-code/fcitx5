@@ -39,21 +39,6 @@ void AnthyKeyboard::toggleZenkakuHankaku(VirtualKeyboard *keyboard) {
     }
 }
 
-void AnthyTextKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) {
-    FCITX_KEYBOARD() << "AnthyTextKey pushed: " << label(keyboard);
-
-    if (!keyboard->i18nKeyboard<AnthyKeyboard>()->isZenkakuOn()) {
-        if (!isRelease) {
-            inputContext->commitString(label(keyboard));
-        }
-        return;
-    }
-
-    auto keyEvent = fcitx::KeyEvent(inputContext, convert(keyboard->isShiftOn_), isRelease);
-    auto hasProcessedInIME = inputContext->keyEvent(keyEvent);
-    FCITX_KEYBOARD() << "key event result: " << hasProcessedInIME;
-}
-
 const char* AnthyMarkKey::label(VirtualKeyboard *keyboard) const {
     if (keyboard->i18nKeyboard<AnthyKeyboard>()->isZenkakuOn()) {
         return zenkakuMark_.c_str();
@@ -71,8 +56,8 @@ void AnthyMarkKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, 
         return;
     }
 
-    auto keyEvent = fcitx::KeyEvent(inputContext, convert(), isRelease);
-    auto hasProcessedInIME = inputContext->keyEvent(keyEvent);
+    auto event = KeyEvent(inputContext, fcitx::Key(name_), isRelease);
+    auto hasProcessedInIME = inputContext->keyEvent(event);
     FCITX_KEYBOARD() << "key event result: " << hasProcessedInIME;
 }
 
@@ -97,48 +82,48 @@ int AnthyModeSwitchKey::currentIndex(VirtualKeyboard *keyboard) {
 
 void AnthyKeyboard::setTextKeys() {
     keys_.clear();
-    keys_.emplace_back(new AnthyTextKey("q", "Q"));
-    keys_.emplace_back(new AnthyTextKey("w", "W"));
-    keys_.emplace_back(new AnthyTextKey("e", "E"));
-    keys_.emplace_back(new AnthyTextKey("r", "R"));
-    keys_.emplace_back(new AnthyTextKey("t", "T"));
-    keys_.emplace_back(new AnthyTextKey("y", "Y"));
-    keys_.emplace_back(new AnthyTextKey("u", "U"));
-    keys_.emplace_back(new AnthyTextKey("i", "I"));
-    keys_.emplace_back(new AnthyTextKey("o", "O"));
-    keys_.emplace_back(new AnthyTextKey("p", "P"));
-    keys_.emplace_back(new BackSpaceKey()); keys_.back()->setCustomLayout(1.0);
+    keys_.emplace_back(new NormalKey("q", 24, "Q"));
+    keys_.emplace_back(new NormalKey("w", 25, "W"));
+    keys_.emplace_back(new NormalKey("e", 26, "E"));
+    keys_.emplace_back(new NormalKey("r", 27, "R"));
+    keys_.emplace_back(new NormalKey("t", 28, "T"));
+    keys_.emplace_back(new NormalKey("y", 29, "Y"));
+    keys_.emplace_back(new NormalKey("u", 30, "U"));
+    keys_.emplace_back(new NormalKey("i", 31, "I"));
+    keys_.emplace_back(new NormalKey("o", 32, "O"));
+    keys_.emplace_back(new NormalKey("p", 33, "P"));
+    keys_.emplace_back(new NormalBackSpaceKey()); keys_.back()->setCustomLayout(1.0);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new AnthyMarkKey("7", "7", "７"));
     keys_.emplace_back(new AnthyMarkKey("8", "8", "８"));
     keys_.emplace_back(new AnthyMarkKey("9", "9", "９")); keys_.back()->setCustomLayout(1.0, true);
 
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new AnthyTextKey("a", "A"));
-    keys_.emplace_back(new AnthyTextKey("s", "S"));
-    keys_.emplace_back(new AnthyTextKey("d", "D"));
-    keys_.emplace_back(new AnthyTextKey("f", "F"));
-    keys_.emplace_back(new AnthyTextKey("g", "G"));
-    keys_.emplace_back(new AnthyTextKey("h", "H"));
-    keys_.emplace_back(new AnthyTextKey("j", "J"));
-    keys_.emplace_back(new AnthyTextKey("k", "K"));
-    keys_.emplace_back(new AnthyTextKey("l", "L"));
-    keys_.emplace_back(new EnterKey()); keys_.back()->setCustomLayout(1.5);
+    keys_.emplace_back(new NormalKey("a", 38, "A"));
+    keys_.emplace_back(new NormalKey("s", 39, "S"));
+    keys_.emplace_back(new NormalKey("d", 40, "D"));
+    keys_.emplace_back(new NormalKey("f", 41, "F"));
+    keys_.emplace_back(new NormalKey("g", 42, "G"));
+    keys_.emplace_back(new NormalKey("h", 43, "H"));
+    keys_.emplace_back(new NormalKey("j", 44, "J"));
+    keys_.emplace_back(new NormalKey("k", 45, "K"));
+    keys_.emplace_back(new NormalKey("l", 46, "L"));
+    keys_.emplace_back(new NormalEnterKey()); keys_.back()->setCustomLayout(1.5);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new AnthyMarkKey("4", "4", "４"));
     keys_.emplace_back(new AnthyMarkKey("5", "5", "５"));
     keys_.emplace_back(new AnthyMarkKey("6", "6", "６")); keys_.back()->setCustomLayout(1.0, true);
 
     keys_.emplace_back(new ShiftToggleKey());
-    keys_.emplace_back(new AnthyTextKey("z", "Z"));
-    keys_.emplace_back(new AnthyTextKey("x", "X"));
-    keys_.emplace_back(new AnthyTextKey("c", "C"));
-    keys_.emplace_back(new AnthyTextKey("v", "V"));
-    keys_.emplace_back(new AnthyTextKey("b", "B"));
-    keys_.emplace_back(new AnthyTextKey("n", "N"));
-    keys_.emplace_back(new AnthyTextKey("m", "M"));
+    keys_.emplace_back(new NormalKey("z", 52, "Z"));
+    keys_.emplace_back(new NormalKey("x", 53, "X"));
+    keys_.emplace_back(new NormalKey("c", 54, "C"));
+    keys_.emplace_back(new NormalKey("v", 55, "V"));
+    keys_.emplace_back(new NormalKey("b", 56, "B"));
+    keys_.emplace_back(new NormalKey("n", 57, "N"));
+    keys_.emplace_back(new NormalKey("m", 58, "M"));
     keys_.emplace_back(new AnthyMarkKey("minus", "-", "ー"));
-    keys_.emplace_back(new ArrowKey("Up", u8"\u2191"));
+    keys_.emplace_back(new UpKey());
     keys_.emplace_back(new LanguageSwitchKey());
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new AnthyMarkKey("1", "1", "１"));
@@ -152,9 +137,9 @@ void AnthyKeyboard::setTextKeys() {
     keys_.emplace_back(new AnthyMarkKey("space", " ",  "")); keys_.back()->setCustomLayout(2.0); keys_.back()->setCustomBackgroundColor({0.3, 0.3, 0.3});
     keys_.emplace_back(new AnthyMarkKey("exclam", "!", "！"));
     keys_.emplace_back(new AnthyMarkKey("question", "?", "？"));
-    keys_.emplace_back(new ArrowKey("Left", u8"\u2190"));
-    keys_.emplace_back(new ArrowKey("Down", u8"\u2193"));
-    keys_.emplace_back(new ArrowKey("Right", u8"\u2192"));
+    keys_.emplace_back(new LeftKey());
+    keys_.emplace_back(new DownKey());
+    keys_.emplace_back(new RightKey());
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new AnthyMarkKey("0", "0", "０")); keys_.back()->setCustomLayout(2.0);
     keys_.emplace_back(new AnthyMarkKey("period", ".", "。")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
@@ -172,7 +157,7 @@ void AnthyKeyboard::setMarkKeys() {
     keys_.emplace_back(new AnthyMarkKey("asterisk", "*", "＊"));
     keys_.emplace_back(new AnthyMarkKey("plus", "+", "＋"));
     keys_.emplace_back(new AnthyMarkKey("equal", "=", "＝"));
-    keys_.emplace_back(new BackSpaceKey());
+    keys_.emplace_back(new NormalBackSpaceKey());
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new AnthyMarkKey("7", "7", "７"));
     keys_.emplace_back(new AnthyMarkKey("8", "8", "８"));
@@ -188,7 +173,7 @@ void AnthyKeyboard::setMarkKeys() {
     keys_.emplace_back(new AnthyMarkKey("ampersand", "&", "＆"));
     keys_.emplace_back(new AnthyMarkKey("at", "@", "＠"));
     keys_.emplace_back(new AnthyMarkKey("yen", u8"\u00A5", "")); // `yen` does not work in Zenkaku
-    keys_.emplace_back(new EnterKey()); keys_.back()->setCustomLayout(1.5);
+    keys_.emplace_back(new NormalEnterKey()); keys_.back()->setCustomLayout(1.5);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new AnthyMarkKey("4", "4", "４"));
     keys_.emplace_back(new AnthyMarkKey("5", "5", "５"));
@@ -203,7 +188,7 @@ void AnthyKeyboard::setMarkKeys() {
     keys_.emplace_back(new AnthyMarkKey("less", "<", "＜"));
     keys_.emplace_back(new AnthyMarkKey("greater", ">", "＞"));
     keys_.emplace_back(new AnthyMarkKey("minus", "-", "ー"));
-    keys_.emplace_back(new ArrowKey("Up", u8"\u2191"));
+    keys_.emplace_back(new UpKey());
     keys_.emplace_back(new LanguageSwitchKey());
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new AnthyMarkKey("1", "1", "１"));
@@ -217,9 +202,9 @@ void AnthyKeyboard::setMarkKeys() {
     keys_.emplace_back(new AnthyMarkKey("space", " ", "")); keys_.back()->setCustomLayout(2.0); keys_.back()->setCustomBackgroundColor({0.3, 0.3, 0.3});
     keys_.emplace_back(new AnthyMarkKey("exclam", "!", "！"));
     keys_.emplace_back(new AnthyMarkKey("question", "?", "？"));
-    keys_.emplace_back(new ArrowKey("Left", u8"\u2190"));
-    keys_.emplace_back(new ArrowKey("Down", u8"\u2193"));
-    keys_.emplace_back(new ArrowKey("Right", u8"\u2192"));
+    keys_.emplace_back(new LeftKey());
+    keys_.emplace_back(new DownKey());
+    keys_.emplace_back(new RightKey());
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new AnthyMarkKey("0", "0", "０")); keys_.back()->setCustomLayout(2.0);
     keys_.emplace_back(new AnthyMarkKey("period", ".", "。")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);

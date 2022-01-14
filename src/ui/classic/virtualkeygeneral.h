@@ -34,6 +34,136 @@ public:
 };
 
 /*
+ * Base class that provides function to convert to fcitx::key.
+ * The name of key is in keynametable.h and is used for taking the corresponding sym.
+ */
+class KeyByNameAndCode : public VirtualKey {
+protected:
+    KeyByNameAndCode(
+        const std::string &name,
+        uint32_t code,
+        const std::string &upperName = ""
+    ) : name_(name), upperName_(upperName), code_(code) {}
+
+    const char* keyName(bool withShift = false) const {
+        if (withShift) {
+            const auto baseSymName = upperName_.empty() ? name_ : upperName_;
+            return ("SHIFT_" + baseSymName).c_str();
+        }
+        return name_.c_str();
+    };
+
+    fcitx::Key convert(bool withShift = false) const {
+        const auto keyFromName = fcitx::Key(keyName(withShift));
+        return fcitx::Key(keyFromName.sym(), keyFromName.states(), code_);
+    }
+
+    
+    /// Be used in converting to Fcitx::Key.
+    /// Corresponding to keyNameList in keynametable.h.
+    const std::string name_;
+
+    /// Be used in converting to Fcitx::Key with shift on.
+    /// Corresponding to keyNameList in keynametable.h.
+    /// If this is empty, `name_` with `SHIFT_` prefix is used for the key name,
+    /// which is converted to the state of the shift modifier.
+    const std::string upperName_;
+
+    const uint32_t code_;
+};
+
+/*
+ * Normal key, which can act the same way as physical keys.
+ */
+class NormalKey : public KeyByNameAndCode {
+    public:
+    NormalKey(
+        const std::string &label,
+        uint32_t code,
+        const std::string &upperLabel = "",
+        const std::string &name = "",
+        const std::string &upperName = ""
+    ) : KeyByNameAndCode(
+            name.empty() ? label : name,
+            code,
+            upperName.empty() ? upperLabel : upperName
+        ),
+        label_(label),
+        upperLabel_(upperLabel) {}
+    virtual const char* label(VirtualKeyboard *keyboard) const override;
+    virtual void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
+
+private:
+    /// Text for display.
+    const std::string label_;
+    const std::string upperLabel_;
+};
+
+/*
+ * Key for inputting marks. This simply inputs the label texts directly,
+ * without sending the event to IME.
+ */
+class MarkKey : public VirtualKey {
+public:
+    MarkKey(const std::string &label) : label_(label) {}
+    virtual const char* label(VirtualKeyboard *keyboard) const override;
+    virtual void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
+
+private:
+    /// Text for display, and commit-string.
+    const std::string label_;
+};
+
+class NormalEnterKey : public NormalKey {
+public:
+    NormalEnterKey() : NormalKey("Enter", 36, "", "Return") {
+        setCustomBackgroundColor({0.2, 0.7, 0.6});
+        setFontColor({1.0, 1.0, 1.0});
+    };
+};
+
+class NormalBackSpaceKey : public NormalKey {
+public:
+    NormalBackSpaceKey() : NormalKey("Back", 22, "", "BackSpace") {
+        setCustomBackgroundColor({0.3, 0.3, 0.3});
+        setFontColor({1.0, 1.0, 1.0});
+    };
+};
+
+class UpKey : public NormalKey {
+public:
+    UpKey() : NormalKey(u8"\u2191", 111, "", "Up") {
+        setCustomBackgroundColor({0.3, 0.3, 0.3});
+        setFontColor({1.0, 1.0, 1.0});
+    };
+};
+
+class LeftKey : public NormalKey {
+public:
+    LeftKey() : NormalKey(u8"\u2190", 113, "", "Left") {
+        setCustomBackgroundColor({0.3, 0.3, 0.3});
+        setFontColor({1.0, 1.0, 1.0});
+    };
+};
+
+class DownKey : public NormalKey {
+public:
+    DownKey() : NormalKey(u8"\u2193", 116, "", "Down") {
+        setCustomBackgroundColor({0.3, 0.3, 0.3});
+        setFontColor({1.0, 1.0, 1.0});
+    };
+};
+
+class RightKey : public NormalKey {
+public:
+    RightKey() : NormalKey(u8"\u2192", 114, "", "Right") {
+        setCustomBackgroundColor({0.3, 0.3, 0.3});
+        setFontColor({1.0, 1.0, 1.0});
+    };
+};
+
+/*
+ * TODO Delete this class
  * Base class that provides function to convert to fcitx::key by keyname in keynametable.h.
  * Keyname corresponds to keysym, but not to keycode.
  */
@@ -64,6 +194,7 @@ protected:
     const std::string upperKeyName_;
 };
 
+/// TODO Delete this class
 class TextKey : public KeyByName {
 public:
     TextKey(std::string text, std::string upperText = "", std::string keyName = "",
@@ -82,7 +213,7 @@ private:
     const std::string upperText_;
 };
 
-/*
+/* TODO Delete this class
  * Keys like enter and arrow keys that can not use commit-string and need to forward.
  */
 class ForwardKey : public KeyByName {
@@ -102,6 +233,7 @@ private:
     bool canForwardKeyRelease_ = false;
 };
 
+/// TODO Delete this class
 class EnterKey : public ForwardKey {
 public:
     EnterKey(bool tryToSendKeyEventFirst = true)
@@ -111,6 +243,7 @@ public:
     };
 };
 
+/// TODO Delete this class
 class BackSpaceKey : public ForwardKey {
 public:
     BackSpaceKey(bool tryToSendKeyEventFirst = true)
@@ -120,6 +253,7 @@ public:
     };
 };
 
+/// TODO Delete this class
 class ArrowKey : public ForwardKey {
 public:
     ArrowKey(std::string keyName, std::string label, bool tryToSendKeyEventFirst = true)
