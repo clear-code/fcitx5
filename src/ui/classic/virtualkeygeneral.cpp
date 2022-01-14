@@ -156,7 +156,11 @@ void LanguageSwitchKey::click(VirtualKeyboard *keyboard, InputContext *, bool is
     if (!isRelease) {
         return;
     }
-    keyboard->switchLanguage();
+
+    // check this key has been pushed and released in order to prevent miss click this key.
+    if (dynamic_cast<LanguageSwitchKey *>(keyboard->pushingKey())) {
+        keyboard->switchLanguage();
+    }
 }
 
 }
