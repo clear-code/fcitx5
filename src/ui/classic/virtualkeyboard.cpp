@@ -46,13 +46,6 @@ void VirtualKey::paintBackground(cairo_t *cr, bool highlight) {
 }
 
 VirtualKeyboard::VirtualKeyboard(Instance *instance) : instance_(instance) {
-    repeatKeyTimer_ = instance_->eventLoop().addTimeEvent(
-        CLOCK_MONOTONIC, now(CLOCK_MONOTONIC), 0,
-        [this](EventSourceTime *, uint64_t) {
-            onKeyRepeat();
-            return true;
-        });
-    repeatKeyTimer_->setEnabled(false);
     i18nKeyboard_.reset(new NullI18nKeyboard());
 
     syncState();
@@ -193,27 +186,8 @@ std::pair<unsigned int, unsigned int> VirtualKeyboard::size() {
     return {width, height};
 }
 
-void VirtualKeyboard::onKeyRepeat() {
-    if (!pushingKey_) {
-        return;
-    }
-
-    auto *inputContext = lastInputContext_.get();
-    if (!inputContext) {
-        return;
-    }
-
-    repeatKeyTimer_->setNextInterval(1000000 / repeatRate_);
-    repeatKeyTimer_->setOneShot();
-    pushingKey_->click(this, inputContext, false);
-}
-
 bool VirtualKeyboard::click(InputContext *inputContext, int x, int y, bool isRelease) {
     lastInputContext_ = inputContext->watch();
-
-    if (isRelease) {
-        repeatKeyTimer_->setEnabled(false);
-    }
 
     auto [clickedKey, hasFound] = findClickedKey(x, y);
     if (!hasFound) {
@@ -224,10 +198,6 @@ bool VirtualKeyboard::click(InputContext *inputContext, int x, int y, bool isRel
     clickedKey->click(this, inputContext, isRelease);
 
     pushingKey_ = isRelease ? nullptr : clickedKey;
-    if (pushingKey_) {
-        repeatKeyTimer_->setNextInterval(repeatDelay_ * 1000);
-        repeatKeyTimer_->setOneShot();
-    }
 
     return true;
 }

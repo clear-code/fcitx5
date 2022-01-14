@@ -127,8 +127,6 @@ protected:
     Instance *instance_;
     VirtualKey *pushingKey_ = nullptr;
     TrackableObjectReference<InputContext> lastInputContext_;
-    std::unique_ptr<EventSourceTime> repeatKeyTimer_;
-    int32_t repeatRate_ = 40, repeatDelay_ = 400;
 
 public: // TODO: Should be moved to protected
     bool isShiftOn_ = false;
