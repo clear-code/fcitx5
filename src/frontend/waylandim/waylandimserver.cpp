@@ -339,6 +339,17 @@ void WaylandIMInputContextV1::keyCallback(uint32_t serial, uint32_t time,
 }
 
 void WaylandIMInputContextV1::virtualKeyEventImpl(KeyEvent &event) {
+    // `mods_locked` value seems to be 16 usually.
+    // It will be 18 with the capslocked state,
+    // but we don't have to consider about it in virtual key process.
+    if (event.rawKey().hasModifier()) {
+        if (event.rawKey().states().test(KeyState::Shift)) {
+            modifiersCallback(serial_, (uint32_t)KeyState::Shift, 0, 16, 0);
+        }
+    } else {
+        modifiersCallback(serial_, 0, 0, 16, 0);
+    }
+
     processKeyEvent(event, true, serial_);
 }
 
