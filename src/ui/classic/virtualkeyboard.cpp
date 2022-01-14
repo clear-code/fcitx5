@@ -191,6 +191,10 @@ bool VirtualKeyboard::click(InputContext *inputContext, int x, int y, bool isRel
 
     auto [clickedKey, hasFound] = findClickedKey(x, y);
     if (!hasFound) {
+        if (pushingKey_) {
+            // Make sure to send key release.
+            pushingKey_->click(this, inputContext, true);
+        }
         pushingKey_ = nullptr;
         return false;
     }
