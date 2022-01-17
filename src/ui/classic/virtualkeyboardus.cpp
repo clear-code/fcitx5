@@ -80,7 +80,7 @@ void UsKeyboard::setTextKeys() {
     keys_.emplace_back(new NormalKey("b", 56, "B"));
     keys_.emplace_back(new NormalKey("n", 57, "N"));
     keys_.emplace_back(new NormalKey("m", 58, "M"));
-    keys_.emplace_back(new MarkKey("-"));
+    keys_.emplace_back(new MarkKey("-", "minus"));
     keys_.emplace_back(new UpKey());
     keys_.emplace_back(new LanguageSwitchKey());
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
