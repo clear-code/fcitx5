@@ -8,15 +8,49 @@
 
 namespace fcitx::classicui {
 
-const char* TextKey::label(VirtualKeyboard *keyboard) const {
-    if (!keyboard->isShiftOn_ || upperText_.empty()) {
-        return text_.c_str();
+const char* NormalKey::label(VirtualKeyboard *keyboard) const {
+    if (!keyboard->isShiftOn_ || upperLabel_.empty()) {
+        return label_.c_str();
     }
-    return upperText_.c_str();
+    return upperLabel_.c_str();
 }
 
-void TextKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) {
-    FCITX_KEYBOARD() << "TextKey pushed: " << label(keyboard);
+void NormalKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) {
+    FCITX_KEYBOARD() << "NormalKey pushed: " << label(keyboard);
+
+    if (keyboard->isShiftOn_) {
+        keyboard->sendShiftModifierToIM(inputContext, false);
+    }
+
+    auto event = KeyEvent(inputContext, convert(keyboard->isShiftOn_), isRelease);
+    inputContext->virtualKeyEvent(event);
+
+    if (keyboard->isShiftOn_) {
+        keyboard->sendShiftModifierToIM(inputContext, true);
+    }
+}
+
+const char* MarkKey::label(VirtualKeyboard *) const {
+    return label_.c_str();
+}
+
+void MarkKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) {
+    FCITX_KEYBOARD() << "MarkKey pushed: " << label(keyboard);
+
+    if (sendKeyEventFirst()) {
+        if (withShift_) {
+            keyboard->sendShiftModifierToIM(inputContext, false);
+        }
+
+        auto event = KeyEvent(inputContext, convert(withShift_), isRelease);
+        const auto hasProcessedInIME = inputContext->keyEvent(event);
+
+        if (withShift_) {
+            keyboard->sendShiftModifierToIM(inputContext, true);
+        }
+
+        if (hasProcessedInIME) return;
+    }
 
     if (isRelease) {
         return;
@@ -25,39 +59,26 @@ void TextKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, bool 
     inputContext->commitString(label(keyboard));
 }
 
-void ForwardKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) {
-    FCITX_KEYBOARD() << "ForwardKey pushed: " << label(keyboard);
+const char* NumberKey::label(VirtualKeyboard *) const {
+    return name_.c_str();
+}
 
-    if (!tryToSendKeyEventFirst_) {
-        inputContext->forwardKey(convert(keyboard->isShiftOn_), isRelease);
-        return;
-    }
+void NumberKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) {
+    FCITX_KEYBOARD() << "NumberKey pushed: " << label(keyboard);
 
-    auto keyEvent = fcitx::KeyEvent(inputContext, convert(keyboard->isShiftOn_), isRelease);
-    auto hasProcessedInIME = inputContext->keyEvent(keyEvent);
-    FCITX_KEYBOARD() << "key event result: " << hasProcessedInIME;
+    auto event = fcitx::KeyEvent(inputContext, convert(false), isRelease);
+    const auto hasProcessedInIME = inputContext->keyEvent(event);
+    if (hasProcessedInIME || isRelease) return;
 
-    if(hasProcessedInIME) {
-        canForwardKeyRelease_ = false;
-        return;
-    }
-
-    if (!isRelease) {
-        inputContext->forwardKey(convert(keyboard->isShiftOn_), false);
-        canForwardKeyRelease_ = true;
-        return;
-    }
-
-    if (!canForwardKeyRelease_) {
-        return;
-    }
-
-    inputContext->forwardKey(convert(keyboard->isShiftOn_), true);
+    inputContext->commitString(label(keyboard));
 }
 
 void ToggleKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) {
     FCITX_KEYBOARD() << "ToggleKey pushed: " << label(keyboard);
-    if (isRelease) {
+    // This may be used for changing key layouts.
+    // Changin key layouts must be executed on key-release,
+    // because VirtualKeyboard has `pushingKey_` pointer.
+    if (!isRelease) {
         return;
     }
     toggle(keyboard, inputContext);
@@ -91,7 +112,10 @@ bool ShiftToggleKey::isOn(VirtualKeyboard *keyboard) {
 void SwitchKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) {
     FCITX_KEYBOARD() << "SwitchKey pushed: " << label(keyboard);
 
-    if (isRelease) {
+    // This may be used for changing key layouts.
+    // Changin key layouts must be executed on key-release,
+    // because VirtualKeyboard has `pushingKey_` pointer.
+    if (!isRelease) {
         return;
     }
 

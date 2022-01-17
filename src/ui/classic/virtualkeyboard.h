@@ -103,6 +103,17 @@ public:
     void switchLanguage();
     void setCurrentInputMethod(std::string name);
     void enumerateGroup();
+
+    /// Some IMs needs to handle the single Shift key event,
+    /// not only the states of the main key.
+    /// Ex. In IMs using customXkbState such as keyboard-ru, some states of modifiers are not
+    /// propagated.
+    /// So it is not enough to process states of the main key in `WaylandIMInputContextV1`
+    /// in these IMs.
+    /// (See event implementation of
+    /// `EventWatcherPhase::ReservedFirst` of `EventType::InputContextKeyEvent` in `Instance`.)
+    void sendShiftModifierToIM(InputContext *inputContext, bool isRelease);
+
     bool isPreediting();
     bool isSeletingCandidates();
     void updateInputPanel();
@@ -122,13 +133,9 @@ public:
     VirtualKey *pushingKey() { return pushingKey_; }
 
 protected:
-    void onKeyRepeat();
-
     Instance *instance_;
     VirtualKey *pushingKey_ = nullptr;
     TrackableObjectReference<InputContext> lastInputContext_;
-    std::unique_ptr<EventSourceTime> repeatKeyTimer_;
-    int32_t repeatRate_ = 40, repeatDelay_ = 400;
 
 public: // TODO: Should be moved to protected
     bool isShiftOn_ = false;

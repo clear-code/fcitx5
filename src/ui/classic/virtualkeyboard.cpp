@@ -46,13 +46,6 @@ void VirtualKey::paintBackground(cairo_t *cr, bool highlight) {
 }
 
 VirtualKeyboard::VirtualKeyboard(Instance *instance) : instance_(instance) {
-    repeatKeyTimer_ = instance_->eventLoop().addTimeEvent(
-        CLOCK_MONOTONIC, now(CLOCK_MONOTONIC), 0,
-        [this](EventSourceTime *, uint64_t) {
-            onKeyRepeat();
-            return true;
-        });
-    repeatKeyTimer_->setEnabled(false);
     i18nKeyboard_.reset(new NullI18nKeyboard());
 
     syncState();
@@ -103,6 +96,13 @@ void VirtualKeyboard::setCurrentInputMethod(std::string name) {
 
 void VirtualKeyboard::enumerateGroup() {
     instance_->inputMethodManager().enumerateGroup(true);
+}
+
+void VirtualKeyboard::sendShiftModifierToIM(InputContext *inputContext, bool isRelease) {
+    const auto keyFromName = fcitx::Key("SHIFT_Shift_R");
+    const auto shiftKey = fcitx::Key(keyFromName.sym(), keyFromName.states(), 62);
+    auto event = KeyEvent(inputContext, shiftKey, isRelease);
+    inputContext->keyEvent(event);
 }
 
 bool VirtualKeyboard::isPreediting() {
@@ -193,40 +193,37 @@ std::pair<unsigned int, unsigned int> VirtualKeyboard::size() {
     return {width, height};
 }
 
-void VirtualKeyboard::onKeyRepeat() {
-    if (!pushingKey_) {
-        return;
-    }
-
-    auto *inputContext = lastInputContext_.get();
-    if (!inputContext) {
-        return;
-    }
-
-    repeatKeyTimer_->setNextInterval(1000000 / repeatRate_);
-    repeatKeyTimer_->setOneShot();
-    pushingKey_->click(this, inputContext, false);
-}
-
 bool VirtualKeyboard::click(InputContext *inputContext, int x, int y, bool isRelease) {
-    lastInputContext_ = inputContext->watch();
+    // Need to pay attention to the possibility of invalid poitner of `pushingKey_`,
+    // caused by changing the key-layout.
 
-    if (isRelease) {
-        repeatKeyTimer_->setEnabled(false);
-    }
+    lastInputContext_ = inputContext->watch();
 
     auto [clickedKey, hasFound] = findClickedKey(x, y);
     if (!hasFound) {
+        if (pushingKey_) {
+            // Make sure to send key release.
+            pushingKey_->click(this, inputContext, true);
+        }
         pushingKey_ = nullptr;
         return false;
     }
 
-    clickedKey->click(this, inputContext, isRelease);
-
-    pushingKey_ = isRelease ? nullptr : clickedKey;
-    if (pushingKey_) {
-        repeatKeyTimer_->setNextInterval(repeatDelay_ * 1000);
-        repeatKeyTimer_->setOneShot();
+    if (isRelease) {
+        if (pushingKey_) {
+            // Make sure to send key release.
+            pushingKey_->click(this, inputContext, true);
+        } else {
+            clickedKey->click(this, inputContext, true);
+        }
+        pushingKey_ = nullptr;
+    } else {
+        if (pushingKey_ && pushingKey_ != clickedKey) {
+            // Make sure to send key release.
+            pushingKey_->click(this, inputContext, true);
+        }
+        clickedKey->click(this, inputContext, false);
+        pushingKey_ = clickedKey;
     }
 
     return true;

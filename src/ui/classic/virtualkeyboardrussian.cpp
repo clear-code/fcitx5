@@ -13,11 +13,8 @@ void RussianKeyboard::updateKeys() {
         setMarkKeys();
         return;
     }
-    if (isLatinTextOn()) {
-        setLatinTextKeys();
-    } else {
-        setCyrillicTextKeys();
-    }
+
+    setCyrillicTextKeys();
 }
 
 void RussianKeyboard::switchMode() {
@@ -27,11 +24,6 @@ void RussianKeyboard::switchMode() {
         mode_ = RussianKeyboardMode::Text;
     }
 
-    updateKeys();
-}
-
-void RussianKeyboard::toggleText() {
-    isLatinTextOn_ = !isLatinTextOn_;
     updateKeys();
 }
 
@@ -46,212 +38,138 @@ int RussianModeSwitchKey::currentIndex(VirtualKeyboard *keyboard) {
     return 1;
 }
 
-void RussianTextToggleKey::toggle(VirtualKeyboard *keyboard, InputContext *) {
-    keyboard->i18nKeyboard<RussianKeyboard>()->toggleText();
-}
-
-bool RussianTextToggleKey::isOn(VirtualKeyboard *keyboard) {
-    return keyboard->i18nKeyboard<RussianKeyboard>()->isLatinTextOn();
-}
-
 void RussianKeyboard::setCyrillicTextKeys() {
     keys_.clear();
-    keys_.emplace_back(new RussianTextKey("й", "Й"));
-    keys_.emplace_back(new RussianTextKey("ц", "Ц"));
-    keys_.emplace_back(new RussianTextKey("ч", "Ч"));
-    keys_.emplace_back(new RussianTextKey("к", "К"));
-    keys_.emplace_back(new RussianTextKey("е", "Е"));
-    keys_.emplace_back(new RussianTextKey("н", "Н"));
-    keys_.emplace_back(new RussianTextKey("г", "Г"));
-    keys_.emplace_back(new RussianTextKey("ш", "Ш"));
-    keys_.emplace_back(new RussianTextKey("щ", "Щ"));
-    keys_.emplace_back(new RussianTextKey("з", "З"));
-    keys_.emplace_back(new RussianTextKey("х", "Х"));
-    keys_.emplace_back(new RussianTextKey("ъ", "Ъ"));
-    keys_.emplace_back(new BackSpaceKey(false)); keys_.back()->setCustomLayout(1.0);
+    keys_.emplace_back(new RussianNormalKey("й", 24, "Й", "q", "Q"));
+    keys_.emplace_back(new RussianNormalKey("ц", 25, "Ц", "w", "W"));
+    keys_.emplace_back(new RussianNormalKey("ч", 26, "Ч", "e", "E"));
+    keys_.emplace_back(new RussianNormalKey("к", 27, "К", "r", "R"));
+    keys_.emplace_back(new RussianNormalKey("е", 28, "Е", "t", "T"));
+    keys_.emplace_back(new RussianNormalKey("н", 29, "Н", "y", "Y"));
+    keys_.emplace_back(new RussianNormalKey("г", 30, "Г", "u", "U"));
+    keys_.emplace_back(new RussianNormalKey("ш", 31, "Ш", "i", "I"));
+    keys_.emplace_back(new RussianNormalKey("щ", 32, "Щ", "o", "O"));
+    keys_.emplace_back(new RussianNormalKey("з", 33, "З", "p", "P"));
+    keys_.emplace_back(new RussianNormalKey("х", 34, "Х", "at", "grave"));
+    keys_.emplace_back(new RussianNormalKey("ъ", 35, "Ъ", "bracketleft", "braceleft"));
+    keys_.emplace_back(new BackSpaceKey()); keys_.back()->setCustomLayout(1.0);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new TextKey("7"));
-    keys_.emplace_back(new TextKey("8"));
-    keys_.emplace_back(new TextKey("9")); keys_.back()->setCustomLayout(1.0, true);
+    keys_.emplace_back(new NumberKey("7", 16));
+    keys_.emplace_back(new NumberKey("8", 17));
+    keys_.emplace_back(new NumberKey("9", 18)); keys_.back()->setCustomLayout(1.0, true);
 
     keys_.emplace_back(new RussianDummyKey(20));
-    keys_.emplace_back(new RussianTextKey("ф", "Ф"));
-    keys_.emplace_back(new RussianTextKey("ы", "Ы"));
-    keys_.emplace_back(new RussianTextKey("в", "В"));
-    keys_.emplace_back(new RussianTextKey("а", "А"));
-    keys_.emplace_back(new RussianTextKey("п", "П"));
-    keys_.emplace_back(new RussianTextKey("р", "Р"));
-    keys_.emplace_back(new RussianTextKey("о", "О"));
-    keys_.emplace_back(new RussianTextKey("л", "Л"));
-    keys_.emplace_back(new RussianTextKey("д", "Д"));
-    keys_.emplace_back(new RussianTextKey("ж", "Ж"));
-    keys_.emplace_back(new RussianTextKey("э", "Э"));
-    keys_.emplace_back(new EnterKey(false)); keys_.back()->setCustomLayout(1.5);
+    keys_.emplace_back(new RussianNormalKey("ф", 38, "Ф", "a", "A"));
+    keys_.emplace_back(new RussianNormalKey("ы", 39, "Ы", "s", "S"));
+    keys_.emplace_back(new RussianNormalKey("в", 40, "В", "d", "D"));
+    keys_.emplace_back(new RussianNormalKey("а", 41, "А", "f", "F"));
+    keys_.emplace_back(new RussianNormalKey("п", 42, "П", "g", "G"));
+    keys_.emplace_back(new RussianNormalKey("р", 43, "Р", "h", "H"));
+    keys_.emplace_back(new RussianNormalKey("о", 44, "О", "j", "J"));
+    keys_.emplace_back(new RussianNormalKey("л", 45, "Л", "k", "K"));
+    keys_.emplace_back(new RussianNormalKey("д", 46, "Д", "l", "L"));
+    keys_.emplace_back(new RussianNormalKey("ж", 47, "Ж", "semicolon", "plus"));
+    keys_.emplace_back(new RussianNormalKey("э", 48, "Э", "colon", "asterisk"));
+    keys_.emplace_back(new EnterKey()); keys_.back()->setCustomLayout(1.5);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new TextKey("4"));
-    keys_.emplace_back(new TextKey("5"));
-    keys_.emplace_back(new TextKey("6")); keys_.back()->setCustomLayout(1.0, true);
+    keys_.emplace_back(new NumberKey("4", 13));
+    keys_.emplace_back(new NumberKey("5", 14));
+    keys_.emplace_back(new NumberKey("6", 15)); keys_.back()->setCustomLayout(1.0, true);
 
     keys_.emplace_back(new RussianShiftToggleKey());
-    keys_.emplace_back(new RussianTextKey("я", "Я"));
-    keys_.emplace_back(new RussianTextKey("у", "У"));
-    keys_.emplace_back(new RussianTextKey("с", "С"));
-    keys_.emplace_back(new RussianTextKey("м", "М"));
-    keys_.emplace_back(new RussianTextKey("и", "И"));
-    keys_.emplace_back(new RussianTextKey("т", "Т"));
-    keys_.emplace_back(new RussianTextKey("ь", "Ь"));
-    keys_.emplace_back(new RussianTextKey("б", "Б"));
-    keys_.emplace_back(new RussianTextKey("ю", "Ю"));
-    keys_.emplace_back(new RussianTextKey("ё", "Ё"));
-    keys_.emplace_back(new ArrowKey("Up", u8"\u2191", false));
+    keys_.emplace_back(new RussianNormalKey("я", 52, "Я", "z", "Z"));
+    keys_.emplace_back(new RussianNormalKey("у", 53, "У", "x", "X"));
+    keys_.emplace_back(new RussianNormalKey("с", 54, "С", "c", "C"));
+    keys_.emplace_back(new RussianNormalKey("м", 55, "М", "v", "V"));
+    keys_.emplace_back(new RussianNormalKey("и", 56, "И", "b", "B"));
+    keys_.emplace_back(new RussianNormalKey("т", 57, "Т", "n", "N"));
+    keys_.emplace_back(new RussianNormalKey("ь", 58, "Ь", "m", "M"));
+    keys_.emplace_back(new RussianNormalKey("б", 59, "Б", "comma", "less"));
+    keys_.emplace_back(new RussianNormalKey("ю", 60, "Ю", "period", "greater"));
+    keys_.emplace_back(new RussianNormalKey("ё", 49, "Ё", "Zenkaku_Hankaku", "Zenkaku_Hankaku"));
+    keys_.emplace_back(new UpKey());
     keys_.emplace_back(new LanguageSwitchKey());
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new TextKey("1"));
-    keys_.emplace_back(new TextKey("2"));
-    keys_.emplace_back(new TextKey("3")); keys_.back()->setCustomLayout(1.0, true);
+    keys_.emplace_back(new NumberKey("1", 10));
+    keys_.emplace_back(new NumberKey("2", 11));
+    keys_.emplace_back(new NumberKey("3", 12)); keys_.back()->setCustomLayout(1.0, true);
 
-    keys_.emplace_back(new RussianModeSwitchKey());
-    keys_.emplace_back(new RussianTextToggleKey());
-    keys_.emplace_back(new TextKey(",")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-    keys_.emplace_back(new TextKey(".")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-    keys_.emplace_back(new TextKey(" ")); keys_.back()->setCustomLayout(2.0); keys_.back()->setCustomBackgroundColor({0.3, 0.3, 0.3});
-    keys_.emplace_back(new TextKey("!"));
-    keys_.emplace_back(new TextKey("?"));
-    keys_.emplace_back(new ArrowKey("Left", u8"\u2190", false));
-    keys_.emplace_back(new ArrowKey("Down", u8"\u2193", false));
-    keys_.emplace_back(new ArrowKey("Right", u8"\u2192", false));
+    keys_.emplace_back(new RussianModeSwitchKey()); keys_.back()->setCustomLayout(2.0);
+    keys_.emplace_back(new MarkKey(",", "question", 61, true)); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new MarkKey(".", "slash", 61)); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new SpaceKey()); keys_.back()->setCustomLayout(2.0);
+    keys_.emplace_back(new MarkKey("!", "exclam", 10, true));
+    keys_.emplace_back(new MarkKey("?", "apostrophe", 16, true));
+    keys_.emplace_back(new LeftKey());
+    keys_.emplace_back(new DownKey());
+    keys_.emplace_back(new RightKey());
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new TextKey("0")); keys_.back()->setCustomLayout(2.0);
-    keys_.emplace_back(new TextKey(".")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-}
-
-void RussianKeyboard::setLatinTextKeys() {
-    keys_.clear();
-    keys_.emplace_back(new TextKey("q", "Q"));
-    keys_.emplace_back(new TextKey("w", "W"));
-    keys_.emplace_back(new TextKey("e", "E"));
-    keys_.emplace_back(new TextKey("r", "R"));
-    keys_.emplace_back(new TextKey("t", "T"));
-    keys_.emplace_back(new TextKey("y", "Y"));
-    keys_.emplace_back(new TextKey("u", "U"));
-    keys_.emplace_back(new TextKey("i", "I"));
-    keys_.emplace_back(new TextKey("o", "O"));
-    keys_.emplace_back(new TextKey("p", "P"));
-    keys_.emplace_back(new BackSpaceKey(false)); keys_.back()->setCustomLayout(1.0);
-    keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new TextKey("7"));
-    keys_.emplace_back(new TextKey("8"));
-    keys_.emplace_back(new TextKey("9")); keys_.back()->setCustomLayout(1.0, true);
-
-    keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new TextKey("a", "A"));
-    keys_.emplace_back(new TextKey("s", "S"));
-    keys_.emplace_back(new TextKey("d", "D"));
-    keys_.emplace_back(new TextKey("f", "F"));
-    keys_.emplace_back(new TextKey("g", "G"));
-    keys_.emplace_back(new TextKey("h", "H"));
-    keys_.emplace_back(new TextKey("j", "J"));
-    keys_.emplace_back(new TextKey("k", "K"));
-    keys_.emplace_back(new TextKey("l", "L"));
-    keys_.emplace_back(new EnterKey(false)); keys_.back()->setCustomLayout(1.5);
-    keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new TextKey("4"));
-    keys_.emplace_back(new TextKey("5"));
-    keys_.emplace_back(new TextKey("6")); keys_.back()->setCustomLayout(1.0, true);
-
-    keys_.emplace_back(new ShiftToggleKey());
-    keys_.emplace_back(new TextKey("z", "Z"));
-    keys_.emplace_back(new TextKey("x", "X"));
-    keys_.emplace_back(new TextKey("c", "C"));
-    keys_.emplace_back(new TextKey("v", "V"));
-    keys_.emplace_back(new TextKey("b", "B"));
-    keys_.emplace_back(new TextKey("n", "N"));
-    keys_.emplace_back(new TextKey("m", "M"));
-    keys_.emplace_back(new TextKey("-"));
-    keys_.emplace_back(new ArrowKey("Up", u8"\u2191", false));
-    keys_.emplace_back(new LanguageSwitchKey());
-    keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new TextKey("1"));
-    keys_.emplace_back(new TextKey("2"));
-    keys_.emplace_back(new TextKey("3")); keys_.back()->setCustomLayout(1.0, true);
-
-    keys_.emplace_back(new RussianModeSwitchKey());
-    keys_.emplace_back(new RussianTextToggleKey());
-    keys_.emplace_back(new TextKey(",")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-    keys_.emplace_back(new TextKey(".")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-    keys_.emplace_back(new TextKey(" ")); keys_.back()->setCustomLayout(2.0); keys_.back()->setCustomBackgroundColor({0.3, 0.3, 0.3});
-    keys_.emplace_back(new TextKey("!"));
-    keys_.emplace_back(new TextKey("?"));
-    keys_.emplace_back(new ArrowKey("Left", u8"\u2190", false));
-    keys_.emplace_back(new ArrowKey("Down", u8"\u2193", false));
-    keys_.emplace_back(new ArrowKey("Right", u8"\u2192", false));
-    keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new TextKey("0")); keys_.back()->setCustomLayout(2.0);
-    keys_.emplace_back(new TextKey(".")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new NumberKey("0", 19)); keys_.back()->setCustomLayout(2.0);
+    keys_.emplace_back(new MarkKey(".")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
 }
 
 void RussianKeyboard::setMarkKeys() {
     keys_.clear();
-    keys_.emplace_back(new TextKey("["));
-    keys_.emplace_back(new TextKey("]"));
-    keys_.emplace_back(new TextKey("{"));
-    keys_.emplace_back(new TextKey("}"));
-    keys_.emplace_back(new TextKey("#"));
-    keys_.emplace_back(new TextKey("%"));
-    keys_.emplace_back(new TextKey("^"));
-    keys_.emplace_back(new TextKey("*"));
-    keys_.emplace_back(new TextKey("+"));
-    keys_.emplace_back(new TextKey("="));
-    keys_.emplace_back(new BackSpaceKey(false));
+    keys_.emplace_back(new MarkKey("["));
+    keys_.emplace_back(new MarkKey("]"));
+    keys_.emplace_back(new MarkKey("{"));
+    keys_.emplace_back(new MarkKey("}"));
+    keys_.emplace_back(new MarkKey("#"));
+    keys_.emplace_back(new MarkKey("%"));
+    keys_.emplace_back(new MarkKey("^"));
+    keys_.emplace_back(new MarkKey("*"));
+    keys_.emplace_back(new MarkKey("+"));
+    keys_.emplace_back(new MarkKey("="));
+    keys_.emplace_back(new BackSpaceKey());
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new TextKey("7"));
-    keys_.emplace_back(new TextKey("8"));
-    keys_.emplace_back(new TextKey("9")); keys_.back()->setCustomLayout(1.0, true);
+    keys_.emplace_back(new NumberKey("7", 16));
+    keys_.emplace_back(new NumberKey("8", 17));
+    keys_.emplace_back(new NumberKey("9", 18)); keys_.back()->setCustomLayout(1.0, true);
 
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new TextKey("/"));
-    keys_.emplace_back(new TextKey("\\"));
-    keys_.emplace_back(new TextKey(":"));
-    keys_.emplace_back(new TextKey(";"));
-    keys_.emplace_back(new TextKey("("));
-    keys_.emplace_back(new TextKey(")"));
-    keys_.emplace_back(new TextKey("&"));
-    keys_.emplace_back(new TextKey("@"));
-    keys_.emplace_back(new TextKey("￥"));
-    keys_.emplace_back(new EnterKey(false)); keys_.back()->setCustomLayout(1.5);
+    keys_.emplace_back(new MarkKey("/"));
+    keys_.emplace_back(new MarkKey("\\"));
+    keys_.emplace_back(new MarkKey(":"));
+    keys_.emplace_back(new MarkKey(";"));
+    keys_.emplace_back(new MarkKey("("));
+    keys_.emplace_back(new MarkKey(")"));
+    keys_.emplace_back(new MarkKey("&"));
+    keys_.emplace_back(new MarkKey("@"));
+    keys_.emplace_back(new MarkKey("￥"));
+    keys_.emplace_back(new EnterKey()); keys_.back()->setCustomLayout(1.5);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new TextKey("4"));
-    keys_.emplace_back(new TextKey("5"));
-    keys_.emplace_back(new TextKey("6")); keys_.back()->setCustomLayout(1.0, true);
+    keys_.emplace_back(new NumberKey("4", 13));
+    keys_.emplace_back(new NumberKey("5", 14));
+    keys_.emplace_back(new NumberKey("6", 15)); keys_.back()->setCustomLayout(1.0, true);
 
     keys_.emplace_back(new DummyKey());
-    keys_.emplace_back(new TextKey("\"")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Top);
-    keys_.emplace_back(new TextKey("\'")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Top);
-    keys_.emplace_back(new TextKey("_")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-    keys_.emplace_back(new TextKey("|"));
-    keys_.emplace_back(new TextKey("~"));
-    keys_.emplace_back(new TextKey("<"));
-    keys_.emplace_back(new TextKey(">"));
-    keys_.emplace_back(new TextKey("-"));
-    keys_.emplace_back(new ArrowKey("Up", u8"\u2191", false));
+    keys_.emplace_back(new MarkKey("\"")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Top);
+    keys_.emplace_back(new MarkKey("\'")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Top);
+    keys_.emplace_back(new MarkKey("_")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new MarkKey("|"));
+    keys_.emplace_back(new MarkKey("~"));
+    keys_.emplace_back(new MarkKey("<"));
+    keys_.emplace_back(new MarkKey(">"));
+    keys_.emplace_back(new MarkKey("-"));
+    keys_.emplace_back(new UpKey());
     keys_.emplace_back(new LanguageSwitchKey());
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new TextKey("1"));
-    keys_.emplace_back(new TextKey("2"));
-    keys_.emplace_back(new TextKey("3")); keys_.back()->setCustomLayout(1.0, true);
+    keys_.emplace_back(new NumberKey("1", 10));
+    keys_.emplace_back(new NumberKey("2", 11));
+    keys_.emplace_back(new NumberKey("3", 12)); keys_.back()->setCustomLayout(1.0, true);
 
     keys_.emplace_back(new RussianModeSwitchKey()); keys_.back()->setCustomLayout(2.0);
-    keys_.emplace_back(new TextKey(",")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-    keys_.emplace_back(new TextKey(".")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-    keys_.emplace_back(new TextKey(" ")); keys_.back()->setCustomLayout(2.0); keys_.back()->setCustomBackgroundColor({0.3, 0.3, 0.3});
-    keys_.emplace_back(new TextKey("!"));
-    keys_.emplace_back(new TextKey("?"));
-    keys_.emplace_back(new ArrowKey("Left", u8"\u2190", false));
-    keys_.emplace_back(new ArrowKey("Down", u8"\u2193", false));
-    keys_.emplace_back(new ArrowKey("Right", u8"\u2192", false));
+    keys_.emplace_back(new MarkKey(",")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new MarkKey(".")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new SpaceKey()); keys_.back()->setCustomLayout(2.0);
+    keys_.emplace_back(new MarkKey("!"));
+    keys_.emplace_back(new MarkKey("?"));
+    keys_.emplace_back(new LeftKey());
+    keys_.emplace_back(new DownKey());
+    keys_.emplace_back(new RightKey());
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new TextKey("0")); keys_.back()->setCustomLayout(2.0);
-    keys_.emplace_back(new TextKey(".")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new NumberKey("0", 19)); keys_.back()->setCustomLayout(2.0);
+    keys_.emplace_back(new MarkKey(".")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
 }
 
 }

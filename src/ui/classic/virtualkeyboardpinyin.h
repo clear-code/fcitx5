@@ -37,33 +37,12 @@ private:
     bool isAdditionalMarkOn_ = false;
 };
 
-class PinyinTextKey : public TextKey {
+class PinyinSpaceKey : public SpaceKey {
 public:
-    PinyinTextKey(std::string text, std::string upperText = "", std::string keyName = "",
-        std::string upperKeyName = "")
-        : TextKey(text, upperText, keyName, upperKeyName) {}
-    void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
-};
-
-class PinyinMarkKey : public VirtualKey {
-public:
-    PinyinMarkKey(std::string mark) : mark_(mark) {}
-    const char* label(VirtualKeyboard *keyboard) const override;
-    void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
-
-private:
-    std::string mark_;
-};
-
-class PinyinSpaceKey : public KeyByName {
-public:
-    PinyinSpaceKey() : KeyByName("space") {
+    PinyinSpaceKey() {
         setFontSize(18);
-        setFontColor({1.0, 1.0, 1.0});
-        setCustomBackgroundColor({0.3, 0.3, 0.3});
     }
     const char* label(VirtualKeyboard *keyboard) const override;
-    void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
 };
 
 class PinyinEnterKey : public EnterKey {
@@ -88,15 +67,16 @@ protected:
     int currentIndex(VirtualKeyboard *keyboard) override;
 };
 
-class PinyinMarkToggleKey : public VirtualKey {
+class PinyinMarkToggleKey : public ToggleKey {
 public:
     PinyinMarkToggleKey() {
         setFontSize(18);
-        setFontColor({1.0, 1.0, 1.0});
-        setCustomBackgroundColor({0.3, 0.3, 0.3});
     }
-    const char* label(VirtualKeyboard *keyboard) const override;
-    void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
+    const char* label(VirtualKeyboard *) const override { return "更多"; }
+
+protected:
+    void toggle(VirtualKeyboard *keyboard, InputContext *inputContext) override;
+    bool isOn(VirtualKeyboard *keyboard) override;
 };
 
 } // namespace classicui

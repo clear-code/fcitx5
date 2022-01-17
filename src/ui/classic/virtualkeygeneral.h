@@ -34,96 +34,170 @@ public:
 };
 
 /*
- * Base class that provides function to convert to fcitx::key by keyname in keynametable.h.
- * Keyname corresponds to keysym, but not to keycode.
+ * Base class that provides function to convert to fcitx::key.
+ * The name of key is in keynametable.h and is used for taking the corresponding sym.
  */
-class KeyByName : public VirtualKey {
+class KeyByNameAndCode : public VirtualKey {
 protected:
-    KeyByName(std::string keyName, std::string upperKeyName = "")
-        : keyName_(keyName), upperKeyName_(upperKeyName) {}
+    KeyByNameAndCode(
+        const std::string &name,
+        uint32_t code,
+        const std::string &upperName = ""
+    ) : name_(name), upperName_(upperName), code_(code) {}
 
     const char* keyName(bool withShift = false) const {
         if (withShift) {
-            if (!upperKeyName_.empty()) {
-                return upperKeyName_.c_str();
-            }
-            return ("SHIFT_" + keyName_).c_str();
+            const auto baseSymName = upperName_.empty() ? name_ : upperName_;
+            return ("SHIFT_" + baseSymName).c_str();
         }
-        return keyName_.c_str();
+        return name_.c_str();
     };
 
     fcitx::Key convert(bool withShift = false) const {
-        return fcitx::Key(keyName(withShift));
+        const auto keyFromName = fcitx::Key(keyName(withShift));
+        return fcitx::Key(keyFromName.sym(), keyFromName.states(), code_);
     }
 
-    /*
-     * Be used in converting to Fcitx::Key.
-     * Corresponding to keyNameList in keynametable.h.
-     */
-    const std::string keyName_;
-    const std::string upperKeyName_;
+    
+    /// Be used in converting to Fcitx::Key.
+    /// Corresponding to keyNameList in keynametable.h.
+    const std::string name_;
+
+    /// Be used in converting to Fcitx::Key with shift on.
+    /// Corresponding to keyNameList in keynametable.h.
+    /// If this is empty, `name_` with `SHIFT_` prefix is used for the key name,
+    /// which is converted to the state of the shift modifier.
+    const std::string upperName_;
+
+    const uint32_t code_;
 };
 
-class TextKey : public KeyByName {
+/*
+ * Normal key, which can act the same way as physical keys.
+ * If `name` is ommitted, `label` value is used as `name` for taking the keysym.
+ */
+class NormalKey : public KeyByNameAndCode {
 public:
-    TextKey(std::string text, std::string upperText = "", std::string keyName = "",
-        std::string upperKeyName = "")
-        : KeyByName(keyName.empty() ? text : keyName,
-            upperKeyName.empty() ? upperText : upperKeyName),
-          text_(text), upperText_(upperText) {}
+    NormalKey(
+        const std::string &label,
+        uint32_t code,
+        const std::string &upperLabel = "",
+        const std::string &name = "",
+        const std::string &upperName = ""
+    ) : KeyByNameAndCode(
+            name.empty() ? label : name,
+            code,
+            upperName.empty() ? upperLabel : upperName
+        ),
+        label_(label),
+        upperLabel_(upperLabel) {}
+    virtual const char* label(VirtualKeyboard *keyboard) const override;
+    virtual void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
+
+protected:
+    /// Text for display.
+    const std::string label_;
+    const std::string upperLabel_;
+};
+
+/*
+ * Key for inputting marks.
+ * Without `name` or `code` value, this simply inputs the label texts directly.
+ * With them, this sends the event to IME first.
+ * Some IME need `code`, not only `name`.
+ * Ex. IMEs using customXkbState such as keyboard-ru.
+ */
+class MarkKey : public KeyByNameAndCode {
+public:
+    MarkKey(
+        const std::string &label,
+        const std::string &name = "",
+        uint32_t code = 0,
+        bool withShift = false
+    ) : KeyByNameAndCode(name, code),
+        label_(label),
+        withShift_(withShift) {}
     virtual const char* label(VirtualKeyboard *keyboard) const override;
     virtual void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
 
 private:
-    /*
-     * Text for display, and commit-string.
-     */
-    const std::string text_;
-    const std::string upperText_;
+    bool sendKeyEventFirst() const { return !name_.empty() || code_ != 0; }
+
+    /// Text for display, and commit-string.
+    const std::string label_;
+
+    /// This key doesn't depend on the Shift state of the keyboard.
+    /// If needing Shift modifier in KeyEvent for IME, then use this value as `true`.
+    bool withShift_;
 };
 
 /*
- * Keys like enter and arrow keys that can not use commit-string and need to forward.
+ * Key for inputting numbers. This is similar to MarkKey, but this sends the number to IME first.
+ * If there are selectable candidates in IME, the number may be used for selecting them.
+ * Some IME need `code`, not only `number`.
+ * Ex. IMEs using customXkbState such as keyboard-ru.
  */
-class ForwardKey : public KeyByName {
+class NumberKey : public KeyByNameAndCode {
 public:
-    ForwardKey(std::string keyName, std::string label, bool tryToSendKeyEventFirst = true)
-        : KeyByName(keyName), label_(label), tryToSendKeyEventFirst_(tryToSendKeyEventFirst) {}
-    virtual const char* label(VirtualKeyboard *) const override { return label_.c_str(); }
+    NumberKey(
+        const std::string &number,
+        uint32_t code = 0
+    ) : KeyByNameAndCode(number, code) {}
+    virtual const char* label(VirtualKeyboard *keyboard) const override;
     virtual void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
-
-private:
-    const std::string label_;
-    bool tryToSendKeyEventFirst_ = true;
-
-    /*
-     * Key release must be forwarded only when key push had been forwarded in advance.
-     */
-    bool canForwardKeyRelease_ = false;
 };
 
-class EnterKey : public ForwardKey {
+class SpaceKey : public NormalKey {
 public:
-    EnterKey(bool tryToSendKeyEventFirst = true)
-        : ForwardKey("Return", "Enter", tryToSendKeyEventFirst) {
-        setCustomBackgroundColor({0.2, 0.7, 0.6});
-        setFontColor({1.0, 1.0, 1.0});
-    };
-};
-
-class BackSpaceKey : public ForwardKey {
-public:
-    BackSpaceKey(bool tryToSendKeyEventFirst = true)
-        : ForwardKey("BackSpace", "Back", tryToSendKeyEventFirst) {
+    SpaceKey() : NormalKey("", 65, "", "space") {
         setCustomBackgroundColor({0.3, 0.3, 0.3});
         setFontColor({1.0, 1.0, 1.0});
     };
 };
 
-class ArrowKey : public ForwardKey {
+class EnterKey : public NormalKey {
 public:
-    ArrowKey(std::string keyName, std::string label, bool tryToSendKeyEventFirst = true)
-        : ForwardKey(keyName, label, tryToSendKeyEventFirst) {
+    EnterKey() : NormalKey("Enter", 36, "", "Return") {
+        setCustomBackgroundColor({0.2, 0.7, 0.6});
+        setFontColor({1.0, 1.0, 1.0});
+    };
+};
+
+class BackSpaceKey : public NormalKey {
+public:
+    BackSpaceKey() : NormalKey("Back", 22, "", "BackSpace") {
+        setCustomBackgroundColor({0.3, 0.3, 0.3});
+        setFontColor({1.0, 1.0, 1.0});
+    };
+};
+
+class UpKey : public NormalKey {
+public:
+    UpKey() : NormalKey(u8"\u2191", 111, "", "Up") {
+        setCustomBackgroundColor({0.3, 0.3, 0.3});
+        setFontColor({1.0, 1.0, 1.0});
+    };
+};
+
+class LeftKey : public NormalKey {
+public:
+    LeftKey() : NormalKey(u8"\u2190", 113, "", "Left") {
+        setCustomBackgroundColor({0.3, 0.3, 0.3});
+        setFontColor({1.0, 1.0, 1.0});
+    };
+};
+
+class DownKey : public NormalKey {
+public:
+    DownKey() : NormalKey(u8"\u2193", 116, "", "Down") {
+        setCustomBackgroundColor({0.3, 0.3, 0.3});
+        setFontColor({1.0, 1.0, 1.0});
+    };
+};
+
+class RightKey : public NormalKey {
+public:
+    RightKey() : NormalKey(u8"\u2192", 114, "", "Right") {
         setCustomBackgroundColor({0.3, 0.3, 0.3});
         setFontColor({1.0, 1.0, 1.0});
     };

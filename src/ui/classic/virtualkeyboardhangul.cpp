@@ -37,157 +37,132 @@ int HangulModeSwitchKey::currentIndex(VirtualKeyboard *keyboard) {
     return 1;
 }
 
-void HangulTextKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) {
-    FCITX_KEYBOARD() << "HangulTextKey pushed: " << label(keyboard);
-
-    auto keyEvent = fcitx::KeyEvent(inputContext, convert(keyboard->isShiftOn_), isRelease);
-    auto hasProcessedInIME = inputContext->keyEvent(keyEvent);
-    FCITX_KEYBOARD() << "key event result: " << hasProcessedInIME;
-}
-
-void HangulSpaceKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) {
-    FCITX_KEYBOARD() << "HangulSpaceKey pushed: " << label(keyboard);
-
-    // Must complete preedit and input space character.
-    // `space` keyevent is not processed in IME,
-    // but sending event is necessary to complete preedit.
-    auto keyEvent = fcitx::KeyEvent(inputContext, convert(keyboard->isShiftOn_), isRelease);
-    auto hasProcessedInIME = inputContext->keyEvent(keyEvent);
-    FCITX_KEYBOARD() << "key event result: " << hasProcessedInIME;
-
-    if(hasProcessedInIME || isRelease) {
-        return;
-    }
-
-    inputContext->commitString(" ");
-}
-
 void HangulKeyboard::setTextKeys() {
     keys_.clear();
-    keys_.emplace_back(new HangulTextKey("ᄇ", "q", "ᄈ", "Q"));
-    keys_.emplace_back(new HangulTextKey("ᄌ", "w", "ᄍ", "W"));
-    keys_.emplace_back(new HangulTextKey("ᄃ", "e", "ᄄ", "E"));
-    keys_.emplace_back(new HangulTextKey("ᄀ", "r", "ᄁ", "R"));
-    keys_.emplace_back(new HangulTextKey("ᄉ", "t", "ᄊ", "T"));
-    keys_.emplace_back(new HangulTextKey("ᅭ", "y"));
-    keys_.emplace_back(new HangulTextKey("ᅧ", "u"));
-    keys_.emplace_back(new HangulTextKey("ᅣ", "i"));
-    keys_.emplace_back(new HangulTextKey("ᅢ", "o", "ᅤ", "O"));
-    keys_.emplace_back(new HangulTextKey("ᅦ", "p", "ᅨ", "P"));
+    keys_.emplace_back(new NormalKey("ᄇ", 24, "ᄈ", "q", "Q"));
+    keys_.emplace_back(new NormalKey("ᄌ", 25, "ᄍ", "w", "W"));
+    keys_.emplace_back(new NormalKey("ᄃ", 26, "ᄄ", "e", "E"));
+    keys_.emplace_back(new NormalKey("ᄀ", 27, "ᄁ", "r", "R"));
+    keys_.emplace_back(new NormalKey("ᄉ", 28, "ᄊ", "t", "T"));
+    keys_.emplace_back(new NormalKey("ᅭ", 29, "", "y", "Y"));
+    keys_.emplace_back(new NormalKey("ᅧ", 30, "", "u", "U"));
+    keys_.emplace_back(new NormalKey("ᅣ", 31, "", "i", "I"));
+    keys_.emplace_back(new NormalKey("ᅢ", 32, "ᅤ", "o", "O"));
+    keys_.emplace_back(new NormalKey("ᅦ", 33, "ᅨ", "p", "P"));
     keys_.emplace_back(new BackSpaceKey()); keys_.back()->setCustomLayout(1.0);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new TextKey("7"));
-    keys_.emplace_back(new TextKey("8"));
-    keys_.emplace_back(new TextKey("9")); keys_.back()->setCustomLayout(1.0, true);
+    keys_.emplace_back(new NumberKey("7"));
+    keys_.emplace_back(new NumberKey("8"));
+    keys_.emplace_back(new NumberKey("9")); keys_.back()->setCustomLayout(1.0, true);
 
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new HangulTextKey("ᄆ", "a"));
-    keys_.emplace_back(new HangulTextKey("ᄂ", "s"));
-    keys_.emplace_back(new HangulTextKey("ᄋ", "d"));
-    keys_.emplace_back(new HangulTextKey("ᄅ", "f"));
-    keys_.emplace_back(new HangulTextKey("ᄒ", "g"));
-    keys_.emplace_back(new HangulTextKey("ᅩ", "h"));
-    keys_.emplace_back(new HangulTextKey("ᅥ", "j"));
-    keys_.emplace_back(new HangulTextKey("ᅡ", "k"));
-    keys_.emplace_back(new HangulTextKey("ᅵ", "l"));
+    keys_.emplace_back(new NormalKey("ᄆ", 38, "", "a", "A"));
+    keys_.emplace_back(new NormalKey("ᄂ", 39, "", "s", "S"));
+    keys_.emplace_back(new NormalKey("ᄋ", 40, "", "d", "D"));
+    keys_.emplace_back(new NormalKey("ᄅ", 41, "", "f", "F"));
+    keys_.emplace_back(new NormalKey("ᄒ", 42, "", "g", "G"));
+    keys_.emplace_back(new NormalKey("ᅩ", 43, "", "h", "H"));
+    keys_.emplace_back(new NormalKey("ᅥ", 44, "", "j", "J"));
+    keys_.emplace_back(new NormalKey("ᅡ", 45, "", "k", "K"));
+    keys_.emplace_back(new NormalKey("ᅵ", 46, "", "l", "L"));
     keys_.emplace_back(new EnterKey()); keys_.back()->setCustomLayout(1.5);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new TextKey("4"));
-    keys_.emplace_back(new TextKey("5"));
-    keys_.emplace_back(new TextKey("6")); keys_.back()->setCustomLayout(1.0, true);
+    keys_.emplace_back(new NumberKey("4"));
+    keys_.emplace_back(new NumberKey("5"));
+    keys_.emplace_back(new NumberKey("6")); keys_.back()->setCustomLayout(1.0, true);
 
     keys_.emplace_back(new ShiftToggleKey());
-    keys_.emplace_back(new HangulTextKey("ᄏ", "z"));
-    keys_.emplace_back(new HangulTextKey("ᄐ", "x"));
-    keys_.emplace_back(new HangulTextKey("ᄎ", "c"));
-    keys_.emplace_back(new HangulTextKey("ᄑ", "v"));
-    keys_.emplace_back(new HangulTextKey("ᅲ", "b"));
-    keys_.emplace_back(new HangulTextKey("ᅮ", "n"));
-    keys_.emplace_back(new HangulTextKey("ᅳ", "m"));
-    keys_.emplace_back(new TextKey("-"));
-    keys_.emplace_back(new ArrowKey("Up", u8"\u2191"));
+    keys_.emplace_back(new NormalKey("ᄏ", 52, "", "z", "Z"));
+    keys_.emplace_back(new NormalKey("ᄐ", 53, "", "x", "X"));
+    keys_.emplace_back(new NormalKey("ᄎ", 54, "", "c", "C"));
+    keys_.emplace_back(new NormalKey("ᄑ", 55, "", "v", "V"));
+    keys_.emplace_back(new NormalKey("ᅲ", 56, "", "b", "B"));
+    keys_.emplace_back(new NormalKey("ᅮ", 57, "", "n", "N"));
+    keys_.emplace_back(new NormalKey("ᅳ", 58, "", "m", "M"));
+    keys_.emplace_back(new MarkKey("-", "minus"));
+    keys_.emplace_back(new UpKey());
     keys_.emplace_back(new LanguageSwitchKey());
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new TextKey("1"));
-    keys_.emplace_back(new TextKey("2"));
-    keys_.emplace_back(new TextKey("3")); keys_.back()->setCustomLayout(1.0, true);
+    keys_.emplace_back(new NumberKey("1"));
+    keys_.emplace_back(new NumberKey("2"));
+    keys_.emplace_back(new NumberKey("3")); keys_.back()->setCustomLayout(1.0, true);
 
     keys_.emplace_back(new HangulModeSwitchKey()); keys_.back()->setCustomLayout(2.0);
-    keys_.emplace_back(new TextKey(",")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-    keys_.emplace_back(new TextKey(".")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-    keys_.emplace_back(new HangulSpaceKey()); keys_.back()->setCustomLayout(2.0);
-    keys_.emplace_back(new TextKey("!"));
-    keys_.emplace_back(new TextKey("?"));
-    keys_.emplace_back(new ArrowKey("Left", u8"\u2190"));
-    keys_.emplace_back(new ArrowKey("Down", u8"\u2193"));
-    keys_.emplace_back(new ArrowKey("Right", u8"\u2192"));
+    keys_.emplace_back(new MarkKey(",", "comma")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new MarkKey(".", "period")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new SpaceKey()); keys_.back()->setCustomLayout(2.0);
+    keys_.emplace_back(new MarkKey("!", "exclam"));
+    keys_.emplace_back(new MarkKey("?", "question"));
+    keys_.emplace_back(new LeftKey());
+    keys_.emplace_back(new DownKey());
+    keys_.emplace_back(new RightKey());
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new TextKey("0")); keys_.back()->setCustomLayout(2.0);
-    keys_.emplace_back(new TextKey(".")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new NumberKey("0")); keys_.back()->setCustomLayout(2.0);
+    keys_.emplace_back(new MarkKey(".")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
 }
 
 void HangulKeyboard::setMarkKeys() {
     keys_.clear();
-    keys_.emplace_back(new TextKey("["));
-    keys_.emplace_back(new TextKey("]"));
-    keys_.emplace_back(new TextKey("{"));
-    keys_.emplace_back(new TextKey("}"));
-    keys_.emplace_back(new TextKey("#"));
-    keys_.emplace_back(new TextKey("%"));
-    keys_.emplace_back(new TextKey("^"));
-    keys_.emplace_back(new TextKey("*"));
-    keys_.emplace_back(new TextKey("+"));
-    keys_.emplace_back(new TextKey("="));
-    keys_.emplace_back(new BackSpaceKey(false));
+    keys_.emplace_back(new MarkKey("["));
+    keys_.emplace_back(new MarkKey("]"));
+    keys_.emplace_back(new MarkKey("{"));
+    keys_.emplace_back(new MarkKey("}"));
+    keys_.emplace_back(new MarkKey("#"));
+    keys_.emplace_back(new MarkKey("%"));
+    keys_.emplace_back(new MarkKey("^"));
+    keys_.emplace_back(new MarkKey("*"));
+    keys_.emplace_back(new MarkKey("+"));
+    keys_.emplace_back(new MarkKey("="));
+    keys_.emplace_back(new BackSpaceKey());
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new TextKey("7"));
-    keys_.emplace_back(new TextKey("8"));
-    keys_.emplace_back(new TextKey("9")); keys_.back()->setCustomLayout(1.0, true);
+    keys_.emplace_back(new NumberKey("7"));
+    keys_.emplace_back(new NumberKey("8"));
+    keys_.emplace_back(new NumberKey("9")); keys_.back()->setCustomLayout(1.0, true);
 
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new TextKey("/"));
-    keys_.emplace_back(new TextKey("\\"));
-    keys_.emplace_back(new TextKey(":"));
-    keys_.emplace_back(new TextKey(";"));
-    keys_.emplace_back(new TextKey("("));
-    keys_.emplace_back(new TextKey(")"));
-    keys_.emplace_back(new TextKey("&"));
-    keys_.emplace_back(new TextKey("@"));
-    keys_.emplace_back(new TextKey("￥"));
-    keys_.emplace_back(new EnterKey(false)); keys_.back()->setCustomLayout(1.5);
+    keys_.emplace_back(new MarkKey("/"));
+    keys_.emplace_back(new MarkKey("\\"));
+    keys_.emplace_back(new MarkKey(":"));
+    keys_.emplace_back(new MarkKey(";"));
+    keys_.emplace_back(new MarkKey("("));
+    keys_.emplace_back(new MarkKey(")"));
+    keys_.emplace_back(new MarkKey("&"));
+    keys_.emplace_back(new MarkKey("@"));
+    keys_.emplace_back(new MarkKey("￥"));
+    keys_.emplace_back(new EnterKey()); keys_.back()->setCustomLayout(1.5);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new TextKey("4"));
-    keys_.emplace_back(new TextKey("5"));
-    keys_.emplace_back(new TextKey("6")); keys_.back()->setCustomLayout(1.0, true);
+    keys_.emplace_back(new NumberKey("4"));
+    keys_.emplace_back(new NumberKey("5"));
+    keys_.emplace_back(new NumberKey("6")); keys_.back()->setCustomLayout(1.0, true);
 
     keys_.emplace_back(new DummyKey());
-    keys_.emplace_back(new TextKey("\"")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Top);
-    keys_.emplace_back(new TextKey("\'")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Top);
-    keys_.emplace_back(new TextKey("_")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-    keys_.emplace_back(new TextKey("|"));
-    keys_.emplace_back(new TextKey("~"));
-    keys_.emplace_back(new TextKey("<"));
-    keys_.emplace_back(new TextKey(">"));
-    keys_.emplace_back(new TextKey("-"));
-    keys_.emplace_back(new ArrowKey("Up", u8"\u2191", false));
+    keys_.emplace_back(new MarkKey("\"")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Top);
+    keys_.emplace_back(new MarkKey("\'")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Top);
+    keys_.emplace_back(new MarkKey("_")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new MarkKey("|"));
+    keys_.emplace_back(new MarkKey("~"));
+    keys_.emplace_back(new MarkKey("<"));
+    keys_.emplace_back(new MarkKey(">"));
+    keys_.emplace_back(new MarkKey("-"));
+    keys_.emplace_back(new UpKey());
     keys_.emplace_back(new LanguageSwitchKey());
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new TextKey("1"));
-    keys_.emplace_back(new TextKey("2"));
-    keys_.emplace_back(new TextKey("3")); keys_.back()->setCustomLayout(1.0, true);
+    keys_.emplace_back(new NumberKey("1"));
+    keys_.emplace_back(new NumberKey("2"));
+    keys_.emplace_back(new NumberKey("3")); keys_.back()->setCustomLayout(1.0, true);
 
     keys_.emplace_back(new HangulModeSwitchKey()); keys_.back()->setCustomLayout(2.0);
-    keys_.emplace_back(new TextKey(",")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-    keys_.emplace_back(new TextKey(".")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-    keys_.emplace_back(new HangulSpaceKey()); keys_.back()->setCustomLayout(2.0);
-    keys_.emplace_back(new TextKey("!"));
-    keys_.emplace_back(new TextKey("?"));
-    keys_.emplace_back(new ArrowKey("Left", u8"\u2190", false));
-    keys_.emplace_back(new ArrowKey("Down", u8"\u2193", false));
-    keys_.emplace_back(new ArrowKey("Right", u8"\u2192", false));
+    keys_.emplace_back(new MarkKey(",")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new MarkKey(".")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new SpaceKey()); keys_.back()->setCustomLayout(2.0);
+    keys_.emplace_back(new MarkKey("!"));
+    keys_.emplace_back(new MarkKey("?"));
+    keys_.emplace_back(new LeftKey());
+    keys_.emplace_back(new DownKey());
+    keys_.emplace_back(new RightKey());
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new TextKey("0")); keys_.back()->setCustomLayout(2.0);
-    keys_.emplace_back(new TextKey(".")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new NumberKey("0")); keys_.back()->setCustomLayout(2.0);
+    keys_.emplace_back(new MarkKey(".")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
 }
 
 }

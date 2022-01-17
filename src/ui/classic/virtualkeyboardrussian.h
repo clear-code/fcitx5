@@ -26,15 +26,11 @@ public:
     void updateKeys() override;
     void switchMode();
     RussianKeyboardMode mode() const { return mode_; }
-    bool isLatinTextOn() const { return isLatinTextOn_; }
-    void toggleText();
 
 private:
     void setCyrillicTextKeys();
-    void setLatinTextKeys();
     void setMarkKeys();
     RussianKeyboardMode mode_ = RussianKeyboardMode::Text;
-    bool isLatinTextOn_ = false;
 };
 
 class RussianDummyKey : public DummyKey {
@@ -51,11 +47,15 @@ public:
     }
 };
 
-class RussianTextKey : public TextKey {
+class RussianNormalKey : public NormalKey {
 public:
-    RussianTextKey(std::string text, std::string upperText = "", std::string keyName = "",
-        std::string upperKeyName = "")
-        : TextKey(text, upperText, keyName, upperKeyName) {
+    RussianNormalKey(
+        const std::string &label,
+        uint32_t code,
+        const std::string &upperLabel = "",
+        const std::string &name = "",
+        const std::string &upperName = ""
+    ) : NormalKey(label, code, upperLabel, name, upperName) {
         width_ = 50;
     }
 };
@@ -72,18 +72,6 @@ protected:
     }
     void switchState(VirtualKeyboard *keyboard, InputContext *inputContext) override;
     int currentIndex(VirtualKeyboard *keyboard) override;
-};
-
-class RussianTextToggleKey : public ToggleKey {
-public:
-    RussianTextToggleKey() {
-        setFontSize(18);
-    }
-    const char* label(VirtualKeyboard *) const override { return "Latin"; }
-
-protected:
-    void toggle(VirtualKeyboard *keyboard, InputContext *inputContext) override;
-    bool isOn(VirtualKeyboard *keyboard) override;
 };
 
 } // namespace classicui

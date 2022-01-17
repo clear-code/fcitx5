@@ -37,31 +37,29 @@ private:
     bool isAdditionalMarkOn_ = false;
 };
 
-class ChewingTextKey : public TextKey {
+class ChewingNumberKey : public NormalKey {
 public:
-    ChewingTextKey(std::string text, std::string keyName)
-        : TextKey(text, "", keyName, "") {}
-    void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
-};
-
-class ChewingNumberKey : public TextKey {
-public:
-    ChewingNumberKey(std::string keyName, std::string text = "")
-        : TextKey(
-            text.empty() ? keyName : text,
+    ChewingNumberKey(
+        const std::string &label,
+        const std::string &number,
+        uint32_t code
+    ) : NormalKey(
+            label,
+            code,
             "",
-            keyName,
-            ""
+            number
         ),
-        inputNumberUsually_(text.empty())
-        {}
+        number_(number) {}
     const char* label(VirtualKeyboard *keyboard) const override;
-    void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
 
 private:
-    typedef TextKey super;
-    //** Numpad-keys inputs the number usually, but `ㄅ`-key inputs `ㄅ` usually. */
-    const bool inputNumberUsually_;
+    const std::string number_;
+};
+
+class ChewingNumPadKey : public NumberKey {
+public:
+    ChewingNumPadKey(const std::string &number) : NumberKey(number) {}
+    void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
 };
 
 class ChewingEnterKey : public EnterKey {
@@ -76,15 +74,12 @@ private:
     typedef EnterKey super;
 };
 
-class ChewingSpaceKey : public KeyByName {
+class ChewingSpaceKey : public SpaceKey {
 public:
-    ChewingSpaceKey() : KeyByName("space") {
+    ChewingSpaceKey() {
         setFontSize(18);
-        setFontColor({1.0, 1.0, 1.0});
-        setCustomBackgroundColor({0.3, 0.3, 0.3});
     }
     const char* label(VirtualKeyboard *keyboard) const override;
-    void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
 };
 
 class ChewingModeSwitchKey : public SwitchKey {
@@ -101,15 +96,16 @@ protected:
     int currentIndex(VirtualKeyboard *keyboard) override;
 };
 
-class ChewingMarkToggleKey : public VirtualKey {
+class ChewingMarkToggleKey : public ToggleKey {
 public:
     ChewingMarkToggleKey() {
         setFontSize(18);
-        setFontColor({1.0, 1.0, 1.0});
-        setCustomBackgroundColor({0.3, 0.3, 0.3});
     }
-    const char* label(VirtualKeyboard *keyboard) const override;
-    void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
+    const char* label(VirtualKeyboard *) const override { return "更多"; }
+
+protected:
+    void toggle(VirtualKeyboard *keyboard, InputContext *inputContext) override;
+    bool isOn(VirtualKeyboard *keyboard) override;
 };
 
 } // namespace classicui
