@@ -199,9 +199,22 @@ bool VirtualKeyboard::click(InputContext *inputContext, int x, int y, bool isRel
         return false;
     }
 
-    clickedKey->click(this, inputContext, isRelease);
-
-    pushingKey_ = isRelease ? nullptr : clickedKey;
+    if (isRelease) {
+        if (pushingKey_) {
+            // Make sure to send key release.
+            pushingKey_->click(this, inputContext, true);
+        } else {
+            clickedKey->click(this, inputContext, true);
+        }
+        pushingKey_ = nullptr;
+    } else {
+        if (pushingKey_ && pushingKey_ != clickedKey) {
+            // Make sure to send key release.
+            pushingKey_->click(this, inputContext, true);
+        }
+        clickedKey->click(this, inputContext, false);
+        pushingKey_ = clickedKey;
+    }
 
     return true;
 }
