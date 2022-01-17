@@ -134,7 +134,7 @@ void AnthyKeyboard::setTextKeys() {
     keys_.emplace_back(new ZenkakuHankakuKey());
     keys_.emplace_back(new AnthyMarkKey("comma", ",", "、")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
     keys_.emplace_back(new AnthyMarkKey("period", ".", "。")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-    keys_.emplace_back(new AnthyMarkKey("space", " ",  "")); keys_.back()->setCustomLayout(2.0); keys_.back()->setCustomBackgroundColor({0.3, 0.3, 0.3});
+    keys_.emplace_back(new SpaceKey()); keys_.back()->setCustomLayout(2.0);
     keys_.emplace_back(new AnthyMarkKey("exclam", "!", "！"));
     keys_.emplace_back(new AnthyMarkKey("question", "?", "？"));
     keys_.emplace_back(new LeftKey());
@@ -199,7 +199,7 @@ void AnthyKeyboard::setMarkKeys() {
     keys_.emplace_back(new ZenkakuHankakuKey());
     keys_.emplace_back(new AnthyMarkKey("comma", ",", "、")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
     keys_.emplace_back(new AnthyMarkKey("period", ".", "。")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-    keys_.emplace_back(new AnthyMarkKey("space", " ", "")); keys_.back()->setCustomLayout(2.0); keys_.back()->setCustomBackgroundColor({0.3, 0.3, 0.3});
+    keys_.emplace_back(new SpaceKey()); keys_.back()->setCustomLayout(2.0);
     keys_.emplace_back(new AnthyMarkKey("exclam", "!", "！"));
     keys_.emplace_back(new AnthyMarkKey("question", "?", "？"));
     keys_.emplace_back(new LeftKey());

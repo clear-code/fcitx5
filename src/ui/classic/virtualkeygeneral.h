@@ -114,6 +114,13 @@ private:
     const std::string label_;
 };
 
+class SpaceKey : public NormalKey {
+public:
+    SpaceKey() : NormalKey("", 65, "", "space") {
+        setCustomBackgroundColor({0.3, 0.3, 0.3});
+    };
+};
+
 class NormalEnterKey : public NormalKey {
 public:
     NormalEnterKey() : NormalKey("Enter", 36, "", "Return") {

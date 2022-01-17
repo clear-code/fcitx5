@@ -91,7 +91,7 @@ void UsKeyboard::setTextKeys() {
     keys_.emplace_back(new UsModeSwitchKey()); keys_.back()->setCustomLayout(2.0);
     keys_.emplace_back(new MarkKey(",")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
     keys_.emplace_back(new MarkKey(".")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-    keys_.emplace_back(new MarkKey(" ")); keys_.back()->setCustomLayout(2.0); keys_.back()->setCustomBackgroundColor({0.3, 0.3, 0.3});
+    keys_.emplace_back(new SpaceKey()); keys_.back()->setCustomLayout(2.0);
     keys_.emplace_back(new MarkKey("!"));
     keys_.emplace_back(new MarkKey("?"));
     keys_.emplace_back(new LeftKey());
@@ -155,7 +155,7 @@ void UsKeyboard::setMarkKeys() {
     keys_.emplace_back(new UsModeSwitchKey()); keys_.back()->setCustomLayout(2.0);
     keys_.emplace_back(new MarkKey(",")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
     keys_.emplace_back(new MarkKey(".")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-    keys_.emplace_back(new MarkKey(" ")); keys_.back()->setCustomLayout(2.0); keys_.back()->setCustomBackgroundColor({0.3, 0.3, 0.3});
+    keys_.emplace_back(new SpaceKey()); keys_.back()->setCustomLayout(2.0);
     keys_.emplace_back(new MarkKey("!"));
     keys_.emplace_back(new MarkKey("?"));
     keys_.emplace_back(new LeftKey());
