@@ -118,6 +118,7 @@ class SpaceKey : public NormalKey {
 public:
     SpaceKey() : NormalKey("", 65, "", "space") {
         setCustomBackgroundColor({0.3, 0.3, 0.3});
+        setFontColor({1.0, 1.0, 1.0});
     };
 };
 
