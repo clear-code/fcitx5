@@ -80,10 +80,10 @@ public:
         labelAlignVertical_ = vertical;
     }
 
-    double width_ = 60;
-    double height_ = 50;
-    bool newLine_ = false;
-    bool visible_ = true;
+    double width() { return width_; }
+    double height() { return height_; }
+    bool newLine() { return newLine_; }
+    bool visible() { return visible_; }
 
 protected:
     Rect region_;
@@ -92,6 +92,10 @@ protected:
     KeyLabelAlignVertical labelAlignVertical_ = KeyLabelAlignVertical::Center;
     bool useCustomBackgroundColor_ = false;
     std::tuple<double, double, double> customBackgroundColorRgb_ = {0, 0, 0};
+    double width_ = 60;
+    double height_ = 50;
+    bool newLine_ = false;
+    bool visible_ = true;
 };
 
 class VirtualKeyboard {
@@ -101,7 +105,7 @@ public:
     bool click(InputContext *inputContext, int x, int y, bool isRelease);
     bool syncState();
     void switchLanguage();
-    void setCurrentInputMethod(std::string name);
+    void setCurrentInputMethod(const std::string &name);
     void enumerateGroup();
 
     /// Some IMs needs to handle the single Shift key event,
@@ -131,20 +135,19 @@ public:
     unsigned int marginX() { return 15; }
     unsigned int marginY() { return 6; }
     VirtualKey *pushingKey() { return pushingKey_; }
-
-protected:
-    Instance *instance_;
-    VirtualKey *pushingKey_ = nullptr;
-    TrackableObjectReference<InputContext> lastInputContext_;
-
-public: // TODO: Should be moved to protected
-    bool isShiftOn_ = false;
+    bool isShiftOn() { return isShiftOn_; }
+    void toggleShift() { isShiftOn_ = !isShiftOn_; }
 
 private:
+    Instance *instance_;
+    TrackableObjectReference<InputContext> lastInputContext_;
+
     std::tuple<VirtualKey *, bool> findClickedKey(int x, int y);
     void paintBackground(cairo_t *cr);
     void setI18nKeyboard(I18nKeyboard *i18nKeyboard);
 
+    VirtualKey *pushingKey_ = nullptr;
+    bool isShiftOn_ = false;
     std::unique_ptr<I18nKeyboard> i18nKeyboard_;
     I18nKeyboardSelector i18nKeyboardSelector_;
 };

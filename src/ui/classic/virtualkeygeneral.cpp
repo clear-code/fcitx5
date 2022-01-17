@@ -9,7 +9,7 @@
 namespace fcitx::classicui {
 
 const char* NormalKey::label(VirtualKeyboard *keyboard) const {
-    if (!keyboard->isShiftOn_ || upperLabel_.empty()) {
+    if (!keyboard->isShiftOn() || upperLabel_.empty()) {
         return label_.c_str();
     }
     return upperLabel_.c_str();
@@ -18,14 +18,14 @@ const char* NormalKey::label(VirtualKeyboard *keyboard) const {
 void NormalKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) {
     FCITX_KEYBOARD() << "NormalKey pushed: " << label(keyboard);
 
-    if (keyboard->isShiftOn_) {
+    if (keyboard->isShiftOn()) {
         keyboard->sendShiftModifierToIM(inputContext, false);
     }
 
-    auto event = KeyEvent(inputContext, convert(keyboard->isShiftOn_), isRelease);
+    auto event = KeyEvent(inputContext, convert(keyboard->isShiftOn()), isRelease);
     inputContext->virtualKeyEvent(event);
 
-    if (keyboard->isShiftOn_) {
+    if (keyboard->isShiftOn()) {
         keyboard->sendShiftModifierToIM(inputContext, true);
     }
 }
@@ -102,11 +102,11 @@ void ToggleKey::paintLabel(VirtualKeyboard *keyboard, cairo_t *cr) {
 }
 
 void ShiftToggleKey::toggle(VirtualKeyboard *keyboard, InputContext *) {
-    keyboard->isShiftOn_ = !keyboard->isShiftOn_;
+    keyboard->toggleShift();
 }
 
 bool ShiftToggleKey::isOn(VirtualKeyboard *keyboard) {
-    return keyboard->isShiftOn_;
+    return keyboard->isShiftOn();
 }
 
 void SwitchKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) {

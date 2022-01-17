@@ -77,6 +77,9 @@ void VirtualKeyboard::setI18nKeyboard(I18nKeyboard *i18nKeyboard) {
 void VirtualKeyboard::switchLanguage() {
     if (instance_->inputMethodManager().groupCount() < 2) return;
 
+    pushingKey_ = nullptr;
+    isShiftOn_ = false;
+
     const auto maxTryCount = 10;
     auto tryCount = 0;
     do
@@ -90,7 +93,7 @@ void VirtualKeyboard::switchLanguage() {
     } while (!syncState());
 }
 
-void VirtualKeyboard::setCurrentInputMethod(std::string name) {
+void VirtualKeyboard::setCurrentInputMethod(const std::string &name) {
     instance_->setCurrentInputMethod(name);
 }
 
@@ -144,22 +147,22 @@ void VirtualKeyboard::paint(cairo_t *cr, unsigned int offsetX, unsigned int offs
 
     for (const auto &key : keys())
     {
-        if (key->visible_) {
+        if (key->visible()) {
             auto highlight = (pushingKey_ == key.get());
             key->paintBackground(cr, highlight);
             key->paintLabel(this, cr);
             key->setRegion(curX, curY);
         }
 
-        if (key->newLine_) {
+        if (key->newLine()) {
             curX = offsetX;
-            curY += key->height_;
+            curY += key->height();
             cairo_restore(cr);
             cairo_save(cr);
             cairo_translate(cr, offsetX, curY);
         } else {
-            curX += key->width_;
-            cairo_translate(cr, key->width_, 0);
+            curX += key->width();
+            cairo_translate(cr, key->width(), 0);
         }
     }
 
@@ -179,13 +182,13 @@ std::pair<unsigned int, unsigned int> VirtualKeyboard::size() {
 
     for (const auto &key : keys())
     {
-        w += key->width_;
+        w += key->width();
         if (height == 0)
-            height += key->height_;
+            height += key->height();
 
-        if (key->newLine_) {
+        if (key->newLine()) {
             width = MAX(width, w);
-            height += key->height_;
+            height += key->height();
             w = 0;
         }
     }
@@ -232,7 +235,7 @@ bool VirtualKeyboard::click(InputContext *inputContext, int x, int y, bool isRel
 std::tuple<VirtualKey *, bool> VirtualKeyboard::findClickedKey(int x, int y) {
     for (const auto &key : keys())
     {
-        if (!(key->visible_ && key->contains(x, y))) continue;
+        if (!(key->visible() && key->contains(x, y))) continue;
         return {key.get(), true};
     }
     return {nullptr, false};
