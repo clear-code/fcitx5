@@ -43,19 +43,12 @@ const char* PinyinEnterKey::label(VirtualKeyboard *keyboard) const {
     return keyboard->isPreediting() ? "确认" : "换行";
 }
 
-const char* PinyinMarkToggleKey::label(VirtualKeyboard *keyboard) const {
-    if (keyboard->i18nKeyboard<PinyinKeyboard>()->isAdditionalMarkOn()) {
-        return "返回";
-    }
-    return "更多";
+void PinyinMarkToggleKey::toggle(VirtualKeyboard *keyboard, InputContext *) {
+    keyboard->i18nKeyboard<PinyinKeyboard>()->toggleMark();
 }
 
-void PinyinMarkToggleKey::click(VirtualKeyboard *keyboard, InputContext *, bool isRelease) {
-    FCITX_KEYBOARD() << "PinyinMarkToggleKey pushed: " << label(keyboard);
-    if (isRelease) {
-        return;
-    }
-    keyboard->i18nKeyboard<PinyinKeyboard>()->toggleMark();
+bool PinyinMarkToggleKey::isOn(VirtualKeyboard *keyboard) {
+    return keyboard->i18nKeyboard<PinyinKeyboard>()->isAdditionalMarkOn();
 }
 
 void PinyinModeSwitchKey::switchState(VirtualKeyboard *keyboard, InputContext *) {

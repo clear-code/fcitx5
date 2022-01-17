@@ -96,15 +96,16 @@ protected:
     int currentIndex(VirtualKeyboard *keyboard) override;
 };
 
-class ChewingMarkToggleKey : public VirtualKey {
+class ChewingMarkToggleKey : public ToggleKey {
 public:
     ChewingMarkToggleKey() {
         setFontSize(18);
-        setFontColor({1.0, 1.0, 1.0});
-        setCustomBackgroundColor({0.3, 0.3, 0.3});
     }
-    const char* label(VirtualKeyboard *keyboard) const override;
-    void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
+    const char* label(VirtualKeyboard *) const override { return "更多"; }
+
+protected:
+    void toggle(VirtualKeyboard *keyboard, InputContext *inputContext) override;
+    bool isOn(VirtualKeyboard *keyboard) override;
 };
 
 } // namespace classicui

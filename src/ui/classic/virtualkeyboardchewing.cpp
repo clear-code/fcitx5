@@ -97,19 +97,12 @@ int ChewingModeSwitchKey::currentIndex(VirtualKeyboard *keyboard) {
     return 1;
 }
 
-const char* ChewingMarkToggleKey::label(VirtualKeyboard *keyboard) const {
-    if (keyboard->i18nKeyboard<ChewingKeyboard>()->isAdditionalMarkOn()) {
-        return "返回";
-    }
-    return "更多";
+void ChewingMarkToggleKey::toggle(VirtualKeyboard *keyboard, InputContext *) {
+    keyboard->i18nKeyboard<ChewingKeyboard>()->toggleMark();
 }
 
-void ChewingMarkToggleKey::click(VirtualKeyboard *keyboard, InputContext *, bool isRelease) {
-    FCITX_KEYBOARD() << "ChewingMarkToggleKey pushed: " << label(keyboard);
-    if (isRelease) {
-        return;
-    }
-    keyboard->i18nKeyboard<ChewingKeyboard>()->toggleMark();
+bool ChewingMarkToggleKey::isOn(VirtualKeyboard *keyboard) {
+    return keyboard->i18nKeyboard<ChewingKeyboard>()->isAdditionalMarkOn();
 }
 
 void ChewingKeyboard::setTextKeys() {

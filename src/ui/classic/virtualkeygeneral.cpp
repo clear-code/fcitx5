@@ -75,7 +75,10 @@ void NumberKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, boo
 
 void ToggleKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) {
     FCITX_KEYBOARD() << "ToggleKey pushed: " << label(keyboard);
-    if (isRelease) {
+    // This may be used for changing key layouts.
+    // Changin key layouts must be executed on key-release,
+    // because VirtualKeyboard has `pushingKey_` pointer.
+    if (!isRelease) {
         return;
     }
     toggle(keyboard, inputContext);
@@ -109,7 +112,10 @@ bool ShiftToggleKey::isOn(VirtualKeyboard *keyboard) {
 void SwitchKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) {
     FCITX_KEYBOARD() << "SwitchKey pushed: " << label(keyboard);
 
-    if (isRelease) {
+    // This may be used for changing key layouts.
+    // Changin key layouts must be executed on key-release,
+    // because VirtualKeyboard has `pushingKey_` pointer.
+    if (!isRelease) {
         return;
     }
 
