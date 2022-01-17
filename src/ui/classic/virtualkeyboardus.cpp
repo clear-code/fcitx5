@@ -50,7 +50,7 @@ void UsKeyboard::setTextKeys() {
     keys_.emplace_back(new NormalKey("i", 31, "I"));
     keys_.emplace_back(new NormalKey("o", 32, "O"));
     keys_.emplace_back(new NormalKey("p", 33, "P"));
-    keys_.emplace_back(new NormalBackSpaceKey()); keys_.back()->setCustomLayout(1.0);
+    keys_.emplace_back(new BackSpaceKey()); keys_.back()->setCustomLayout(1.0);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new NumberKey("7"));
     keys_.emplace_back(new NumberKey("8"));
@@ -66,7 +66,7 @@ void UsKeyboard::setTextKeys() {
     keys_.emplace_back(new NormalKey("j", 44, "J"));
     keys_.emplace_back(new NormalKey("k", 45, "K"));
     keys_.emplace_back(new NormalKey("l", 46, "L"));
-    keys_.emplace_back(new NormalEnterKey()); keys_.back()->setCustomLayout(1.5);
+    keys_.emplace_back(new EnterKey()); keys_.back()->setCustomLayout(1.5);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new NumberKey("4"));
     keys_.emplace_back(new NumberKey("5"));
@@ -114,7 +114,7 @@ void UsKeyboard::setMarkKeys() {
     keys_.emplace_back(new MarkKey("*"));
     keys_.emplace_back(new MarkKey("+"));
     keys_.emplace_back(new MarkKey("="));
-    keys_.emplace_back(new NormalBackSpaceKey());
+    keys_.emplace_back(new BackSpaceKey());
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new NumberKey("7"));
     keys_.emplace_back(new NumberKey("8"));
@@ -130,7 +130,7 @@ void UsKeyboard::setMarkKeys() {
     keys_.emplace_back(new MarkKey("&"));
     keys_.emplace_back(new MarkKey("@"));
     keys_.emplace_back(new MarkKey("￥"));
-    keys_.emplace_back(new NormalEnterKey()); keys_.back()->setCustomLayout(1.5);
+    keys_.emplace_back(new EnterKey()); keys_.back()->setCustomLayout(1.5);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new NumberKey("4"));
     keys_.emplace_back(new NumberKey("5"));

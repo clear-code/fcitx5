@@ -92,7 +92,7 @@ void AnthyKeyboard::setTextKeys() {
     keys_.emplace_back(new NormalKey("i", 31, "I"));
     keys_.emplace_back(new NormalKey("o", 32, "O"));
     keys_.emplace_back(new NormalKey("p", 33, "P"));
-    keys_.emplace_back(new NormalBackSpaceKey()); keys_.back()->setCustomLayout(1.0);
+    keys_.emplace_back(new BackSpaceKey()); keys_.back()->setCustomLayout(1.0);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new AnthyMarkKey("7", "7", "７"));
     keys_.emplace_back(new AnthyMarkKey("8", "8", "８"));
@@ -108,7 +108,7 @@ void AnthyKeyboard::setTextKeys() {
     keys_.emplace_back(new NormalKey("j", 44, "J"));
     keys_.emplace_back(new NormalKey("k", 45, "K"));
     keys_.emplace_back(new NormalKey("l", 46, "L"));
-    keys_.emplace_back(new NormalEnterKey()); keys_.back()->setCustomLayout(1.5);
+    keys_.emplace_back(new EnterKey()); keys_.back()->setCustomLayout(1.5);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new AnthyMarkKey("4", "4", "４"));
     keys_.emplace_back(new AnthyMarkKey("5", "5", "５"));
@@ -157,7 +157,7 @@ void AnthyKeyboard::setMarkKeys() {
     keys_.emplace_back(new AnthyMarkKey("asterisk", "*", "＊"));
     keys_.emplace_back(new AnthyMarkKey("plus", "+", "＋"));
     keys_.emplace_back(new AnthyMarkKey("equal", "=", "＝"));
-    keys_.emplace_back(new NormalBackSpaceKey());
+    keys_.emplace_back(new BackSpaceKey());
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new AnthyMarkKey("7", "7", "７"));
     keys_.emplace_back(new AnthyMarkKey("8", "8", "８"));
@@ -173,7 +173,7 @@ void AnthyKeyboard::setMarkKeys() {
     keys_.emplace_back(new AnthyMarkKey("ampersand", "&", "＆"));
     keys_.emplace_back(new AnthyMarkKey("at", "@", "＠"));
     keys_.emplace_back(new AnthyMarkKey("yen", u8"\u00A5", "")); // `yen` does not work in Zenkaku
-    keys_.emplace_back(new NormalEnterKey()); keys_.back()->setCustomLayout(1.5);
+    keys_.emplace_back(new EnterKey()); keys_.back()->setCustomLayout(1.5);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new AnthyMarkKey("4", "4", "４"));
     keys_.emplace_back(new AnthyMarkKey("5", "5", "５"));

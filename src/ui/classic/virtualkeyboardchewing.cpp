@@ -138,7 +138,7 @@ void ChewingKeyboard::setTextKeys() {
     keys_.emplace_back(new NormalKey("ㄛ", 31, "", "i", "I"));
     keys_.emplace_back(new NormalKey("ㄟ", 32, "", "o", "O"));
     keys_.emplace_back(new NormalKey("ㄣ", 33, "", "p", "P"));
-    keys_.emplace_back(new NormalBackSpaceKey());
+    keys_.emplace_back(new BackSpaceKey());
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new ChewingNumPadKey("7"));
     keys_.emplace_back(new ChewingNumPadKey("8"));
@@ -203,7 +203,7 @@ void ChewingKeyboard::setMarkKeys() {
     keys_.emplace_back(new MarkKey("」"));
     keys_.emplace_back(new MarkKey("『"));
     keys_.emplace_back(new MarkKey("』"));
-    keys_.emplace_back(new NormalBackSpaceKey());
+    keys_.emplace_back(new BackSpaceKey());
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new ChewingNumPadKey("7"));
     keys_.emplace_back(new ChewingNumPadKey("8"));
@@ -267,7 +267,7 @@ void ChewingKeyboard::setAdditionalMarkKeys() {
     keys_.emplace_back(new MarkKey("*"));
     keys_.emplace_back(new MarkKey("+"));
     keys_.emplace_back(new MarkKey("="));
-    keys_.emplace_back(new NormalBackSpaceKey());
+    keys_.emplace_back(new BackSpaceKey());
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new ChewingNumPadKey("7"));
     keys_.emplace_back(new ChewingNumPadKey("8"));

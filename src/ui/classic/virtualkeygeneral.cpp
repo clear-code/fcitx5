@@ -73,53 +73,6 @@ void NumberKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, boo
     inputContext->commitString(label(keyboard));
 }
 
-const char* TextKey::label(VirtualKeyboard *keyboard) const {
-    if (!keyboard->isShiftOn_ || upperText_.empty()) {
-        return text_.c_str();
-    }
-    return upperText_.c_str();
-}
-
-void TextKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) {
-    FCITX_KEYBOARD() << "TextKey pushed: " << label(keyboard);
-
-    if (isRelease) {
-        return;
-    }
-
-    inputContext->commitString(label(keyboard));
-}
-
-void ForwardKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) {
-    FCITX_KEYBOARD() << "ForwardKey pushed: " << label(keyboard);
-
-    if (!tryToSendKeyEventFirst_) {
-        inputContext->forwardKey(convert(keyboard->isShiftOn_), isRelease);
-        return;
-    }
-
-    auto keyEvent = fcitx::KeyEvent(inputContext, convert(keyboard->isShiftOn_), isRelease);
-    auto hasProcessedInIME = inputContext->keyEvent(keyEvent);
-    FCITX_KEYBOARD() << "key event result: " << hasProcessedInIME;
-
-    if(hasProcessedInIME) {
-        canForwardKeyRelease_ = false;
-        return;
-    }
-
-    if (!isRelease) {
-        inputContext->forwardKey(convert(keyboard->isShiftOn_), false);
-        canForwardKeyRelease_ = true;
-        return;
-    }
-
-    if (!canForwardKeyRelease_) {
-        return;
-    }
-
-    inputContext->forwardKey(convert(keyboard->isShiftOn_), true);
-}
-
 void ToggleKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) {
     FCITX_KEYBOARD() << "ToggleKey pushed: " << label(keyboard);
     if (isRelease) {

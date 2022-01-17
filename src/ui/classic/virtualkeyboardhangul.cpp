@@ -49,7 +49,7 @@ void HangulKeyboard::setTextKeys() {
     keys_.emplace_back(new NormalKey("ᅣ", 31, "", "i", "I"));
     keys_.emplace_back(new NormalKey("ᅢ", 32, "ᅤ", "o", "O"));
     keys_.emplace_back(new NormalKey("ᅦ", 33, "ᅨ", "p", "P"));
-    keys_.emplace_back(new NormalBackSpaceKey()); keys_.back()->setCustomLayout(1.0);
+    keys_.emplace_back(new BackSpaceKey()); keys_.back()->setCustomLayout(1.0);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new NumberKey("7"));
     keys_.emplace_back(new NumberKey("8"));
@@ -65,7 +65,7 @@ void HangulKeyboard::setTextKeys() {
     keys_.emplace_back(new NormalKey("ᅥ", 44, "", "j", "J"));
     keys_.emplace_back(new NormalKey("ᅡ", 45, "", "k", "K"));
     keys_.emplace_back(new NormalKey("ᅵ", 46, "", "l", "L"));
-    keys_.emplace_back(new NormalEnterKey()); keys_.back()->setCustomLayout(1.5);
+    keys_.emplace_back(new EnterKey()); keys_.back()->setCustomLayout(1.5);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new NumberKey("4"));
     keys_.emplace_back(new NumberKey("5"));
@@ -113,7 +113,7 @@ void HangulKeyboard::setMarkKeys() {
     keys_.emplace_back(new MarkKey("*"));
     keys_.emplace_back(new MarkKey("+"));
     keys_.emplace_back(new MarkKey("="));
-    keys_.emplace_back(new NormalBackSpaceKey());
+    keys_.emplace_back(new BackSpaceKey());
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new NumberKey("7"));
     keys_.emplace_back(new NumberKey("8"));
@@ -129,7 +129,7 @@ void HangulKeyboard::setMarkKeys() {
     keys_.emplace_back(new MarkKey("&"));
     keys_.emplace_back(new MarkKey("@"));
     keys_.emplace_back(new MarkKey("￥"));
-    keys_.emplace_back(new NormalEnterKey()); keys_.back()->setCustomLayout(1.5);
+    keys_.emplace_back(new EnterKey()); keys_.back()->setCustomLayout(1.5);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new NumberKey("4"));
     keys_.emplace_back(new NumberKey("5"));

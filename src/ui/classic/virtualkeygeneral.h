@@ -155,17 +155,17 @@ public:
     };
 };
 
-class NormalEnterKey : public NormalKey {
+class EnterKey : public NormalKey {
 public:
-    NormalEnterKey() : NormalKey("Enter", 36, "", "Return") {
+    EnterKey() : NormalKey("Enter", 36, "", "Return") {
         setCustomBackgroundColor({0.2, 0.7, 0.6});
         setFontColor({1.0, 1.0, 1.0});
     };
 };
 
-class NormalBackSpaceKey : public NormalKey {
+class BackSpaceKey : public NormalKey {
 public:
-    NormalBackSpaceKey() : NormalKey("Back", 22, "", "BackSpace") {
+    BackSpaceKey() : NormalKey("Back", 22, "", "BackSpace") {
         setCustomBackgroundColor({0.3, 0.3, 0.3});
         setFontColor({1.0, 1.0, 1.0});
     };
@@ -198,107 +198,6 @@ public:
 class RightKey : public NormalKey {
 public:
     RightKey() : NormalKey(u8"\u2192", 114, "", "Right") {
-        setCustomBackgroundColor({0.3, 0.3, 0.3});
-        setFontColor({1.0, 1.0, 1.0});
-    };
-};
-
-/*
- * TODO Delete this class
- * Base class that provides function to convert to fcitx::key by keyname in keynametable.h.
- * Keyname corresponds to keysym, but not to keycode.
- */
-class KeyByName : public VirtualKey {
-protected:
-    KeyByName(std::string keyName, std::string upperKeyName = "")
-        : keyName_(keyName), upperKeyName_(upperKeyName) {}
-
-    const char* keyName(bool withShift = false) const {
-        if (withShift) {
-            if (!upperKeyName_.empty()) {
-                return upperKeyName_.c_str();
-            }
-            return ("SHIFT_" + keyName_).c_str();
-        }
-        return keyName_.c_str();
-    };
-
-    fcitx::Key convert(bool withShift = false) const {
-        return fcitx::Key(keyName(withShift));
-    }
-
-    /*
-     * Be used in converting to Fcitx::Key.
-     * Corresponding to keyNameList in keynametable.h.
-     */
-    const std::string keyName_;
-    const std::string upperKeyName_;
-};
-
-/// TODO Delete this class
-class TextKey : public KeyByName {
-public:
-    TextKey(std::string text, std::string upperText = "", std::string keyName = "",
-        std::string upperKeyName = "")
-        : KeyByName(keyName.empty() ? text : keyName,
-            upperKeyName.empty() ? upperText : upperKeyName),
-          text_(text), upperText_(upperText) {}
-    virtual const char* label(VirtualKeyboard *keyboard) const override;
-    virtual void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
-
-private:
-    /*
-     * Text for display, and commit-string.
-     */
-    const std::string text_;
-    const std::string upperText_;
-};
-
-/* TODO Delete this class
- * Keys like enter and arrow keys that can not use commit-string and need to forward.
- */
-class ForwardKey : public KeyByName {
-public:
-    ForwardKey(std::string keyName, std::string label, bool tryToSendKeyEventFirst = true)
-        : KeyByName(keyName), label_(label), tryToSendKeyEventFirst_(tryToSendKeyEventFirst) {}
-    virtual const char* label(VirtualKeyboard *) const override { return label_.c_str(); }
-    virtual void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
-
-private:
-    const std::string label_;
-    bool tryToSendKeyEventFirst_ = true;
-
-    /*
-     * Key release must be forwarded only when key push had been forwarded in advance.
-     */
-    bool canForwardKeyRelease_ = false;
-};
-
-/// TODO Delete this class
-class EnterKey : public ForwardKey {
-public:
-    EnterKey(bool tryToSendKeyEventFirst = true)
-        : ForwardKey("Return", "Enter", tryToSendKeyEventFirst) {
-        setCustomBackgroundColor({0.2, 0.7, 0.6});
-        setFontColor({1.0, 1.0, 1.0});
-    };
-};
-
-/// TODO Delete this class
-class BackSpaceKey : public ForwardKey {
-public:
-    BackSpaceKey(bool tryToSendKeyEventFirst = true)
-        : ForwardKey("BackSpace", "Back", tryToSendKeyEventFirst) {
-        setCustomBackgroundColor({0.3, 0.3, 0.3});
-        setFontColor({1.0, 1.0, 1.0});
-    };
-};
-
-/// TODO Delete this class
-class ArrowKey : public ForwardKey {
-public:
-    ArrowKey(std::string keyName, std::string label, bool tryToSendKeyEventFirst = true)
-        : ForwardKey(keyName, label, tryToSendKeyEventFirst) {
         setCustomBackgroundColor({0.3, 0.3, 0.3});
         setFontColor({1.0, 1.0, 1.0});
     };

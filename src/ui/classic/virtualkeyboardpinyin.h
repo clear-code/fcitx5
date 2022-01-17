@@ -45,7 +45,7 @@ public:
     const char* label(VirtualKeyboard *keyboard) const override;
 };
 
-class PinyinEnterKey : public NormalEnterKey {
+class PinyinEnterKey : public EnterKey {
 public:
     PinyinEnterKey() {
         setFontSize(18);

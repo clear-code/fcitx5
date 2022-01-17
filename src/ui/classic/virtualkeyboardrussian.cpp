@@ -52,7 +52,7 @@ void RussianKeyboard::setCyrillicTextKeys() {
     keys_.emplace_back(new RussianNormalKey("з", 33, "З", "p", "P"));
     keys_.emplace_back(new RussianNormalKey("х", 34, "Х", "at", "grave"));
     keys_.emplace_back(new RussianNormalKey("ъ", 35, "Ъ", "bracketleft", "braceleft"));
-    keys_.emplace_back(new NormalBackSpaceKey()); keys_.back()->setCustomLayout(1.0);
+    keys_.emplace_back(new BackSpaceKey()); keys_.back()->setCustomLayout(1.0);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new NumberKey("7", 16));
     keys_.emplace_back(new NumberKey("8", 17));
@@ -70,7 +70,7 @@ void RussianKeyboard::setCyrillicTextKeys() {
     keys_.emplace_back(new RussianNormalKey("д", 46, "Д", "l", "L"));
     keys_.emplace_back(new RussianNormalKey("ж", 47, "Ж", "semicolon", "plus"));
     keys_.emplace_back(new RussianNormalKey("э", 48, "Э", "colon", "asterisk"));
-    keys_.emplace_back(new NormalEnterKey()); keys_.back()->setCustomLayout(1.5);
+    keys_.emplace_back(new EnterKey()); keys_.back()->setCustomLayout(1.5);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new NumberKey("4", 13));
     keys_.emplace_back(new NumberKey("5", 14));
@@ -120,7 +120,7 @@ void RussianKeyboard::setMarkKeys() {
     keys_.emplace_back(new MarkKey("*"));
     keys_.emplace_back(new MarkKey("+"));
     keys_.emplace_back(new MarkKey("="));
-    keys_.emplace_back(new NormalBackSpaceKey());
+    keys_.emplace_back(new BackSpaceKey());
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new NumberKey("7", 16));
     keys_.emplace_back(new NumberKey("8", 17));
@@ -136,7 +136,7 @@ void RussianKeyboard::setMarkKeys() {
     keys_.emplace_back(new MarkKey("&"));
     keys_.emplace_back(new MarkKey("@"));
     keys_.emplace_back(new MarkKey("￥"));
-    keys_.emplace_back(new NormalEnterKey()); keys_.back()->setCustomLayout(1.5);
+    keys_.emplace_back(new EnterKey()); keys_.back()->setCustomLayout(1.5);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new NumberKey("4", 13));
     keys_.emplace_back(new NumberKey("5", 14));

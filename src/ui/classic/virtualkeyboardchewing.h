@@ -62,7 +62,7 @@ public:
     void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
 };
 
-class ChewingEnterKey : public NormalEnterKey {
+class ChewingEnterKey : public EnterKey {
 public:
     ChewingEnterKey() {
         setFontSize(18);
@@ -71,7 +71,7 @@ public:
     void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
 
 private:
-    typedef NormalEnterKey super;
+    typedef EnterKey super;
 };
 
 class ChewingSpaceKey : public SpaceKey {
