@@ -89,11 +89,11 @@ void UsKeyboard::setTextKeys() {
     keys_.emplace_back(new NumberKey("3")); keys_.back()->setCustomLayout(1.0, true);
 
     keys_.emplace_back(new UsModeSwitchKey()); keys_.back()->setCustomLayout(2.0);
-    keys_.emplace_back(new MarkKey(",")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-    keys_.emplace_back(new MarkKey(".")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new MarkKey(",", "comma")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new MarkKey(".", "period")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
     keys_.emplace_back(new SpaceKey()); keys_.back()->setCustomLayout(2.0);
-    keys_.emplace_back(new MarkKey("!"));
-    keys_.emplace_back(new MarkKey("?"));
+    keys_.emplace_back(new MarkKey("!", "exclam"));
+    keys_.emplace_back(new MarkKey("?", "question"));
     keys_.emplace_back(new LeftKey());
     keys_.emplace_back(new DownKey());
     keys_.emplace_back(new RightKey());

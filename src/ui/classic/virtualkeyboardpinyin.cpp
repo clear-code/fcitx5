@@ -111,7 +111,7 @@ void PinyinKeyboard::setTextKeys() {
     keys_.emplace_back(new NormalKey("b", 56, "B"));
     keys_.emplace_back(new NormalKey("n", 57, "N"));
     keys_.emplace_back(new NormalKey("m", 58, "M"));
-    keys_.emplace_back(new NormalKey("、", 132, "", "backslash"));
+    keys_.emplace_back(new MarkKey("、", "backslash"));
     keys_.emplace_back(new UpKey());
     keys_.emplace_back(new LanguageSwitchKey());
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
@@ -120,11 +120,11 @@ void PinyinKeyboard::setTextKeys() {
     keys_.emplace_back(new NumberKey("3")); keys_.back()->setCustomLayout(1.0, true);
 
     keys_.emplace_back(new PinyinModeSwitchKey()); keys_.back()->setCustomLayout(2.0);
-    keys_.emplace_back(new NormalKey("，", 59, "", "comma")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-    keys_.emplace_back(new NormalKey("。", 60, "", "period")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new MarkKey("，", "comma")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new MarkKey("。", "period")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
     keys_.emplace_back(new PinyinSpaceKey()); keys_.back()->setCustomLayout(2.0);
-    keys_.emplace_back(new NormalKey("！", 10, "", "exclam"));
-    keys_.emplace_back(new NormalKey("？", 61, "", "question"));
+    keys_.emplace_back(new MarkKey("！", "exclam"));
+    keys_.emplace_back(new MarkKey("？", "question"));
     keys_.emplace_back(new LeftKey());
     keys_.emplace_back(new DownKey());
     keys_.emplace_back(new RightKey());

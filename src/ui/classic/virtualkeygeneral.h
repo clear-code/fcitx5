@@ -100,18 +100,29 @@ private:
 };
 
 /*
- * Key for inputting marks. This simply inputs the label texts directly,
- * without sending the event to IME.
+ * Key for inputting marks.
+ * Without `name` value, this simply inputs the label texts directly.
+ * With `name` value, this sends the event to IME first.
  */
 class MarkKey : public VirtualKey {
 public:
-    MarkKey(const std::string &label) : label_(label) {}
+    MarkKey(
+        const std::string &label,
+        const std::string &name = ""
+    ) : label_(label),
+        name_(name) {}
     virtual const char* label(VirtualKeyboard *keyboard) const override;
     virtual void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
 
 private:
+    bool sendKeyEventFirst() const { return !name_.empty(); }
+
     /// Text for display, and commit-string.
     const std::string label_;
+
+    /// Be used for deciding KeySym in converting to Fcitx::Key.
+    /// Corresponding to keyNameList in keynametable.h.
+    const std::string name_;
 };
 
 /*
