@@ -36,6 +36,20 @@ void MarkKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, bool 
     inputContext->commitString(label(keyboard));
 }
 
+const char* NumberKey::label(VirtualKeyboard *) const {
+    return number_.c_str();
+}
+
+void NumberKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) {
+    FCITX_KEYBOARD() << "NumberKey pushed: " << label(keyboard);
+
+    auto event = fcitx::KeyEvent(inputContext, fcitx::Key(number_), isRelease);
+    auto hasProcessedInIME = inputContext->keyEvent(event);
+    if (hasProcessedInIME || isRelease) return;
+
+    inputContext->commitString(label(keyboard));
+}
+
 const char* TextKey::label(VirtualKeyboard *keyboard) const {
     if (!keyboard->isShiftOn_ || upperText_.empty()) {
         return text_.c_str();

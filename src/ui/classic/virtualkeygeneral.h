@@ -114,6 +114,20 @@ private:
     const std::string label_;
 };
 
+/*
+ * Key for inputting numbers. This is similar to MarkKey, but this sends the number to IME first.
+ * If there are selectable candidates in IME, the number is used for selecting them.
+ */
+class NumberKey : public VirtualKey {
+public:
+    NumberKey(const std::string &number) : number_(number) {}
+    virtual const char* label(VirtualKeyboard *keyboard) const override;
+    virtual void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
+
+private:
+    const std::string number_;
+};
+
 class SpaceKey : public NormalKey {
 public:
     SpaceKey() : NormalKey("", 65, "", "space") {
