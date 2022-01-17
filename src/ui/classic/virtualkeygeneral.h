@@ -76,7 +76,7 @@ protected:
  * Normal key, which can act the same way as physical keys.
  */
 class NormalKey : public KeyByNameAndCode {
-    public:
+public:
     NormalKey(
         const std::string &label,
         uint32_t code,
@@ -93,7 +93,7 @@ class NormalKey : public KeyByNameAndCode {
     virtual const char* label(VirtualKeyboard *keyboard) const override;
     virtual void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
 
-private:
+protected:
     /// Text for display.
     const std::string label_;
     const std::string upperLabel_;
@@ -135,7 +135,7 @@ public:
     virtual const char* label(VirtualKeyboard *keyboard) const override;
     virtual void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
 
-private:
+protected:
     const std::string number_;
 };
 
