@@ -133,8 +133,6 @@ public:
     VirtualKey *pushingKey() { return pushingKey_; }
 
 protected:
-    void onKeyRepeat();
-
     Instance *instance_;
     VirtualKey *pushingKey_ = nullptr;
     TrackableObjectReference<InputContext> lastInputContext_;
