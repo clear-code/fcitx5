@@ -47,27 +47,6 @@ protected:
     int currentIndex(VirtualKeyboard *keyboard) override;
 };
 
-class HangulTextKey : public TextKey {
-public:
-    HangulTextKey(std::string text, std::string keyName, std::string upperText = "",
-        std::string upperKeyName = "")
-        : TextKey(text, upperText, keyName, upperKeyName) {
-        setFontSize(32);
-    }
-    void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
-};
-
-class HangulSpaceKey : public KeyByName {
-public:
-    HangulSpaceKey() : KeyByName("space") {
-        setFontSize(18);
-        setFontColor({1.0, 1.0, 1.0});
-        setCustomBackgroundColor({0.3, 0.3, 0.3});
-    }
-    const char* label(VirtualKeyboard *) const override { return ""; }
-    void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
-};
-
 } // namespace classicui
 } // namespace fcitx
 
