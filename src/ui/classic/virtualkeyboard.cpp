@@ -98,6 +98,13 @@ void VirtualKeyboard::enumerateGroup() {
     instance_->inputMethodManager().enumerateGroup(true);
 }
 
+void VirtualKeyboard::sendShiftModifierToIM(InputContext *inputContext, bool isRelease) {
+    const auto keyFromName = fcitx::Key("SHIFT_Shift_R");
+    const auto shiftKey = fcitx::Key(keyFromName.sym(), keyFromName.states(), 62);
+    auto event = KeyEvent(inputContext, shiftKey, isRelease);
+    inputContext->keyEvent(event);
+}
+
 bool VirtualKeyboard::isPreediting() {
     auto inputContext = lastInputContext_.get();
     if (!inputContext) {

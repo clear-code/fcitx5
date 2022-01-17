@@ -74,6 +74,7 @@ protected:
 
 /*
  * Normal key, which can act the same way as physical keys.
+ * If `name` is ommitted, `label` value is used as `name` for taking the keysym.
  */
 class NormalKey : public KeyByNameAndCode {
 public:
@@ -101,42 +102,49 @@ protected:
 
 /*
  * Key for inputting marks.
- * Without `name` value, this simply inputs the label texts directly.
- * With `name` value, this sends the event to IME first.
+ * Without `name` or `code` value, this simply inputs the label texts directly.
+ * With them, this sends the event to IME first.
+ * Some IME need `code`, not only `name`.
+ * Ex. IMEs using customXkbState such as keyboard-ru.
  */
-class MarkKey : public VirtualKey {
+class MarkKey : public KeyByNameAndCode {
 public:
     MarkKey(
         const std::string &label,
-        const std::string &name = ""
-    ) : label_(label),
-        name_(name) {}
+        const std::string &name = "",
+        uint32_t code = 0,
+        bool withShift = false
+    ) : KeyByNameAndCode(name, code),
+        label_(label),
+        withShift_(withShift) {}
     virtual const char* label(VirtualKeyboard *keyboard) const override;
     virtual void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
 
 private:
-    bool sendKeyEventFirst() const { return !name_.empty(); }
+    bool sendKeyEventFirst() const { return !name_.empty() || code_ != 0; }
 
     /// Text for display, and commit-string.
     const std::string label_;
 
-    /// Be used for deciding KeySym in converting to Fcitx::Key.
-    /// Corresponding to keyNameList in keynametable.h.
-    const std::string name_;
+    /// This key doesn't depend on the Shift state of the keyboard.
+    /// If needing Shift modifier in KeyEvent for IME, then use this value as `true`.
+    bool withShift_;
 };
 
 /*
  * Key for inputting numbers. This is similar to MarkKey, but this sends the number to IME first.
- * If there are selectable candidates in IME, the number is used for selecting them.
+ * If there are selectable candidates in IME, the number may be used for selecting them.
+ * Some IME need `code`, not only `number`.
+ * Ex. IMEs using customXkbState such as keyboard-ru.
  */
-class NumberKey : public VirtualKey {
+class NumberKey : public KeyByNameAndCode {
 public:
-    NumberKey(const std::string &number) : number_(number) {}
+    NumberKey(
+        const std::string &number,
+        uint32_t code = 0
+    ) : KeyByNameAndCode(number, code) {}
     virtual const char* label(VirtualKeyboard *keyboard) const override;
     virtual void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
-
-protected:
-    const std::string number_;
 };
 
 class SpaceKey : public NormalKey {

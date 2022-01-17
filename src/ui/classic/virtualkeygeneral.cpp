@@ -18,8 +18,16 @@ const char* NormalKey::label(VirtualKeyboard *keyboard) const {
 void NormalKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) {
     FCITX_KEYBOARD() << "NormalKey pushed: " << label(keyboard);
 
+    if (keyboard->isShiftOn_) {
+        keyboard->sendShiftModifierToIM(inputContext, false);
+    }
+
     auto event = KeyEvent(inputContext, convert(keyboard->isShiftOn_), isRelease);
     inputContext->virtualKeyEvent(event);
+
+    if (keyboard->isShiftOn_) {
+        keyboard->sendShiftModifierToIM(inputContext, true);
+    }
 }
 
 const char* MarkKey::label(VirtualKeyboard *) const {
@@ -30,8 +38,17 @@ void MarkKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, bool 
     FCITX_KEYBOARD() << "MarkKey pushed: " << label(keyboard);
 
     if (sendKeyEventFirst()) {
-        auto event = KeyEvent(inputContext, fcitx::Key(name_), isRelease);
+        if (withShift_) {
+            keyboard->sendShiftModifierToIM(inputContext, false);
+        }
+
+        auto event = KeyEvent(inputContext, convert(withShift_), isRelease);
         const auto hasProcessedInIME = inputContext->keyEvent(event);
+
+        if (withShift_) {
+            keyboard->sendShiftModifierToIM(inputContext, true);
+        }
+
         if (hasProcessedInIME) return;
     }
 
@@ -43,13 +60,13 @@ void MarkKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, bool 
 }
 
 const char* NumberKey::label(VirtualKeyboard *) const {
-    return number_.c_str();
+    return name_.c_str();
 }
 
 void NumberKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) {
     FCITX_KEYBOARD() << "NumberKey pushed: " << label(keyboard);
 
-    auto event = fcitx::KeyEvent(inputContext, fcitx::Key(number_), isRelease);
+    auto event = fcitx::KeyEvent(inputContext, convert(false), isRelease);
     const auto hasProcessedInIME = inputContext->keyEvent(event);
     if (hasProcessedInIME || isRelease) return;
 

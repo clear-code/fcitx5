@@ -52,7 +52,7 @@ void ChewingNumPadKey::click(VirtualKeyboard *keyboard, InputContext *inputConte
     // In order to numpad-keys can select candidates too.
     // Number sym keys input chewings such as `ㄅ`, so we need `commitString` to input number chars.
     if (keyboard->isSeletingCandidates()) {
-        auto event = KeyEvent(inputContext, fcitx::Key(number_), isRelease);
+        auto event = KeyEvent(inputContext, fcitx::Key(name_), isRelease);
         inputContext->keyEvent(event);
         return;
     }
