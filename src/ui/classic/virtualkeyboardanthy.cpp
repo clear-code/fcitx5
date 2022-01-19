@@ -172,7 +172,9 @@ void AnthyKeyboard::setMarkKeys() {
     keys_.emplace_back(new AnthyMarkKey("parenright", ")", "）"));
     keys_.emplace_back(new AnthyMarkKey("ampersand", "&", "＆"));
     keys_.emplace_back(new AnthyMarkKey("at", "@", "＠"));
-    keys_.emplace_back(new AnthyMarkKey("yen", u8"\u00A5", "")); // `yen` does not work in Zenkaku
+    // `FcitxKey_yen: 0x00a5` does not work in fcitx5-anthy,
+    // so use `FcitxKey_backslash` for Zenkaku.
+    keys_.emplace_back(new AnthyMarkKey("backslash", u8"\u00A5", "＼"));
     keys_.emplace_back(new EnterKey()); keys_.back()->setCustomLayout(1.5);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new AnthyMarkKey("4", "4", "４"));
