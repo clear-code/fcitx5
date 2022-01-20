@@ -47,7 +47,8 @@ public:
             label,
             code,
             "",
-            number
+            number,
+            ""
         ),
         number_(number) {}
     const char* label(VirtualKeyboard *keyboard) const override;

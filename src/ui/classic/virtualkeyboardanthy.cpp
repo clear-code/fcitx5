@@ -82,16 +82,16 @@ int AnthyModeSwitchKey::currentIndex(VirtualKeyboard *keyboard) {
 
 void AnthyKeyboard::setTextKeys() {
     keys_.clear();
-    keys_.emplace_back(new NormalKey("q", 24, "Q"));
-    keys_.emplace_back(new NormalKey("w", 25, "W"));
-    keys_.emplace_back(new NormalKey("e", 26, "E"));
-    keys_.emplace_back(new NormalKey("r", 27, "R"));
-    keys_.emplace_back(new NormalKey("t", 28, "T"));
-    keys_.emplace_back(new NormalKey("y", 29, "Y"));
-    keys_.emplace_back(new NormalKey("u", 30, "U"));
-    keys_.emplace_back(new NormalKey("i", 31, "I"));
-    keys_.emplace_back(new NormalKey("o", 32, "O"));
-    keys_.emplace_back(new NormalKey("p", 33, "P"));
+    keys_.emplace_back(new NormalKey("q", 24, "Q", true));
+    keys_.emplace_back(new NormalKey("w", 25, "W", true));
+    keys_.emplace_back(new NormalKey("e", 26, "E", true));
+    keys_.emplace_back(new NormalKey("r", 27, "R", true));
+    keys_.emplace_back(new NormalKey("t", 28, "T", true));
+    keys_.emplace_back(new NormalKey("y", 29, "Y", true));
+    keys_.emplace_back(new NormalKey("u", 30, "U", true));
+    keys_.emplace_back(new NormalKey("i", 31, "I", true));
+    keys_.emplace_back(new NormalKey("o", 32, "O", true));
+    keys_.emplace_back(new NormalKey("p", 33, "P", true));
     keys_.emplace_back(new BackSpaceKey()); keys_.back()->setCustomLayout(1.0);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new AnthyMarkKey("7", "7", "７"));
@@ -99,15 +99,15 @@ void AnthyKeyboard::setTextKeys() {
     keys_.emplace_back(new AnthyMarkKey("9", "9", "９")); keys_.back()->setCustomLayout(1.0, true);
 
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
-    keys_.emplace_back(new NormalKey("a", 38, "A"));
-    keys_.emplace_back(new NormalKey("s", 39, "S"));
-    keys_.emplace_back(new NormalKey("d", 40, "D"));
-    keys_.emplace_back(new NormalKey("f", 41, "F"));
-    keys_.emplace_back(new NormalKey("g", 42, "G"));
-    keys_.emplace_back(new NormalKey("h", 43, "H"));
-    keys_.emplace_back(new NormalKey("j", 44, "J"));
-    keys_.emplace_back(new NormalKey("k", 45, "K"));
-    keys_.emplace_back(new NormalKey("l", 46, "L"));
+    keys_.emplace_back(new NormalKey("a", 38, "A", true));
+    keys_.emplace_back(new NormalKey("s", 39, "S", true));
+    keys_.emplace_back(new NormalKey("d", 40, "D", true));
+    keys_.emplace_back(new NormalKey("f", 41, "F", true));
+    keys_.emplace_back(new NormalKey("g", 42, "G", true));
+    keys_.emplace_back(new NormalKey("h", 43, "H", true));
+    keys_.emplace_back(new NormalKey("j", 44, "J", true));
+    keys_.emplace_back(new NormalKey("k", 45, "K", true));
+    keys_.emplace_back(new NormalKey("l", 46, "L", true));
     keys_.emplace_back(new EnterKey()); keys_.back()->setCustomLayout(1.5);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new AnthyMarkKey("4", "4", "４"));
@@ -115,13 +115,13 @@ void AnthyKeyboard::setTextKeys() {
     keys_.emplace_back(new AnthyMarkKey("6", "6", "６")); keys_.back()->setCustomLayout(1.0, true);
 
     keys_.emplace_back(new ShiftToggleKey());
-    keys_.emplace_back(new NormalKey("z", 52, "Z"));
-    keys_.emplace_back(new NormalKey("x", 53, "X"));
-    keys_.emplace_back(new NormalKey("c", 54, "C"));
-    keys_.emplace_back(new NormalKey("v", 55, "V"));
-    keys_.emplace_back(new NormalKey("b", 56, "B"));
-    keys_.emplace_back(new NormalKey("n", 57, "N"));
-    keys_.emplace_back(new NormalKey("m", 58, "M"));
+    keys_.emplace_back(new NormalKey("z", 52, "Z", true));
+    keys_.emplace_back(new NormalKey("x", 53, "X", true));
+    keys_.emplace_back(new NormalKey("c", 54, "C", true));
+    keys_.emplace_back(new NormalKey("v", 55, "V", true));
+    keys_.emplace_back(new NormalKey("b", 56, "B", true));
+    keys_.emplace_back(new NormalKey("n", 57, "N", true));
+    keys_.emplace_back(new NormalKey("m", 58, "M", true));
     keys_.emplace_back(new AnthyMarkKey("minus", "-", "ー"));
     keys_.emplace_back(new UpKey());
     keys_.emplace_back(new LanguageSwitchKey());

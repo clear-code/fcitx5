@@ -52,10 +52,8 @@ public:
     RussianNormalKey(
         const std::string &label,
         uint32_t code,
-        const std::string &upperLabel = "",
-        const std::string &name = "",
-        const std::string &upperName = ""
-    ) : NormalKey(label, code, upperLabel, name, upperName) {
+        const std::string &upperLabel
+    ) : NormalKey(label, code, upperLabel, false) {
         width_ = 50;
     }
 };

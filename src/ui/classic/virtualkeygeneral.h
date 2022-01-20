@@ -47,10 +47,13 @@ protected:
 
     const char* keyName(bool withShift = false) const {
         if (withShift) {
-            const auto baseSymName = upperName_.empty() ? name_ : upperName_;
+            auto baseSymName = upperName_;
+            if (baseSymName.empty()) baseSymName = name_;
+            if (baseSymName.empty()) baseSymName = "None";
+
             return ("SHIFT_" + baseSymName).c_str();
         }
-        return name_.c_str();
+        return !name_.empty() ? name_.c_str() : "None";
     };
 
     fcitx::Key convert(bool withShift = false) const {
@@ -74,23 +77,44 @@ protected:
 
 /*
  * Normal key, which can act the same way as physical keys.
- * If `name` is ommitted, `label` value is used as `name` for taking the keysym.
  */
 class NormalKey : public KeyByNameAndCode {
 public:
+    /// `label` value is used for display.
+    /// `name` value is used for taking the keysym.
+    /// `upperLabel` and `upperName` are used with Shift on,
+    /// and these values can be emtpy to use `label` and `name` instead.
     NormalKey(
         const std::string &label,
         uint32_t code,
-        const std::string &upperLabel = "",
-        const std::string &name = "",
-        const std::string &upperName = ""
+        const std::string &upperLabel,
+        const std::string &name,
+        const std::string &upperName
     ) : KeyByNameAndCode(
-            name.empty() ? label : name,
+            name,
             code,
-            upperName.empty() ? upperLabel : upperName
+            upperName
         ),
         label_(label),
         upperLabel_(upperLabel) {}
+
+    /// If `useLabelAsKeyName` is true,
+    /// then `label` value is also used for taking the keysym, not only for display.
+    /// If `useLabelAsKeyName` is false,
+    /// then this key works only with keycode, without keysym.
+    NormalKey(
+        const std::string &label,
+        uint32_t code,
+        const std::string &upperLabel,
+        bool useLabelAsKeyName
+    ) : KeyByNameAndCode(
+            useLabelAsKeyName ? label : "",
+            code,
+            useLabelAsKeyName ? upperLabel : ""
+        ),
+        label_(label),
+        upperLabel_(upperLabel) {}
+
     virtual const char* label(VirtualKeyboard *keyboard) const override;
     virtual void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
 
@@ -104,8 +128,6 @@ protected:
  * Key for inputting marks.
  * Without `name` or `code` value, this simply inputs the label texts directly.
  * With them, this sends the event to IME first.
- * Some IME need `code`, not only `name`.
- * Ex. IMEs using customXkbState such as keyboard-ru.
  */
 class MarkKey : public KeyByNameAndCode {
 public:
@@ -134,8 +156,6 @@ private:
 /*
  * Key for inputting numbers. This is similar to MarkKey, but this sends the number to IME first.
  * If there are selectable candidates in IME, the number may be used for selecting them.
- * Some IME need `code`, not only `number`.
- * Ex. IMEs using customXkbState such as keyboard-ru.
  */
 class NumberKey : public KeyByNameAndCode {
 public:
@@ -149,7 +169,7 @@ public:
 
 class SpaceKey : public NormalKey {
 public:
-    SpaceKey() : NormalKey("", 65, "", "space") {
+    SpaceKey() : NormalKey("", 65, "", "space", "") {
         setCustomBackgroundColor({0.3, 0.3, 0.3});
         setFontColor({1.0, 1.0, 1.0});
     };
@@ -157,7 +177,7 @@ public:
 
 class EnterKey : public NormalKey {
 public:
-    EnterKey() : NormalKey("Enter", 36, "", "Return") {
+    EnterKey() : NormalKey("Enter", 36, "", "Return", "") {
         setCustomBackgroundColor({0.2, 0.7, 0.6});
         setFontColor({1.0, 1.0, 1.0});
     };
@@ -165,7 +185,7 @@ public:
 
 class BackSpaceKey : public NormalKey {
 public:
-    BackSpaceKey() : NormalKey("Back", 22, "", "BackSpace") {
+    BackSpaceKey() : NormalKey("Back", 22, "", "BackSpace", "") {
         setCustomBackgroundColor({0.3, 0.3, 0.3});
         setFontColor({1.0, 1.0, 1.0});
     };
@@ -173,7 +193,7 @@ public:
 
 class UpKey : public NormalKey {
 public:
-    UpKey() : NormalKey(u8"\u2191", 111, "", "Up") {
+    UpKey() : NormalKey(u8"\u2191", 111, "", "Up", "") {
         setCustomBackgroundColor({0.3, 0.3, 0.3});
         setFontColor({1.0, 1.0, 1.0});
     };
@@ -181,7 +201,7 @@ public:
 
 class LeftKey : public NormalKey {
 public:
-    LeftKey() : NormalKey(u8"\u2190", 113, "", "Left") {
+    LeftKey() : NormalKey(u8"\u2190", 113, "", "Left", "") {
         setCustomBackgroundColor({0.3, 0.3, 0.3});
         setFontColor({1.0, 1.0, 1.0});
     };
@@ -189,7 +209,7 @@ public:
 
 class DownKey : public NormalKey {
 public:
-    DownKey() : NormalKey(u8"\u2193", 116, "", "Down") {
+    DownKey() : NormalKey(u8"\u2193", 116, "", "Down", "") {
         setCustomBackgroundColor({0.3, 0.3, 0.3});
         setFontColor({1.0, 1.0, 1.0});
     };
@@ -197,7 +217,7 @@ public:
 
 class RightKey : public NormalKey {
 public:
-    RightKey() : NormalKey(u8"\u2192", 114, "", "Right") {
+    RightKey() : NormalKey(u8"\u2192", 114, "", "Right", "") {
         setCustomBackgroundColor({0.3, 0.3, 0.3});
         setFontColor({1.0, 1.0, 1.0});
     };
