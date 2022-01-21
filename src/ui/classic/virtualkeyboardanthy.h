@@ -43,20 +43,18 @@ private:
     bool isZenkakuOn_ = true;
 };
 
-class AnthyMarkKey : public VirtualKey {
+class AnthyMarkKey : public MarkKey {
 public:
     AnthyMarkKey(
         const std::string &name,
         const std::string &hankakuMark,
         const std::string &zenkakuMark
-    ) : name_(name),
+    ) : MarkKey("", name),
         hankakuMark_(hankakuMark),
         zenkakuMark_(zenkakuMark) {}
     const char* label(VirtualKeyboard *keyboard) const override;
-    void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
 
 private:
-    const std::string name_;
     const std::string hankakuMark_;
     const std::string zenkakuMark_;
 };

@@ -46,21 +46,6 @@ const char* AnthyMarkKey::label(VirtualKeyboard *keyboard) const {
     return hankakuMark_.c_str();
 }
 
-void AnthyMarkKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) {
-    FCITX_KEYBOARD() << "AnthyMarkKey pushed: " << label(keyboard);
-
-    if (!keyboard->i18nKeyboard<AnthyKeyboard>()->isZenkakuOn()) {
-        if (!isRelease) {
-            inputContext->commitString(label(keyboard));
-        }
-        return;
-    }
-
-    auto event = KeyEvent(inputContext, fcitx::Key(name_), isRelease);
-    auto hasProcessedInIME = inputContext->keyEvent(event);
-    FCITX_KEYBOARD() << "key event result: " << hasProcessedInIME;
-}
-
 void ZenkakuHankakuKey::toggle(VirtualKeyboard *keyboard, InputContext *) {
     keyboard->i18nKeyboard<AnthyKeyboard>()->toggleZenkakuHankaku(keyboard);
 }
