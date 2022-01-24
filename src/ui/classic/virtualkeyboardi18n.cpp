@@ -110,9 +110,9 @@ bool I18nKeyboard::containInputMethod(
     return iter != items.end();
 }
 
-void I18nKeyboard::syncState(const std::string &) {
-    // do nothing
-    // override this if need to use multiple input methods in one keyboard, such as anthy.
+void I18nKeyboard::syncState(VirtualKeyboard *, const std::string &) {
+    // Do nothing.
+    // Override this if need to do some processes depending on the launguage.
 }
 
 }

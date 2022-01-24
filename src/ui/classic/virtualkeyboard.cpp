@@ -63,7 +63,7 @@ bool VirtualKeyboard::syncState() {
 
     auto curImName = instance_->currentInputMethod();
 
-    i18nKeyboard_->syncState(curImName);
+    i18nKeyboard_->syncState(this, curImName);
     return false;
 }
 
@@ -99,6 +99,31 @@ void VirtualKeyboard::setCurrentInputMethod(const std::string &name) {
 
 void VirtualKeyboard::enumerateGroup() {
     instance_->inputMethodManager().enumerateGroup(true);
+}
+
+std::tuple<const std::string, bool> VirtualKeyboard::getIMActionText(
+    const std::string &name,
+    bool getShort
+) {
+    auto inputContext = lastInputContext_.get();
+    if (!inputContext) return {"", false};
+
+    const auto action = instance_->userInterfaceManager().lookupAction(name);
+    if (!action) return {"", false};
+
+    const auto text = getShort ? action->shortText(inputContext) : action->longText(inputContext);
+    return {text, true};
+}
+
+bool VirtualKeyboard::activateIMAction(const std::string &name) {
+    auto inputContext = lastInputContext_.get();
+    if (!inputContext) return false;
+
+    const auto action = instance_->userInterfaceManager().lookupAction(name);
+    if (!action) return false;
+
+    action->activate(inputContext);
+    return true;
 }
 
 void VirtualKeyboard::sendShiftModifierToIM(InputContext *inputContext, bool isRelease) {

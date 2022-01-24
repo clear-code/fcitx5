@@ -9,22 +9,52 @@
 namespace fcitx::classicui {
 
 void AnthyKeyboard::updateKeys() {
-    if (mode_ == AnthyKeyboardMode::Text) {
-        setTextKeys();
+    if (mode_ == AnthyKeyboardMode::TextRomaji) {
+        setTextRomajiKeys();
+    } else if (mode_ == AnthyKeyboardMode::TextJisKana) {
+        setTextJisKanaKeys();
     } else {
         setMarkKeys();
     }
 }
 
-void AnthyKeyboard::syncState(const std::string &currentInputMethodName) {
+void AnthyKeyboard::syncState(
+    VirtualKeyboard *keyboard,
+    const std::string &currentInputMethodName
+) {
     isZenkakuOn_ = currentInputMethodName != hankakuImeName;
+    if (!isZenkakuOn_) return;
+
+    auto [text, hasFound] = keyboard->getIMActionText(actionNameOfAnthyTypingMethod, true);
+    if (!hasFound) return;
+    // TODO "かな" chars may depend on the environment.
+    if (text == "かな") {
+        if (mode_ == AnthyKeyboardMode::TextRomaji) {
+            mode_ = AnthyKeyboardMode::TextJisKana;
+            updateKeys();
+        }
+    } else {
+        if (mode_ == AnthyKeyboardMode::TextJisKana) {
+            mode_ = AnthyKeyboardMode::TextRomaji;
+            updateKeys();
+        }
+    }
 }
 
-void AnthyKeyboard::switchMode() {
-    if (mode_ == AnthyKeyboardMode::Text) {
+void AnthyKeyboard::switchMode(VirtualKeyboard *keyboard) {
+    if (mode_ == AnthyKeyboardMode::TextRomaji) {
+        keyboard->activateIMAction(actionNameOfAnthyKana);
+        mode_ = AnthyKeyboardMode::TextJisKana;
+        if (!isZenkakuOn_) {
+            // Zenkaku Only in JisKana mode.
+            keyboard->setCurrentInputMethod(imeNames[type()]);
+        }
+    } else if (mode_ == AnthyKeyboardMode::TextJisKana) {
+        keyboard->activateIMAction(actionNameOfAnthyRomaji);
         mode_ = AnthyKeyboardMode::Mark;
     } else {
-        mode_ = AnthyKeyboardMode::Text;
+        keyboard->activateIMAction(actionNameOfAnthyRomaji);
+        mode_ = AnthyKeyboardMode::TextRomaji;
     }
 
     updateKeys();
@@ -35,6 +65,13 @@ void AnthyKeyboard::toggleZenkakuHankaku(VirtualKeyboard *keyboard) {
     if (isZenkakuOn_) {
         keyboard->setCurrentInputMethod(imeNames[type()]);
     } else {
+        if (mode_ == AnthyKeyboardMode::TextJisKana) {
+            // Change keys to romaji, but stay Kana method in fcitx5-anthy.
+            // This should not change typing method of fcitx5-anthy,
+            // because toggling this again should change the mode to Zenkaku-JisKana again.
+            mode_ = AnthyKeyboardMode::TextRomaji;
+            updateKeys();
+        }
         keyboard->setCurrentInputMethod(hankakuImeName);
     }
 }
@@ -46,8 +83,34 @@ const char* AnthyMarkKey::label(VirtualKeyboard *keyboard) const {
     return hankakuMark_.c_str();
 }
 
+const char *AnthyKanaKey::label(VirtualKeyboard *keyboard) const {
+    if (isNumberKey_ && keyboard->isSeletingCandidates()) {
+        return name_.c_str();
+    }
+
+    return super::label(keyboard);
+}
+
+void AnthyKanaNumPadKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) {
+    FCITX_KEYBOARD() << "AnthyKanaNumPadKey pushed";
+
+    // In JIS-kana-mode of fcitx5-anthy, nubmer keys are used for inputting KANAs, not numbers.
+    // So limit sending the event to IME into the case selecting candidates.
+    if (keyboard->isSeletingCandidates()) {
+        auto event = KeyEvent(inputContext, fcitx::Key(name_), isRelease);
+        inputContext->keyEvent(event);
+        return;
+    }
+
+    if (isRelease) return;
+
+    inputContext->commitString(label(keyboard));
+}
+
 void ZenkakuHankakuKey::toggle(VirtualKeyboard *keyboard, InputContext *) {
     keyboard->i18nKeyboard<AnthyKeyboard>()->toggleZenkakuHankaku(keyboard);
+    // Because this switching changes the size of the keyboard.
+    keyboard->updateInputPanel();
 }
 
 bool ZenkakuHankakuKey::isOn(VirtualKeyboard *keyboard) {
@@ -55,17 +118,21 @@ bool ZenkakuHankakuKey::isOn(VirtualKeyboard *keyboard) {
 }
 
 void AnthyModeSwitchKey::switchState(VirtualKeyboard *keyboard, InputContext *) {
-    keyboard->i18nKeyboard<AnthyKeyboard>()->switchMode();
+    keyboard->i18nKeyboard<AnthyKeyboard>()->switchMode(keyboard);
+    // Because this switching changes the size of the keyboard.
+    keyboard->updateInputPanel();
 }
 
 int AnthyModeSwitchKey::currentIndex(VirtualKeyboard *keyboard) {
-    if (keyboard->i18nKeyboard<AnthyKeyboard>()->mode() == AnthyKeyboardMode::Text) {
+    if (keyboard->i18nKeyboard<AnthyKeyboard>()->mode() == AnthyKeyboardMode::TextRomaji) {
         return 0;
+    } else if (keyboard->i18nKeyboard<AnthyKeyboard>()->mode() == AnthyKeyboardMode::TextJisKana) {
+        return 1;
     }
-    return 1;
+    return 2;
 }
 
-void AnthyKeyboard::setTextKeys() {
+void AnthyKeyboard::setTextRomajiKeys() {
     keys_.clear();
     keys_.emplace_back(new NormalKey("q", 24, "Q", true));
     keys_.emplace_back(new NormalKey("w", 25, "W", true));
@@ -77,7 +144,7 @@ void AnthyKeyboard::setTextKeys() {
     keys_.emplace_back(new NormalKey("i", 31, "I", true));
     keys_.emplace_back(new NormalKey("o", 32, "O", true));
     keys_.emplace_back(new NormalKey("p", 33, "P", true));
-    keys_.emplace_back(new BackSpaceKey()); keys_.back()->setCustomLayout(1.0);
+    keys_.emplace_back(new BackSpaceKey());
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new AnthyMarkKey("7", "7", "７"));
     keys_.emplace_back(new AnthyMarkKey("8", "8", "８"));
@@ -195,6 +262,92 @@ void AnthyKeyboard::setMarkKeys() {
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new AnthyMarkKey("0", "0", "０")); keys_.back()->setCustomLayout(2.0);
     keys_.emplace_back(new AnthyMarkKey("period", ".", "。")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+}
+
+void AnthyKeyboard::setTextJisKanaKeys() {
+    keys_.clear();
+    keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.4);
+    keys_.emplace_back(new AnthyKanaKey("ぬ", 10, "", "1", "", true));
+    keys_.emplace_back(new AnthyKanaKey("ふ", 11, "", "2", "", true));
+    keys_.emplace_back(new AnthyKanaKey("あ", 12, "ぁ", "3", "numbersign", true));
+    keys_.emplace_back(new AnthyKanaKey("う", 13, "ぅ", "4", "dollar", true));
+    keys_.emplace_back(new AnthyKanaKey("え", 14, "ぇ", "5", "percent", true));
+    keys_.emplace_back(new AnthyKanaKey("お", 15, "ぉ", "6", "ampersand", true));
+    keys_.emplace_back(new AnthyKanaKey("や", 16, "ゃ", "7", "apostrophe", true));
+    keys_.emplace_back(new AnthyKanaKey("ゆ", 17, "ゅ", "8", "parenleft", true));
+    keys_.emplace_back(new AnthyKanaKey("よ", 18, "ょ", "9", "parenright", true));
+    keys_.emplace_back(new AnthyKanaKey("わ", 19, "を", "0", "asciitilde", true));
+    keys_.emplace_back(new AnthyKanaKey("ほ", 19, "", "minus", ""));
+    keys_.emplace_back(new AnthyKanaKey("へ", 19, "", "asciicircum", ""));
+    keys_.emplace_back(new AnthyKanaKey("ー", 20, "", "backslash", "")); keys_.back()->setCustomLayout(1.0, true);
+
+    keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.4);
+    keys_.emplace_back(new AnthyKanaKey("た", 24, "", "q", "Q"));
+    keys_.emplace_back(new AnthyKanaKey("て", 25, "", "w", "W"));
+    keys_.emplace_back(new AnthyKanaKey("い", 26, "ぃ", "e", "E"));
+    keys_.emplace_back(new AnthyKanaKey("す", 27, "", "r", "R"));
+    keys_.emplace_back(new AnthyKanaKey("か", 28, "", "t", "T"));
+    keys_.emplace_back(new AnthyKanaKey("ん", 29, "", "y", "Y"));
+    keys_.emplace_back(new AnthyKanaKey("な", 30, "", "u", "U"));
+    keys_.emplace_back(new AnthyKanaKey("に", 31, "", "i", "I"));
+    keys_.emplace_back(new AnthyKanaKey("ら", 32, "", "o", "O"));
+    keys_.emplace_back(new AnthyKanaKey("せ", 33, "", "p", "P"));
+    keys_.emplace_back(new AnthyKanaKey("゛", 34, "", "at", ""));
+    keys_.emplace_back(new AnthyKanaKey("゜", 35, "「", "bracketleft", "braceleft"));
+    keys_.emplace_back(new BackSpaceKey());
+    keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
+    keys_.emplace_back(new AnthyKanaNumPadKey("7"));
+    keys_.emplace_back(new AnthyKanaNumPadKey("8"));
+    keys_.emplace_back(new AnthyKanaNumPadKey("9")); keys_.back()->setCustomLayout(1.0, true);
+
+    keys_.emplace_back(new AnthyKanaKey("ち", 38, "", "a", "A"));
+    keys_.emplace_back(new AnthyKanaKey("と", 39, "", "s", "S"));
+    keys_.emplace_back(new AnthyKanaKey("し", 40, "", "d", "D"));
+    keys_.emplace_back(new AnthyKanaKey("は", 41, "", "f", "F"));
+    keys_.emplace_back(new AnthyKanaKey("き", 42, "", "g", "G"));
+    keys_.emplace_back(new AnthyKanaKey("く", 43, "", "h", "H"));
+    keys_.emplace_back(new AnthyKanaKey("ま", 44, "", "j", "J"));
+    keys_.emplace_back(new AnthyKanaKey("の", 45, "", "k", "K"));
+    keys_.emplace_back(new AnthyKanaKey("り", 46, "", "l", "L"));
+    keys_.emplace_back(new AnthyKanaKey("れ", 47, "", "semicolon", ""));
+    keys_.emplace_back(new AnthyKanaKey("け", 48, "", "colon", ""));
+    keys_.emplace_back(new AnthyKanaKey("む", 49, "」", "bracketright", "braceright"));
+    keys_.emplace_back(new EnterKey()); keys_.back()->setCustomLayout(1.4);
+    keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
+    keys_.emplace_back(new AnthyKanaNumPadKey("4"));
+    keys_.emplace_back(new AnthyKanaNumPadKey("5"));
+    keys_.emplace_back(new AnthyKanaNumPadKey("6")); keys_.back()->setCustomLayout(1.0, true);
+
+    keys_.emplace_back(new ShiftToggleKey()); keys_.back()->setCustomLayout(1.0);
+    keys_.emplace_back(new AnthyKanaKey("つ", 52, "っ", "z", "Z"));
+    keys_.emplace_back(new AnthyKanaKey("さ", 53, "", "x", "X"));
+    keys_.emplace_back(new AnthyKanaKey("そ", 54, "", "c", "C"));
+    keys_.emplace_back(new AnthyKanaKey("ひ", 55, "", "v", "V"));
+    keys_.emplace_back(new AnthyKanaKey("こ", 56, "", "b", "B"));
+    keys_.emplace_back(new AnthyKanaKey("み", 57, "", "n", "N"));
+    keys_.emplace_back(new AnthyKanaKey("も", 58, "", "m", "M"));
+    keys_.emplace_back(new AnthyKanaKey("ね", 59, "", "comma", ""));
+    keys_.emplace_back(new AnthyKanaKey("る", 60, "", "period", ""));
+    keys_.emplace_back(new AnthyKanaKey("め", 61, "", "slash", ""));
+    keys_.emplace_back(new UpKey());
+    keys_.emplace_back(new LanguageSwitchKey());
+    keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
+    keys_.emplace_back(new AnthyKanaNumPadKey("1"));
+    keys_.emplace_back(new AnthyKanaNumPadKey("2"));
+    keys_.emplace_back(new AnthyKanaNumPadKey("3")); keys_.back()->setCustomLayout(1.0, true);
+
+    keys_.emplace_back(new AnthyModeSwitchKey());
+    keys_.emplace_back(new ZenkakuHankakuKey());
+    keys_.emplace_back(new MarkKey("、", "less", 0, true)); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new SpaceKey()); keys_.back()->setCustomLayout(3.0);
+    keys_.emplace_back(new MarkKey("。", "greater", 0, true)); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new AnthyKanaKey("ろ", 62, "", "underscore", "")); keys_.back()->setCustomLayout(1.25);
+    keys_.emplace_back(new LeftKey());
+    keys_.emplace_back(new DownKey());
+    keys_.emplace_back(new RightKey());
+    keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
+    keys_.emplace_back(new AnthyKanaNumPadKey("0")); keys_.back()->setCustomLayout(2.0);
+    keys_.emplace_back(new MarkKey(".")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
 }
 
 }

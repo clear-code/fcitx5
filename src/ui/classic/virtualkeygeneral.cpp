@@ -157,6 +157,8 @@ void LanguageSwitchKey::click(VirtualKeyboard *keyboard, InputContext *, bool is
     if (dynamic_cast<LanguageSwitchKey *>(keyboard->pushingKey())) {
         keyboard->switchLanguage();
     }
+
+    keyboard->updateInputPanel();
 }
 
 }

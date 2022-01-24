@@ -14,6 +14,8 @@
 #include "fcitx/instance.h"
 #include "fcitx/inputcontext.h"
 #include "fcitx/inputmethodmanager.h"
+#include "fcitx/userinterfacemanager.h"
+#include "fcitx/action.h"
 #include "fcitx/inputpanel.h"
 #include <fcitx-utils/event.h>
 #include "fcitx-utils/log.h"
@@ -107,6 +109,11 @@ public:
     void switchLanguage();
     void setCurrentInputMethod(const std::string &name);
     void enumerateGroup();
+    std::tuple<const std::string, bool> getIMActionText(
+        const std::string &name,
+        bool getShort
+    );
+    bool activateIMAction(const std::string &name);
 
     /// Some IMs needs to handle the single Shift key event,
     /// not only the states of the main key.

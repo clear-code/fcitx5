@@ -34,12 +34,16 @@ static std::map<KeyboardType, std::string> imeNames = {
 };
 
 class VirtualKey;
+class VirtualKeyboard;
 class I18nKeyboard {
 public:
     virtual KeyboardType type() const = 0;
     virtual const char *label() const = 0;
     virtual void updateKeys() = 0;
-    virtual void syncState(const std::string &currentInputMethodName);
+    virtual void syncState(
+        VirtualKeyboard *keyboard,
+        const std::string &currentInputMethodName
+    );
     std::vector<std::unique_ptr<VirtualKey>> &keys() { return keys_; }
     bool checkOtherNecessaryImesExist(std::vector<fcitx::InputMethodGroupItem> &allItems);
 protected:

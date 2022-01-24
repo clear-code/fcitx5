@@ -15,20 +15,27 @@ namespace fcitx {
 namespace classicui {
 
 enum class AnthyKeyboardMode {
-    Text,
+    TextRomaji,
+    TextJisKana,
     Mark,
 };
 
 static const std::string hankakuImeName = "keyboard-us";
+static const std::string actionNameOfAnthyRomaji = "anthy-typing-method-romaji";
+static const std::string actionNameOfAnthyKana = "anthy-typing-method-kana";
+static const std::string actionNameOfAnthyTypingMethod = "anthy-typing-method";
 
 class AnthyKeyboard : public I18nKeyboard {
 public:
     KeyboardType type() const override { return KeyboardType::Anthy; };
     const char *label() const override { return "JP"; }
     void updateKeys() override;
-    void syncState(const std::string &currentInputMethodName) override;
+    void syncState(
+        VirtualKeyboard *keyboard,
+        const std::string &currentInputMethodName
+    ) override;
 
-    void switchMode();
+    void switchMode(VirtualKeyboard *keyboard);
     AnthyKeyboardMode mode() const { return mode_; }
     bool isZenkakuOn() const { return isZenkakuOn_; }
     void toggleZenkakuHankaku(VirtualKeyboard *keyboard);
@@ -37,9 +44,10 @@ protected:
     std::vector<std::string> otherNecessaryImeList() override { return { hankakuImeName }; }
 
 private:
-    void setTextKeys();
+    void setTextRomajiKeys();
     void setMarkKeys();
-    AnthyKeyboardMode mode_ = AnthyKeyboardMode::Text;
+    void setTextJisKanaKeys();
+    AnthyKeyboardMode mode_ = AnthyKeyboardMode::TextRomaji;
     bool isZenkakuOn_ = true;
 };
 
@@ -59,6 +67,39 @@ private:
     const std::string zenkakuMark_;
 };
 
+class AnthyKanaKey : public NormalKey {
+public:
+    AnthyKanaKey(
+        const std::string &label,
+        uint32_t code,
+        const std::string &upperLabel,
+        const std::string &name,
+        const std::string &upperName,
+        bool isNumberKey = false
+    ) : NormalKey(
+            label,
+            code,
+            upperLabel,
+            name,
+            upperName
+        ),
+        isNumberKey_(isNumberKey) {
+        setCustomLayout(0.8);
+    }
+
+    const char *label(VirtualKeyboard *keyboard) const override;
+
+private:
+    typedef NormalKey super;
+    bool isNumberKey_;
+};
+
+class AnthyKanaNumPadKey : public NumberKey {
+public:
+    AnthyKanaNumPadKey(const std::string &number) : NumberKey(number) {}
+    void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
+};
+
 class ZenkakuHankakuKey : public ToggleKey {
 public:
     ZenkakuHankakuKey() {
@@ -74,12 +115,22 @@ protected:
 class AnthyModeSwitchKey : public SwitchKey {
 public:
     AnthyModeSwitchKey() : SwitchKey() {}
-    const char* label(VirtualKeyboard *) const override { return "A#"; }
+    const char* label(VirtualKeyboard *) const override { return "Aか#"; }
 
 protected:
-    int numberOfStates() const override { return 2; }
+    int numberOfStates() const override { return 3; }
     const char *stateLabel(int index) const override {
-        return index == 0 ? "A" : "#";
+        switch (index) {
+        case 0:
+            return "A";
+        case 1:
+            return "か";
+        case 2:
+            return "#";
+        default:
+            break;
+        }
+        return "";
     }
     void switchState(VirtualKeyboard *keyboard, InputContext *inputContext) override;
     int currentIndex(VirtualKeyboard *keyboard) override;

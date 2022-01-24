@@ -45,15 +45,15 @@ protected:
         const std::string &upperName = ""
     ) : name_(name), upperName_(upperName), code_(code) {}
 
-    const char* keyName(bool withShift = false) const {
+    std::string keyName(bool withShift = false) const {
         if (withShift) {
             auto baseSymName = upperName_;
             if (baseSymName.empty()) baseSymName = name_;
             if (baseSymName.empty()) baseSymName = "None";
 
-            return ("SHIFT_" + baseSymName).c_str();
+            return "SHIFT_" + baseSymName;
         }
-        return !name_.empty() ? name_.c_str() : "None";
+        return !name_.empty() ? name_: "None";
     };
 
     fcitx::Key convert(bool withShift = false) const {
@@ -61,7 +61,6 @@ protected:
         return fcitx::Key(keyFromName.sym(), keyFromName.states(), code_);
     }
 
-    
     /// Be used in converting to Fcitx::Key.
     /// Corresponding to keyNameList in keynametable.h.
     const std::string name_;
