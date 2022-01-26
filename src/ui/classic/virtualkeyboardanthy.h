@@ -24,9 +24,11 @@ static const std::string hankakuImeName = "keyboard-us";
 static const std::string actionNameOfAnthyRomaji = "anthy-typing-method-romaji";
 static const std::string actionNameOfAnthyKana = "anthy-typing-method-kana";
 static const std::string actionNameOfAnthyTypingMethod = "anthy-typing-method";
+static const std::string anthyGetTextDomainName = "fcitx5-anthy";
 
 class AnthyKeyboard : public I18nKeyboard {
 public:
+    AnthyKeyboard();
     KeyboardType type() const override { return KeyboardType::Anthy; };
     const char *label() const override { return "JP"; }
     void updateKeys() override;
@@ -49,6 +51,7 @@ private:
     void setTextJisKanaKeys();
     AnthyKeyboardMode mode_ = AnthyKeyboardMode::TextRomaji;
     bool isZenkakuOn_ = true;
+    const std::string typingMethodNameOfKana_;
 };
 
 class AnthyMarkKey : public MarkKey {

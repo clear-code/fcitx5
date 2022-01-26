@@ -5,8 +5,13 @@
  *
  */
 #include "virtualkeyboardanthy.h"
+#include "fcitx-utils/i18n.h"
 
 namespace fcitx::classicui {
+
+AnthyKeyboard::AnthyKeyboard() :
+    typingMethodNameOfKana_(translateDomain(anthyGetTextDomainName.c_str(), "Kana"))
+    {}
 
 void AnthyKeyboard::updateKeys() {
     if (mode_ == AnthyKeyboardMode::TextRomaji) {
@@ -27,8 +32,8 @@ void AnthyKeyboard::syncState(
 
     auto [text, hasFound] = keyboard->getIMActionText(actionNameOfAnthyTypingMethod, true);
     if (!hasFound) return;
-    // TODO "かな" chars may depend on the environment.
-    if (text == "かな") {
+
+    if (text == typingMethodNameOfKana_) {
         if (mode_ == AnthyKeyboardMode::TextRomaji) {
             mode_ = AnthyKeyboardMode::TextJisKana;
             updateKeys();
