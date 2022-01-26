@@ -291,7 +291,7 @@ void AnthyKeyboard::setTextJisKanaKeys() {
     keys_.emplace_back(new AnthyKanaKey("て", 25, "", "w", "W"));
     keys_.emplace_back(new AnthyKanaKey("い", 26, "ぃ", "e", "E"));
     keys_.emplace_back(new AnthyKanaKey("す", 27, "", "r", "R"));
-    keys_.emplace_back(new AnthyKanaKey("か", 28, "", "t", "T"));
+    keys_.emplace_back(new AnthyKanaKey("か", 28, "ヵ", "t", "T"));
     keys_.emplace_back(new AnthyKanaKey("ん", 29, "", "y", "Y"));
     keys_.emplace_back(new AnthyKanaKey("な", 30, "", "u", "U"));
     keys_.emplace_back(new AnthyKanaKey("に", 31, "", "i", "I"));
@@ -308,7 +308,7 @@ void AnthyKeyboard::setTextJisKanaKeys() {
     keys_.emplace_back(new AnthyKanaKey("ち", 38, "", "a", "A"));
     keys_.emplace_back(new AnthyKanaKey("と", 39, "", "s", "S"));
     keys_.emplace_back(new AnthyKanaKey("し", 40, "", "d", "D"));
-    keys_.emplace_back(new AnthyKanaKey("は", 41, "", "f", "F"));
+    keys_.emplace_back(new AnthyKanaKey("は", 41, "ゎ", "f", "F"));
     keys_.emplace_back(new AnthyKanaKey("き", 42, "", "g", "G"));
     keys_.emplace_back(new AnthyKanaKey("く", 43, "", "h", "H"));
     keys_.emplace_back(new AnthyKanaKey("ま", 44, "", "j", "J"));
@@ -327,7 +327,7 @@ void AnthyKeyboard::setTextJisKanaKeys() {
     keys_.emplace_back(new AnthyKanaKey("つ", 52, "っ", "z", "Z"));
     keys_.emplace_back(new AnthyKanaKey("さ", 53, "", "x", "X"));
     keys_.emplace_back(new AnthyKanaKey("そ", 54, "", "c", "C"));
-    keys_.emplace_back(new AnthyKanaKey("ひ", 55, "", "v", "V"));
+    keys_.emplace_back(new AnthyKanaKey("ひ", 55, "ゐ", "v", "V"));
     keys_.emplace_back(new AnthyKanaKey("こ", 56, "", "b", "B"));
     keys_.emplace_back(new AnthyKanaKey("み", 57, "", "n", "N"));
     keys_.emplace_back(new AnthyKanaKey("も", 58, "", "m", "M"));
