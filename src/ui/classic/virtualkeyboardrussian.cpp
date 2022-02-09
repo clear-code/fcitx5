@@ -135,7 +135,7 @@ void RussianKeyboard::setMarkKeys() {
     keys_.emplace_back(new MarkKey(")"));
     keys_.emplace_back(new MarkKey("&"));
     keys_.emplace_back(new MarkKey("@"));
-    keys_.emplace_back(new MarkKey("￥"));
+    keys_.emplace_back(new MarkKey(u8"\u20BD")); // rouble sign
     keys_.emplace_back(new EnterKey()); keys_.back()->setCustomLayout(1.5);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new NumberKey("4", 13));
