@@ -129,7 +129,7 @@ void UsKeyboard::setMarkKeys() {
     keys_.emplace_back(new MarkKey(")"));
     keys_.emplace_back(new MarkKey("&"));
     keys_.emplace_back(new MarkKey("@"));
-    keys_.emplace_back(new MarkKey("￥"));
+    keys_.emplace_back(new MarkKey("$"));
     keys_.emplace_back(new EnterKey()); keys_.back()->setCustomLayout(1.5);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new NumberKey("4"));
