@@ -229,7 +229,7 @@ public:
     }
     virtual const char* label(VirtualKeyboard *) const = 0;
     void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
-    void paintLabel(VirtualKeyboard *keyboard, cairo_t *cr) override;
+    void fillLayout(VirtualKeyboard *keyboard, PangoLayout *layout) override;
 
 protected:
     virtual void toggle(VirtualKeyboard *keyboard, InputContext *inputContext) = 0;
@@ -253,7 +253,7 @@ public:
     }
     virtual const char *label(VirtualKeyboard *) const = 0;
     void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) override;
-    void paintLabel(VirtualKeyboard *keyboard, cairo_t *cr) override;
+    void fillLayout(VirtualKeyboard *keyboard, PangoLayout *layout) override;
 
 protected:
     virtual int numberOfStates() const = 0;

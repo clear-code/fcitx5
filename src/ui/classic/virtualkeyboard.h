@@ -32,9 +32,23 @@ enum KeyLabelAlignVertical {
 class VirtualKeyboard;
 class VirtualKey {
 public:
+    using PangoAttrListUniquePtr = UniqueCPtr<PangoAttrList, pango_attr_list_unref>;
+    static constexpr double DefaultFontSize = 22;
+    static void addForegroundAttr(PangoAttrList *attrList,
+                                  guint start_index, guint end_index,
+                                  double r, double g, double b) {
+        const auto scale = std::numeric_limits<uint16_t>::max();
+        auto attr = pango_attr_foreground_new(r * scale, g * scale, b * scale);
+        attr->start_index = start_index;
+        attr->end_index = end_index;
+        pango_attr_list_insert(attrList, attr);
+    }
+
+public:
     virtual const char* label(VirtualKeyboard *keyboard) const = 0;
     virtual void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) = 0;
-    virtual void paintLabel(VirtualKeyboard *keyboard, cairo_t *cr);
+    virtual void paintLabel(VirtualKeyboard *keyboard, cairo_t *cr, PangoLayout *layout);
+    virtual void fillLayout(VirtualKeyboard *keyboard, PangoLayout *layout);
     void paintBackground(cairo_t *cr, bool highlight);
 
     void setRegion(int x, int y) {
@@ -89,7 +103,7 @@ public:
 
 protected:
     Rect region_;
-    double fontSize_ = 22;
+    double fontSize_ = DefaultFontSize;
     std::tuple<double, double, double> fontColorRgb_ = {0.3, 0.35, 0.4};
     KeyLabelAlignVertical labelAlignVertical_ = KeyLabelAlignVertical::Center;
     bool useCustomBackgroundColor_ = false;
@@ -102,7 +116,7 @@ protected:
 
 class VirtualKeyboard {
 public:
-    VirtualKeyboard(Instance *instance);
+    VirtualKeyboard(Instance *instance, PangoContext *pangoContext);
     void paint(cairo_t *cr, unsigned int offsetX, unsigned int offsetY);
     bool click(InputContext *inputContext, int x, int y, bool isRelease);
     bool syncState();
@@ -145,8 +159,22 @@ public:
     bool isShiftOn() { return isShiftOn_; }
     void toggleShift() { isShiftOn_ = !isShiftOn_; }
 
+    const PangoFontDescription *getFontDesc(double fontSize) {
+        int size = fontSize * PANGO_SCALE;
+        auto context = pango_layout_get_context(pangoLayout_.get());
+        if (fontDescMap_.find(size) == fontDescMap_.end()) {
+            auto origFontDesc = pango_context_get_font_description(context);
+            auto fontDesc = pango_font_description_copy(origFontDesc);
+            pango_font_description_set_absolute_size(fontDesc, size);
+            fontDescMap_[size].reset(fontDesc);
+        }
+        return fontDescMap_[size].get();
+    }
+
 private:
     Instance *instance_;
+    GObjectUniquePtr<PangoLayout> pangoLayout_;
+    std::map<int, UniqueCPtr<PangoFontDescription, pango_font_description_free>> fontDescMap_;
     TrackableObjectReference<InputContext> lastInputContext_;
 
     std::tuple<VirtualKey *, bool> findClickedKey(int x, int y);

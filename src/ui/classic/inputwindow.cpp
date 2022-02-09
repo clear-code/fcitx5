@@ -92,7 +92,7 @@ InputWindow::InputWindow(ClassicUI *parent) : parent_(parent) {
     upperLayout_ = newPangoLayout(context_.get());
     lowerLayout_ = newPangoLayout(context_.get());
 
-    keyboard_.reset(new VirtualKeyboard(parent->instance()));
+    keyboard_.reset(new VirtualKeyboard(parent->instance(), context_.get()));
 }
 
 void InputWindow::insertAttr(PangoAttrList *attrList, TextFormatFlags format,

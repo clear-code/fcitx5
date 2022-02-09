@@ -5,6 +5,7 @@
  *
  */
 #include "virtualkeygeneral.h"
+#include <pango/pangocairo.h>
 
 namespace fcitx::classicui {
 
@@ -84,21 +85,16 @@ void ToggleKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, boo
     toggle(keyboard, inputContext);
 }
 
-void ToggleKey::paintLabel(VirtualKeyboard *keyboard, cairo_t *cr) {
-    cairo_save(cr);
-
+void ToggleKey::fillLayout(VirtualKeyboard *keyboard, PangoLayout *layout) {
+    PangoAttrListUniquePtr attrList(pango_attr_list_new());
+    auto text = label(keyboard);
     if (isOn(keyboard)) {
-        cairo_set_source_rgb(cr, 0.2, 0.7, 0.6);
+        addForegroundAttr(attrList.get(), 0, strlen(text), 0.2, 0.6, 0.6);
     } else {
-        cairo_set_source_rgb(cr, 0.8, 0.8, 0.8);
+        addForegroundAttr(attrList.get(), 0, strlen(text), 0.8, 0.8, 0.8);
     }
-    cairo_set_font_size(cr, fontSize_);
-    cairo_text_extents_t extents;
-    cairo_text_extents(cr, label(keyboard), &extents);
-    cairo_translate(cr, labelOffsetX(extents), labelOffsetY(extents));
-    cairo_show_text(cr, label(keyboard));
-
-    cairo_restore(cr);
+    pango_layout_set_text(layout, label(keyboard), -1);
+    pango_layout_set_attributes(layout, attrList.get());
 }
 
 void ShiftToggleKey::toggle(VirtualKeyboard *keyboard, InputContext *) {
@@ -122,25 +118,23 @@ void SwitchKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, boo
     switchState(keyboard, inputContext);
 }
 
-void SwitchKey::paintLabel(VirtualKeyboard *keyboard, cairo_t *cr) {
-    cairo_save(cr);
-
-    cairo_set_font_size(cr, fontSize_);
-    cairo_text_extents_t extents;
-    cairo_text_extents(cr, label(keyboard), &extents);
-    cairo_translate(cr, labelOffsetX(extents), labelOffsetY(extents));
+void SwitchKey::fillLayout(VirtualKeyboard *keyboard, PangoLayout *layout) {
+    std::string label;
+    PangoAttrListUniquePtr attrList(pango_attr_list_new());
 
     for (int i = 0; i < numberOfStates(); i++)
     {
+        int end_index = label.size() + strlen(stateLabel(i));
         if (i == currentIndex(keyboard)) {
-            cairo_set_source_rgb(cr, 0.2, 0.7, 0.6);
+            addForegroundAttr(attrList.get(), label.size(), end_index, 0.2, 0.7, 0.6);
         } else {
-            cairo_set_source_rgb(cr, 0.8, 0.8, 0.8);
+            addForegroundAttr(attrList.get(), label.size(), end_index, 0.8, 0.8, 0.8);
         }
-        cairo_show_text(cr, stateLabel(i));
+        label.append(stateLabel(i));
     }
 
-    cairo_restore(cr);
+    pango_layout_set_text(layout, label.c_str(), -1);
+    pango_layout_set_attributes(layout, attrList.get());
 }
 
 const char *LanguageSwitchKey::label(VirtualKeyboard *keyboard) const {

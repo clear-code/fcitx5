@@ -5,23 +5,39 @@
  *
  */
 #include "virtualkeyboard.h"
+#include <pango/pangocairo.h>
 
 FCITX_DEFINE_LOG_CATEGORY(keyboard, "keyboard")
 
 namespace fcitx::classicui {
 
-void VirtualKey::paintLabel(VirtualKeyboard *keyboard, cairo_t *cr) {
+void VirtualKey::paintLabel(VirtualKeyboard *keyboard, cairo_t *cr, PangoLayout *layout) {
     cairo_save(cr);
 
-    auto [r, g, b] = fontColorRgb_;
-    cairo_set_source_rgb(cr, r, g, b);
-    cairo_set_font_size(cr, fontSize_);
-    cairo_text_extents_t extents;
-    cairo_text_extents(cr, label(keyboard), &extents);
-    cairo_translate(cr, labelOffsetX(extents), labelOffsetY(extents));
-    cairo_show_text(cr, label(keyboard));
+    auto fontDesc = keyboard->getFontDesc(fontSize_);
+    pango_layout_set_font_description(layout, fontDesc);
+
+    fillLayout(keyboard, layout);
+
+    int width, height;
+    pango_layout_get_pixel_size(layout, &width, &height);
+    cairo_translate(cr, (width_ - width) / 2, (height_ - height) / 2);
+    pango_cairo_show_layout(cr, layout);
+
+    pango_layout_set_text(layout, "", -1);
+    pango_layout_set_attributes(layout, NULL);
+    pango_layout_set_font_description(layout, NULL);
 
     cairo_restore(cr);
+}
+
+void VirtualKey::fillLayout(VirtualKeyboard *keyboard, PangoLayout *layout) {
+    PangoAttrListUniquePtr attrList(pango_attr_list_new());
+    auto [r, g, b] = fontColorRgb_;
+    auto text = label(keyboard);
+    addForegroundAttr(attrList.get(), 0, strlen(text), r, g, b);
+    pango_layout_set_text(layout, text, -1);
+    pango_layout_set_attributes(layout, attrList.get());
 }
 
 void VirtualKey::paintBackground(cairo_t *cr, bool highlight) {
@@ -45,7 +61,9 @@ void VirtualKey::paintBackground(cairo_t *cr, bool highlight) {
     cairo_restore(cr);
 }
 
-VirtualKeyboard::VirtualKeyboard(Instance *instance) : instance_(instance) {
+VirtualKeyboard::VirtualKeyboard(Instance *instance, PangoContext *pangoContext)
+    : instance_(instance) {
+    pangoLayout_.reset(pango_layout_new(pangoContext));
     i18nKeyboard_.reset(new NullI18nKeyboard());
 
     syncState();
@@ -175,7 +193,7 @@ void VirtualKeyboard::paint(cairo_t *cr, unsigned int offsetX, unsigned int offs
         if (key->visible()) {
             auto highlight = (pushingKey_ == key.get());
             key->paintBackground(cr, highlight);
-            key->paintLabel(this, cr);
+            key->paintLabel(this, cr, pangoLayout_.get());
             key->setRegion(curX, curY);
         }
 
