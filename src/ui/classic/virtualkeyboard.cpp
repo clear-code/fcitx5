@@ -14,10 +14,8 @@ namespace fcitx::classicui {
 void VirtualKey::paintLabel(VirtualKeyboard *keyboard, cairo_t *cr, PangoLayout *layout) {
     cairo_save(cr);
 
-    auto fontDesc = keyboard->getFontDesc(fontSize_);
-    pango_layout_set_font_description(layout, fontDesc);
-
     fillLayout(keyboard, layout);
+    applyFont(keyboard, layout);
 
     int width, height;
     pango_layout_get_pixel_size(layout, &width, &height);
@@ -38,6 +36,29 @@ void VirtualKey::fillLayout(VirtualKeyboard *keyboard, PangoLayout *layout) {
     addForegroundAttr(attrList.get(), 0, strlen(text), r, g, b);
     pango_layout_set_text(layout, text, -1);
     pango_layout_set_attributes(layout, attrList.get());
+}
+
+void VirtualKey::applyFont(VirtualKeyboard *keyboard, PangoLayout *layout) {
+    auto fontDesc = keyboard->getFontDesc(fontSize_);
+    pango_layout_set_font_description(layout, fontDesc);
+
+    auto entry = keyboard->currentInputMethodEntry();
+    auto setIMLanguage = keyboard->useInputMethodLanguageToDisplayText()
+        && entry && !entry->languageCode().empty();
+    if (!setIMLanguage) return;
+
+    auto language = pango_language_from_string(entry->languageCode().c_str());
+    if (!language) return;
+
+    const auto attrList = pango_layout_get_attributes(layout);
+    if (attrList) {
+        pango_attr_list_insert(attrList, pango_attr_language_new(language));
+        pango_layout_set_attributes(layout, attrList);
+    } else {
+        PangoAttrListUniquePtr newAttrList(pango_attr_list_new());
+        pango_attr_list_insert(newAttrList.get(), pango_attr_language_new(language));
+        pango_layout_set_attributes(layout, newAttrList.get());
+    }
 }
 
 void VirtualKey::paintBackground(cairo_t *cr, bool highlight) {
@@ -61,8 +82,12 @@ void VirtualKey::paintBackground(cairo_t *cr, bool highlight) {
     cairo_restore(cr);
 }
 
-VirtualKeyboard::VirtualKeyboard(Instance *instance, PangoContext *pangoContext)
-    : instance_(instance) {
+VirtualKeyboard::VirtualKeyboard(
+    Instance *instance,
+    PangoContext *pangoContext,
+    bool useInputMethodLanguageToDisplayText
+) : instance_(instance),
+    useInputMethodLanguageToDisplayText_(useInputMethodLanguageToDisplayText) {
     pangoLayout_.reset(pango_layout_new(pangoContext));
     i18nKeyboard_.reset(new NullI18nKeyboard());
 

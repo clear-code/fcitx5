@@ -14,6 +14,7 @@
 #include "fcitx/instance.h"
 #include "fcitx/inputcontext.h"
 #include "fcitx/inputmethodmanager.h"
+#include "fcitx/inputmethodentry.h"
 #include "fcitx/userinterfacemanager.h"
 #include "fcitx/action.h"
 #include "fcitx/inputpanel.h"
@@ -42,7 +43,6 @@ public:
     virtual const char* label(VirtualKeyboard *keyboard) const = 0;
     virtual void click(VirtualKeyboard *keyboard, InputContext *inputContext, bool isRelease) = 0;
     virtual void paintLabel(VirtualKeyboard *keyboard, cairo_t *cr, PangoLayout *layout);
-    virtual void fillLayout(VirtualKeyboard *keyboard, PangoLayout *layout);
     void paintBackground(cairo_t *cr, bool highlight);
 
     void setRegion(int x, int y) {
@@ -76,6 +76,9 @@ public:
     bool visible() { return visible_; }
 
 protected:
+    virtual void fillLayout(VirtualKeyboard *keyboard, PangoLayout *layout);
+    virtual void applyFont(VirtualKeyboard *keyboard, PangoLayout *layout);
+
     Rect region_;
     double fontSize_ = DefaultFontSize;
     std::tuple<double, double, double> fontColorRgb_ = {0.3, 0.35, 0.4};
@@ -89,7 +92,11 @@ protected:
 
 class VirtualKeyboard {
 public:
-    VirtualKeyboard(Instance *instance, PangoContext *pangoContext);
+    VirtualKeyboard(
+        Instance *instance,
+        PangoContext *pangoContext,
+        bool useInputMethodLanguageToDisplayText
+    );
     void paint(cairo_t *cr, unsigned int offsetX, unsigned int offsetY);
     bool click(InputContext *inputContext, int x, int y, bool isRelease);
     bool syncState();
@@ -98,6 +105,16 @@ public:
     }
     void switchLanguage();
     void setCurrentInputMethod(const std::string &name);
+    const InputMethodEntry *currentInputMethodEntry() const {
+        auto inputContext = lastInputContext_.get();
+        if (!inputContext) {
+            return nullptr;
+        }
+        return instance_->inputMethodEntry(inputContext);
+    }
+    bool useInputMethodLanguageToDisplayText() const {
+        return useInputMethodLanguageToDisplayText_;
+    }
     void enumerateGroup();
     std::tuple<const std::string, bool> getIMActionText(
         const std::string &name,
@@ -149,6 +166,7 @@ public:
 
 private:
     Instance *instance_;
+    bool useInputMethodLanguageToDisplayText_;
     GObjectUniquePtr<PangoLayout> pangoLayout_;
     std::map<int, UniqueCPtr<PangoFontDescription, pango_font_description_free>> fontDescMap_;
     TrackableObjectReference<InputContext> lastInputContext_;
