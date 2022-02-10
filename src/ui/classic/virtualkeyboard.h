@@ -93,6 +93,9 @@ public:
     void paint(cairo_t *cr, unsigned int offsetX, unsigned int offsetY);
     bool click(InputContext *inputContext, int x, int y, bool isRelease);
     bool syncState();
+    void setInputContext(InputContext *inputContext) {
+        lastInputContext_ = inputContext->watch();
+    }
     void switchLanguage();
     void setCurrentInputMethod(const std::string &name);
     void enumerateGroup();

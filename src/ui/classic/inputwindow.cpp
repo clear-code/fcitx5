@@ -273,6 +273,7 @@ void InputWindow::update(InputContext *inputContext) {
 
     if (hasVirtualKeyboard()) {
         keyboard_->syncState();
+        keyboard_->setInputContext(inputContext);
     }
 
     cursor_ = -1;

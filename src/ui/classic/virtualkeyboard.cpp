@@ -243,8 +243,6 @@ bool VirtualKeyboard::click(InputContext *inputContext, int x, int y, bool isRel
     // Need to pay attention to the possibility of invalid poitner of `pushingKey_`,
     // caused by changing the key-layout.
 
-    lastInputContext_ = inputContext->watch();
-
     auto [clickedKey, hasFound] = findClickedKey(x, y);
     if (!hasFound) {
         if (pushingKey_) {
