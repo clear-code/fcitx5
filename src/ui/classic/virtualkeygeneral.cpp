@@ -89,7 +89,7 @@ void ToggleKey::fillLayout(VirtualKeyboard *keyboard, PangoLayout *layout) {
     PangoAttrListUniquePtr attrList(pango_attr_list_new());
     auto text = label(keyboard);
     if (isOn(keyboard)) {
-        addForegroundAttr(attrList.get(), 0, strlen(text), 0.2, 0.6, 0.6);
+        addForegroundAttr(attrList.get(), 0, strlen(text), 0.2, 0.7, 0.6);
     } else {
         addForegroundAttr(attrList.get(), 0, strlen(text), 0.8, 0.8, 0.8);
     }
