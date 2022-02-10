@@ -296,8 +296,8 @@ void AnthyKeyboard::setTextRomajiKeys() {
 
     keys_.emplace_back(new AnthyModeSwitchKey());
     keys_.emplace_back(new ZenkakuHankakuKey());
-    keys_.emplace_back(new AnthyMarkKey("comma", ",", "、")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-    keys_.emplace_back(new AnthyMarkKey("period", ".", "。")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new AnthyMarkKey("comma", ",", "、"));
+    keys_.emplace_back(new AnthyMarkKey("period", ".", "。"));
     keys_.emplace_back(new SpaceKey()); keys_.back()->setCustomLayout(2.0);
     keys_.emplace_back(new AnthyMarkKey("exclam", "!", "！"));
     keys_.emplace_back(new AnthyMarkKey("question", "?", "？"));
@@ -307,7 +307,7 @@ void AnthyKeyboard::setTextRomajiKeys() {
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     if (numpadMode_ == AnthyNumpadMode::Number) {
         keys_.emplace_back(new AnthyMarkKey("0", "0", "０"));
-        keys_.emplace_back(new AnthyMarkKey("period", ".", "。")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+        keys_.emplace_back(new AnthyMarkKey("period", ".", "。"));
     } else {
         keys_.emplace_back(new EmptyKey()); keys_.back()->setCustomLayout(2.0);
     }
@@ -359,9 +359,9 @@ void AnthyKeyboard::setMarkKeys() {
     }
 
     keys_.emplace_back(new ShiftToggleKey());
-    keys_.emplace_back(new AnthyMarkKey("quotedbl", "\"", "”")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Top);
-    keys_.emplace_back(new AnthyMarkKey("apostrophe", "\'", "’")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Top);
-    keys_.emplace_back(new AnthyMarkKey("underscore", "_", "＿")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new AnthyMarkKey("quotedbl", "\"", "”"));
+    keys_.emplace_back(new AnthyMarkKey("apostrophe", "\'", "’"));
+    keys_.emplace_back(new AnthyMarkKey("underscore", "_", "＿"));
     keys_.emplace_back(new AnthyMarkKey("bar", "|", "｜"));
     keys_.emplace_back(new AnthyMarkKey("asciitilde", "~", "〜"));
     keys_.emplace_back(new AnthyMarkKey("less", "<", "＜"));
@@ -380,8 +380,8 @@ void AnthyKeyboard::setMarkKeys() {
 
     keys_.emplace_back(new AnthyModeSwitchKey());
     keys_.emplace_back(new ZenkakuHankakuKey());
-    keys_.emplace_back(new AnthyMarkKey("comma", ",", "、")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-    keys_.emplace_back(new AnthyMarkKey("period", ".", "。")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new AnthyMarkKey("comma", ",", "、"));
+    keys_.emplace_back(new AnthyMarkKey("period", ".", "。"));
     keys_.emplace_back(new SpaceKey()); keys_.back()->setCustomLayout(2.0);
     keys_.emplace_back(new AnthyMarkKey("exclam", "!", "！"));
     keys_.emplace_back(new AnthyMarkKey("question", "?", "？"));
@@ -391,7 +391,7 @@ void AnthyKeyboard::setMarkKeys() {
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     if (numpadMode_ == AnthyNumpadMode::Number) {
         keys_.emplace_back(new AnthyMarkKey("0", "0", "０"));
-        keys_.emplace_back(new AnthyMarkKey("period", ".", "。")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+        keys_.emplace_back(new AnthyMarkKey("period", ".", "。"));
     } else {
         keys_.emplace_back(new EmptyKey()); keys_.back()->setCustomLayout(2.0);
     }
@@ -484,9 +484,9 @@ void AnthyKeyboard::setTextJisKanaKeys() {
 
     keys_.emplace_back(new AnthyModeSwitchKey());
     keys_.emplace_back(new ZenkakuHankakuKey());
-    keys_.emplace_back(new MarkKey("、", "less", 0, true)); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new MarkKey("、", "less", 0, true));
     keys_.emplace_back(new SpaceKey()); keys_.back()->setCustomLayout(3.0);
-    keys_.emplace_back(new MarkKey("。", "greater", 0, true)); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new MarkKey("。", "greater", 0, true));
     keys_.emplace_back(new AnthyKanaKey("ろ", 62, "", "underscore", "")); keys_.back()->setCustomLayout(1.25);
     keys_.emplace_back(new LeftKey());
     keys_.emplace_back(new DownKey());
@@ -494,7 +494,7 @@ void AnthyKeyboard::setTextJisKanaKeys() {
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     if (numpadMode_ == AnthyNumpadMode::Number) {
         keys_.emplace_back(new AnthyKanaNumPadKey("0"));
-        keys_.emplace_back(new MarkKey(".")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+        keys_.emplace_back(new MarkKey("."));
     } else {
         keys_.emplace_back(new EmptyKey()); keys_.back()->setCustomLayout(2.0);
     }

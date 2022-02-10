@@ -88,8 +88,8 @@ void HangulKeyboard::setTextKeys() {
     keys_.emplace_back(new NumberKey("3")); keys_.back()->setCustomLayout(1.0, true);
 
     keys_.emplace_back(new HangulModeSwitchKey()); keys_.back()->setCustomLayout(2.0);
-    keys_.emplace_back(new MarkKey(",", "comma")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-    keys_.emplace_back(new MarkKey(".", "period")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new MarkKey(",", "comma"));
+    keys_.emplace_back(new MarkKey(".", "period"));
     keys_.emplace_back(new SpaceKey()); keys_.back()->setCustomLayout(2.0);
     keys_.emplace_back(new MarkKey("!", "exclam"));
     keys_.emplace_back(new MarkKey("?", "question"));
@@ -98,7 +98,7 @@ void HangulKeyboard::setTextKeys() {
     keys_.emplace_back(new RightKey());
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new NumberKey("0")); keys_.back()->setCustomLayout(2.0);
-    keys_.emplace_back(new MarkKey(".")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new MarkKey("."));
 }
 
 void HangulKeyboard::setMarkKeys() {
@@ -136,9 +136,9 @@ void HangulKeyboard::setMarkKeys() {
     keys_.emplace_back(new NumberKey("6")); keys_.back()->setCustomLayout(1.0, true);
 
     keys_.emplace_back(new DummyKey());
-    keys_.emplace_back(new MarkKey("\"")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Top);
-    keys_.emplace_back(new MarkKey("\'")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Top);
-    keys_.emplace_back(new MarkKey("_")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new MarkKey("\""));
+    keys_.emplace_back(new MarkKey("\'"));
+    keys_.emplace_back(new MarkKey("_"));
     keys_.emplace_back(new MarkKey("|"));
     keys_.emplace_back(new MarkKey("~"));
     keys_.emplace_back(new MarkKey("<"));
@@ -152,8 +152,8 @@ void HangulKeyboard::setMarkKeys() {
     keys_.emplace_back(new NumberKey("3")); keys_.back()->setCustomLayout(1.0, true);
 
     keys_.emplace_back(new HangulModeSwitchKey()); keys_.back()->setCustomLayout(2.0);
-    keys_.emplace_back(new MarkKey(",")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-    keys_.emplace_back(new MarkKey(".")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new MarkKey(","));
+    keys_.emplace_back(new MarkKey("."));
     keys_.emplace_back(new SpaceKey()); keys_.back()->setCustomLayout(2.0);
     keys_.emplace_back(new MarkKey("!"));
     keys_.emplace_back(new MarkKey("?"));
@@ -162,7 +162,7 @@ void HangulKeyboard::setMarkKeys() {
     keys_.emplace_back(new RightKey());
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new NumberKey("0")); keys_.back()->setCustomLayout(2.0);
-    keys_.emplace_back(new MarkKey(".")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new MarkKey("."));
 }
 
 }

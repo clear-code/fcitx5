@@ -95,8 +95,8 @@ void RussianKeyboard::setCyrillicTextKeys() {
     keys_.emplace_back(new NumberKey("3", 12)); keys_.back()->setCustomLayout(1.0, true);
 
     keys_.emplace_back(new RussianModeSwitchKey()); keys_.back()->setCustomLayout(2.0);
-    keys_.emplace_back(new MarkKey(",", "", 61, true)); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-    keys_.emplace_back(new MarkKey(".", "", 61)); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new MarkKey(",", "", 61, true));
+    keys_.emplace_back(new MarkKey(".", "", 61));
     keys_.emplace_back(new SpaceKey()); keys_.back()->setCustomLayout(2.0);
     keys_.emplace_back(new MarkKey("!", "", 10, true));
     keys_.emplace_back(new MarkKey("?", "", 16, true));
@@ -105,7 +105,7 @@ void RussianKeyboard::setCyrillicTextKeys() {
     keys_.emplace_back(new RightKey());
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new NumberKey("0", 19)); keys_.back()->setCustomLayout(2.0);
-    keys_.emplace_back(new MarkKey(".")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new MarkKey("."));
 }
 
 void RussianKeyboard::setMarkKeys() {
@@ -143,9 +143,9 @@ void RussianKeyboard::setMarkKeys() {
     keys_.emplace_back(new NumberKey("6", 15)); keys_.back()->setCustomLayout(1.0, true);
 
     keys_.emplace_back(new DummyKey());
-    keys_.emplace_back(new MarkKey("\"")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Top);
-    keys_.emplace_back(new MarkKey("\'")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Top);
-    keys_.emplace_back(new MarkKey("_")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new MarkKey("\""));
+    keys_.emplace_back(new MarkKey("\'"));
+    keys_.emplace_back(new MarkKey("_"));
     keys_.emplace_back(new MarkKey("|"));
     keys_.emplace_back(new MarkKey("~"));
     keys_.emplace_back(new MarkKey("<"));
@@ -159,8 +159,8 @@ void RussianKeyboard::setMarkKeys() {
     keys_.emplace_back(new NumberKey("3", 12)); keys_.back()->setCustomLayout(1.0, true);
 
     keys_.emplace_back(new RussianModeSwitchKey()); keys_.back()->setCustomLayout(2.0);
-    keys_.emplace_back(new MarkKey(",")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-    keys_.emplace_back(new MarkKey(".")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new MarkKey(","));
+    keys_.emplace_back(new MarkKey("."));
     keys_.emplace_back(new SpaceKey()); keys_.back()->setCustomLayout(2.0);
     keys_.emplace_back(new MarkKey("!"));
     keys_.emplace_back(new MarkKey("?"));
@@ -169,7 +169,7 @@ void RussianKeyboard::setMarkKeys() {
     keys_.emplace_back(new RightKey());
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new NumberKey("0", 19)); keys_.back()->setCustomLayout(2.0);
-    keys_.emplace_back(new MarkKey(".")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new MarkKey("."));
 }
 
 }

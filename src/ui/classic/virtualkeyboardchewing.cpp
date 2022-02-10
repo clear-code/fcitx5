@@ -170,8 +170,8 @@ void ChewingKeyboard::setTextKeys() {
     keys_.emplace_back(new ChewingNumPadKey("3")); keys_.back()->setCustomLayout(1.0, true);
 
     keys_.emplace_back(new ChewingModeSwitchKey());
-    keys_.emplace_back(new MarkKey("，", "less")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-    keys_.emplace_back(new MarkKey("。", "greater")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new MarkKey("，", "less"));
+    keys_.emplace_back(new MarkKey("。", "greater"));
     keys_.emplace_back(new ChewingSpaceKey()); keys_.back()->setCustomLayout(2.0);
     keys_.emplace_back(new MarkKey("！", "exclam"));
     keys_.emplace_back(new MarkKey("？", "question"));
@@ -181,15 +181,15 @@ void ChewingKeyboard::setTextKeys() {
     keys_.emplace_back(new RightKey());
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new ChewingNumPadKey("0")); keys_.back()->setCustomLayout(2.0);
-    keys_.emplace_back(new MarkKey(".")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new MarkKey("."));
 }
 
 void ChewingKeyboard::setMarkKeys() {
     keys_.clear();
-    keys_.emplace_back(new MarkKey("“")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Top);
-    keys_.emplace_back(new MarkKey("”")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Top);
-    keys_.emplace_back(new MarkKey("‘")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Top);
-    keys_.emplace_back(new MarkKey("’")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Top);
+    keys_.emplace_back(new MarkKey("“"));
+    keys_.emplace_back(new MarkKey("”"));
+    keys_.emplace_back(new MarkKey("‘"));
+    keys_.emplace_back(new MarkKey("’"));
     keys_.emplace_back(new MarkKey("（"));
     keys_.emplace_back(new MarkKey("）"));
     keys_.emplace_back(new MarkKey("「"));
@@ -210,7 +210,7 @@ void ChewingKeyboard::setMarkKeys() {
     keys_.emplace_back(new MarkKey("："));
     keys_.emplace_back(new MarkKey("；"));
     keys_.emplace_back(new MarkKey("—"));
-    keys_.emplace_back(new MarkKey("…")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new MarkKey("…"));
     keys_.emplace_back(new MarkKey("@"));
     keys_.emplace_back(new ChewingEnterKey()); keys_.back()->setCustomLayout(1.5);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
@@ -225,8 +225,8 @@ void ChewingKeyboard::setMarkKeys() {
     keys_.emplace_back(new MarkKey("$"));
     keys_.emplace_back(new MarkKey("&"));
     keys_.emplace_back(new MarkKey("|"));
-    keys_.emplace_back(new MarkKey("_")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-    keys_.emplace_back(new MarkKey("、")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new MarkKey("_"));
+    keys_.emplace_back(new MarkKey("、"));
     keys_.emplace_back(new UpKey());
     keys_.emplace_back(new LanguageSwitchKey());
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
@@ -235,8 +235,8 @@ void ChewingKeyboard::setMarkKeys() {
     keys_.emplace_back(new ChewingNumPadKey("3")); keys_.back()->setCustomLayout(1.0, true);
 
     keys_.emplace_back(new ChewingModeSwitchKey());
-    keys_.emplace_back(new MarkKey("，")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-    keys_.emplace_back(new MarkKey("。")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new MarkKey("，"));
+    keys_.emplace_back(new MarkKey("。"));
     keys_.emplace_back(new ChewingSpaceKey()); keys_.back()->setCustomLayout(3.0);
     keys_.emplace_back(new MarkKey("！"));
     keys_.emplace_back(new MarkKey("？"));
@@ -245,7 +245,7 @@ void ChewingKeyboard::setMarkKeys() {
     keys_.emplace_back(new RightKey());
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new ChewingNumPadKey("0")); keys_.back()->setCustomLayout(2.0);
-    keys_.emplace_back(new MarkKey(".")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new MarkKey("."));
 }
 
 void ChewingKeyboard::setAdditionalMarkKeys() {
@@ -283,14 +283,14 @@ void ChewingKeyboard::setAdditionalMarkKeys() {
     keys_.emplace_back(new ChewingNumPadKey("6")); keys_.back()->setCustomLayout(1.0, true);
 
     keys_.emplace_back(new ChewingMarkToggleKey());
-    keys_.emplace_back(new MarkKey("\"")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Top);
-    keys_.emplace_back(new MarkKey("\'")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Top);
+    keys_.emplace_back(new MarkKey("\""));
+    keys_.emplace_back(new MarkKey("\'"));
     keys_.emplace_back(new MarkKey(u8"\u00A5"));
     keys_.emplace_back(new MarkKey("!"));
     keys_.emplace_back(new MarkKey("?"));
     keys_.emplace_back(new MarkKey("<"));
     keys_.emplace_back(new MarkKey(">"));
-    keys_.emplace_back(new MarkKey("、")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new MarkKey("、"));
     keys_.emplace_back(new UpKey());
     keys_.emplace_back(new LanguageSwitchKey());
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
@@ -299,8 +299,8 @@ void ChewingKeyboard::setAdditionalMarkKeys() {
     keys_.emplace_back(new ChewingNumPadKey("3")); keys_.back()->setCustomLayout(1.0, true);
 
     keys_.emplace_back(new ChewingModeSwitchKey());
-    keys_.emplace_back(new MarkKey("，")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-    keys_.emplace_back(new MarkKey("。")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new MarkKey("，"));
+    keys_.emplace_back(new MarkKey("。"));
     keys_.emplace_back(new ChewingSpaceKey()); keys_.back()->setCustomLayout(3.0);
     keys_.emplace_back(new MarkKey("！"));
     keys_.emplace_back(new MarkKey("？"));
@@ -309,7 +309,7 @@ void ChewingKeyboard::setAdditionalMarkKeys() {
     keys_.emplace_back(new RightKey());
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new ChewingNumPadKey("0")); keys_.back()->setCustomLayout(2.0);
-    keys_.emplace_back(new MarkKey(".")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new MarkKey("."));
 }
 
 }

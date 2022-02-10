@@ -113,8 +113,8 @@ void PinyinKeyboard::setTextKeys() {
     keys_.emplace_back(new NumberKey("3")); keys_.back()->setCustomLayout(1.0, true);
 
     keys_.emplace_back(new PinyinModeSwitchKey()); keys_.back()->setCustomLayout(2.0);
-    keys_.emplace_back(new MarkKey("，", "comma")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-    keys_.emplace_back(new MarkKey("。", "period")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new MarkKey("，", "comma"));
+    keys_.emplace_back(new MarkKey("。", "period"));
     keys_.emplace_back(new PinyinSpaceKey()); keys_.back()->setCustomLayout(2.0);
     keys_.emplace_back(new MarkKey("！", "exclam"));
     keys_.emplace_back(new MarkKey("？", "question"));
@@ -123,15 +123,15 @@ void PinyinKeyboard::setTextKeys() {
     keys_.emplace_back(new RightKey());
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new NumberKey("0")); keys_.back()->setCustomLayout(2.0);
-    keys_.emplace_back(new MarkKey(".")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new MarkKey("."));
 }
 
 void PinyinKeyboard::setMarkKeys() {
     keys_.clear();
-    keys_.emplace_back(new MarkKey("“")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Top);
-    keys_.emplace_back(new MarkKey("”")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Top);
-    keys_.emplace_back(new MarkKey("‘")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Top);
-    keys_.emplace_back(new MarkKey("’")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Top);
+    keys_.emplace_back(new MarkKey("“"));
+    keys_.emplace_back(new MarkKey("”"));
+    keys_.emplace_back(new MarkKey("‘"));
+    keys_.emplace_back(new MarkKey("’"));
     keys_.emplace_back(new MarkKey("（"));
     keys_.emplace_back(new MarkKey("）"));
     keys_.emplace_back(new MarkKey("「"));
@@ -152,7 +152,7 @@ void PinyinKeyboard::setMarkKeys() {
     keys_.emplace_back(new MarkKey("："));
     keys_.emplace_back(new MarkKey("；"));
     keys_.emplace_back(new MarkKey("—"));
-    keys_.emplace_back(new MarkKey("…")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new MarkKey("…"));
     keys_.emplace_back(new MarkKey("@"));
     keys_.emplace_back(new PinyinEnterKey()); keys_.back()->setCustomLayout(1.5);
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
@@ -167,8 +167,8 @@ void PinyinKeyboard::setMarkKeys() {
     keys_.emplace_back(new MarkKey("$"));
     keys_.emplace_back(new MarkKey("&"));
     keys_.emplace_back(new MarkKey("|"));
-    keys_.emplace_back(new MarkKey("_")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-    keys_.emplace_back(new MarkKey("、")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new MarkKey("_"));
+    keys_.emplace_back(new MarkKey("、"));
     keys_.emplace_back(new UpKey());
     keys_.emplace_back(new LanguageSwitchKey());
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
@@ -177,8 +177,8 @@ void PinyinKeyboard::setMarkKeys() {
     keys_.emplace_back(new NumberKey("3")); keys_.back()->setCustomLayout(1.0, true);
 
     keys_.emplace_back(new PinyinModeSwitchKey());  keys_.back()->setCustomLayout(2.0);
-    keys_.emplace_back(new MarkKey("，")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-    keys_.emplace_back(new MarkKey("。")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new MarkKey("，"));
+    keys_.emplace_back(new MarkKey("。"));
     keys_.emplace_back(new PinyinSpaceKey()); keys_.back()->setCustomLayout(2.0);
     keys_.emplace_back(new MarkKey("！"));
     keys_.emplace_back(new MarkKey("？"));
@@ -187,7 +187,7 @@ void PinyinKeyboard::setMarkKeys() {
     keys_.emplace_back(new RightKey());
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new NumberKey("0")); keys_.back()->setCustomLayout(2.0);
-    keys_.emplace_back(new MarkKey(".")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new MarkKey("."));
 }
 
 void PinyinKeyboard::setAdditionalMarkKeys() {
@@ -225,14 +225,14 @@ void PinyinKeyboard::setAdditionalMarkKeys() {
     keys_.emplace_back(new NumberKey("6")); keys_.back()->setCustomLayout(1.0, true);
 
     keys_.emplace_back(new PinyinMarkToggleKey());
-    keys_.emplace_back(new MarkKey("\"")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Top);
-    keys_.emplace_back(new MarkKey("\'")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Top);
+    keys_.emplace_back(new MarkKey("\""));
+    keys_.emplace_back(new MarkKey("\'"));
     keys_.emplace_back(new MarkKey(u8"\u00A5"));
     keys_.emplace_back(new MarkKey("!"));
     keys_.emplace_back(new MarkKey("?"));
     keys_.emplace_back(new MarkKey("<"));
     keys_.emplace_back(new MarkKey(">"));
-    keys_.emplace_back(new MarkKey("、")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new MarkKey("、"));
     keys_.emplace_back(new UpKey());
     keys_.emplace_back(new LanguageSwitchKey());
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
@@ -241,8 +241,8 @@ void PinyinKeyboard::setAdditionalMarkKeys() {
     keys_.emplace_back(new NumberKey("3")); keys_.back()->setCustomLayout(1.0, true);
 
     keys_.emplace_back(new PinyinModeSwitchKey());  keys_.back()->setCustomLayout(2.0);
-    keys_.emplace_back(new MarkKey("，")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
-    keys_.emplace_back(new MarkKey("。")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new MarkKey("，"));
+    keys_.emplace_back(new MarkKey("。"));
     keys_.emplace_back(new PinyinSpaceKey()); keys_.back()->setCustomLayout(2.0);
     keys_.emplace_back(new MarkKey("！"));
     keys_.emplace_back(new MarkKey("？"));
@@ -251,7 +251,7 @@ void PinyinKeyboard::setAdditionalMarkKeys() {
     keys_.emplace_back(new RightKey());
     keys_.emplace_back(new DummyKey()); keys_.back()->setCustomLayout(0.5);
     keys_.emplace_back(new NumberKey("0")); keys_.back()->setCustomLayout(2.0);
-    keys_.emplace_back(new MarkKey(".")); keys_.back()->setLabelAlign(KeyLabelAlignVertical::Bottom);
+    keys_.emplace_back(new MarkKey("."));
 }
 
 }
