@@ -84,6 +84,7 @@ public:
     void deactivate(wayland::ZwpInputMethodContextV1 *id);
 
 protected:
+    void virtualKeyEventImpl(KeyEvent &event) override;
     void commitStringImpl(const std::string &text) override {
         ic_->commitString(serial_, text.c_str());
     }
@@ -112,6 +113,7 @@ private:
     void keymapCallback(uint32_t format, int32_t fd, uint32_t size);
     void keyCallback(uint32_t serial, uint32_t time, uint32_t key,
                      uint32_t state);
+    void processKeyEvent(KeyEvent &event, bool isVirtualKey, uint32_t serial);
     void modifiersCallback(uint32_t serial, uint32_t mods_depressed,
                            uint32_t mods_latched, uint32_t mods_locked,
                            uint32_t group);
