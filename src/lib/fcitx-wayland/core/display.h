@@ -65,6 +65,11 @@ public:
 
     WlRegistry *registry();
 
+    WlOutput *output() const {
+        // TODO: should be selectable
+        return outputInfo_.begin()->first;
+    };
+
     const OutputInfomation *outputInformation(WlOutput *output) const;
 
     template <typename T>

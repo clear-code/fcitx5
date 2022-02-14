@@ -128,6 +128,7 @@ void WaylandIMInputContextV1::activate(wayland::ZwpInputMethodContextV1 *ic) {
     repeatInfoCallback(repeatRate_, repeatDelay_);
     server_->display_->sync();
     focusIn();
+    updateUserInterface(UserInterfaceComponent::InputPanel);
 }
 
 void WaylandIMInputContextV1::deactivate(wayland::ZwpInputMethodContextV1 *ic) {
@@ -334,13 +335,44 @@ void WaylandIMInputContextV1::keyCallback(uint32_t serial, uint32_t time,
                        server_->modifiers_, code),
                    state == WL_KEYBOARD_KEY_STATE_RELEASED, time);
 
-    if (state == WL_KEYBOARD_KEY_STATE_RELEASED && key == repeatKey_) {
+    processKeyEvent(event, false, serial);
+}
+
+void WaylandIMInputContextV1::virtualKeyEventImpl(KeyEvent &event) {
+    // `mods_locked` value seems to be 16 usually.
+    // It will be 18 with the capslocked state,
+    // but we don't have to consider about it in virtual key process.
+    if (event.rawKey().hasModifier()) {
+        if (event.rawKey().states().test(KeyState::Shift)) {
+            modifiersCallback(serial_, (uint32_t)KeyState::Shift, 0, 16, 0);
+        }
+    } else {
+        modifiersCallback(serial_, 0, 0, 16, 0);
+    }
+
+    processKeyEvent(event, true, serial_);
+}
+
+void WaylandIMInputContextV1::processKeyEvent(KeyEvent &event,
+                                              bool isVirtualKey,
+                                              uint32_t serial) {
+    const uint32_t key = event.rawKey().code() > 8 ? event.rawKey().code() - 8
+                                                   : 0;
+    const auto state = event.isRelease() ? WL_KEYBOARD_KEY_STATE_RELEASED
+                                         : WL_KEYBOARD_KEY_STATE_PRESSED;
+
+    const auto cancelRepeat = isVirtualKey
+        ? (state == WL_KEYBOARD_KEY_STATE_RELEASED)
+        // Strict condition for physical keys.
+        : (state == WL_KEYBOARD_KEY_STATE_RELEASED && key == repeatKey_);
+
+    if (cancelRepeat) {
         timeEvent_->setEnabled(false);
     } else if (state == WL_KEYBOARD_KEY_STATE_PRESSED &&
-               xkb_keymap_key_repeats(server_->keymap_.get(), code)) {
+               xkb_keymap_key_repeats(server_->keymap_.get(), event.rawKey().code())) {
         if (repeatRate_) {
             repeatKey_ = key;
-            repeatTime_ = time;
+            repeatTime_ = event.time();
             repeatSym_ = event.rawKey().sym();
             timeEvent_->setNextInterval(repeatDelay_ * 1000);
             timeEvent_->setOneShot();
@@ -349,14 +381,13 @@ void WaylandIMInputContextV1::keyCallback(uint32_t serial, uint32_t time,
 
     WAYLANDIM_DEBUG() << event.key().toString()
                       << " IsRelease=" << event.isRelease();
+
     if (!keyEvent(event)) {
-        ic_->keysym(serial, time, event.rawKey().sym(),
-                    event.isRelease() ? WL_KEYBOARD_KEY_STATE_RELEASED
-                                      : WL_KEYBOARD_KEY_STATE_PRESSED,
-                    event.rawKey().states());
+        ic_->key(serial, event.time(), key, state);
     }
     server_->display_->flush();
 }
+
 void WaylandIMInputContextV1::modifiersCallback(uint32_t serial,
                                                 uint32_t mods_depressed,
                                                 uint32_t mods_latched,

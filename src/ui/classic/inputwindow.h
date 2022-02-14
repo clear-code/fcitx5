@@ -13,6 +13,7 @@
 #include "fcitx/candidatelist.h"
 #include "fcitx/inputcontext.h"
 #include "common.h"
+#include "virtualkeyboard.h"
 
 namespace fcitx {
 namespace classicui {
@@ -58,7 +59,7 @@ public:
     void hide();
     bool visible() const { return visible_; }
     bool hover(int x, int y);
-    void click(int x, int y);
+    void click(int x, int y, bool isRelease = false);
     void wheel(bool up);
 
 protected:
@@ -75,6 +76,7 @@ protected:
     void setTextToMultilineLayout(InputContext *inputContext,
                                   MultilineLayout &layout, const Text &text);
     int highlight() const;
+    bool hasVirtualKeyboard() { return !!keyboard_; }
 
     ClassicUI *parent_;
     GObjectUniquePtr<PangoContext> context_;
@@ -83,6 +85,7 @@ protected:
     std::vector<MultilineLayout> labelLayouts_;
     std::vector<MultilineLayout> candidateLayouts_;
     std::vector<Rect> candidateRegions_;
+    std::unique_ptr<VirtualKeyboard> keyboard_;
     TrackableObjectReference<InputContext> inputContext_;
     bool visible_ = false;
     int cursor_ = 0;
