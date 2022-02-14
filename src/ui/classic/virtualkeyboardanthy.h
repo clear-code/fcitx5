@@ -50,6 +50,7 @@ public:
     AnthyKeyboard();
     KeyboardType type() const override { return KeyboardType::Anthy; };
     const char *label() const override { return "JP"; }
+    const std::string languageCode() const override { return "ja"; }
     void updateKeys() override;
     void syncState(
         VirtualKeyboard *keyboard,

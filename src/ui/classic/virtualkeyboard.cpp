@@ -40,12 +40,8 @@ void VirtualKey::applyFont(
     auto fontDesc = keyboard->getFontDesc(fontSize_);
     pango_layout_set_font_description(layout, fontDesc);
 
-    auto entry = keyboard->currentInputMethodEntry();
-    auto setIMLanguage = keyboard->useInputMethodLanguageToDisplayText()
-        && entry && !entry->languageCode().empty();
-    if (!setIMLanguage) return;
-
-    auto language = pango_language_from_string(entry->languageCode().c_str());
+    if (keyboard->languageCode().empty()) return;
+    auto language = pango_language_from_string(keyboard->languageCode().c_str());
     if (!language) return;
 
     pango_attr_list_insert(attrList, pango_attr_language_new(language));
@@ -83,12 +79,8 @@ void VirtualKey::paintBackground(cairo_t *cr, bool highlight) {
     cairo_restore(cr);
 }
 
-VirtualKeyboard::VirtualKeyboard(
-    Instance *instance,
-    PangoContext *pangoContext,
-    bool useInputMethodLanguageToDisplayText
-) : instance_(instance),
-    useInputMethodLanguageToDisplayText_(useInputMethodLanguageToDisplayText) {
+VirtualKeyboard::VirtualKeyboard(Instance *instance, PangoContext *pangoContext)
+    : instance_(instance) {
     pangoLayout_.reset(pango_layout_new(pangoContext));
     i18nKeyboard_.reset(new NullI18nKeyboard());
 

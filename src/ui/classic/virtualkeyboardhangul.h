@@ -23,6 +23,7 @@ class HangulKeyboard : public I18nKeyboard {
 public:
     KeyboardType type() const override { return KeyboardType::Hangul; };
     const char *label() const override { return "KR"; }
+    const std::string languageCode() const override { return "ko"; }
     void updateKeys() override;
     void switchMode();
     HangulKeyboardMode mode() const { return mode_; }

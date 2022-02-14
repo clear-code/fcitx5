@@ -23,6 +23,7 @@ class RussianKeyboard : public I18nKeyboard {
 public:
     KeyboardType type() const override { return KeyboardType::Russian; };
     const char *label() const override { return "RU"; }
+    const std::string languageCode() const override { return "ru"; }
     void updateKeys() override;
     void switchMode();
     RussianKeyboardMode mode() const { return mode_; }

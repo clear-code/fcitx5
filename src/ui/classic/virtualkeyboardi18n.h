@@ -40,6 +40,7 @@ public:
     virtual KeyboardType type() const = 0;
     virtual const char *label() const = 0;
     virtual void updateKeys() = 0;
+    virtual const std::string languageCode() const { return ""; }
     virtual void syncState(
         VirtualKeyboard *keyboard,
         const std::string &currentInputMethodName

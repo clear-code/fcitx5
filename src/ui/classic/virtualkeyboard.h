@@ -101,11 +101,7 @@ protected:
 
 class VirtualKeyboard {
 public:
-    VirtualKeyboard(
-        Instance *instance,
-        PangoContext *pangoContext,
-        bool useInputMethodLanguageToDisplayText
-    );
+    VirtualKeyboard(Instance *instance, PangoContext *pangoContext);
     void paint(cairo_t *cr, unsigned int offsetX, unsigned int offsetY);
     bool click(InputContext *inputContext, int x, int y, bool isRelease);
     bool syncState();
@@ -114,16 +110,6 @@ public:
     }
     void switchLanguage();
     void setCurrentInputMethod(const std::string &name);
-    const InputMethodEntry *currentInputMethodEntry() const {
-        auto inputContext = lastInputContext_.get();
-        if (!inputContext) {
-            return nullptr;
-        }
-        return instance_->inputMethodEntry(inputContext);
-    }
-    bool useInputMethodLanguageToDisplayText() const {
-        return useInputMethodLanguageToDisplayText_;
-    }
     void enumerateGroup();
     std::tuple<const std::string, bool> getIMActionText(
         const std::string &name,
@@ -145,10 +131,11 @@ public:
     bool isSeletingCandidates();
     void updateInputPanel();
 
-    std::vector<std::unique_ptr<VirtualKey>> &keys() { return i18nKeyboard_->keys(); }
-    I18nKeyboard *i18nKeyboard() { return i18nKeyboard_.get(); }
+    std::string languageCode() const { return i18nKeyboard_->languageCode(); }
+    std::vector<std::unique_ptr<VirtualKey>> &keys() const { return i18nKeyboard_->keys(); }
+    I18nKeyboard *i18nKeyboard() const { return i18nKeyboard_.get(); }
     template<class T>
-    T *i18nKeyboard() {
+    T *i18nKeyboard() const {
         static_assert(std::is_base_of<I18nKeyboard, T>::value,
             "type parameter of this function must derive from I18nKeyboard");
         return static_cast<T *>(i18nKeyboard_.get());
@@ -175,7 +162,6 @@ public:
 
 private:
     Instance *instance_;
-    bool useInputMethodLanguageToDisplayText_;
     GObjectUniquePtr<PangoLayout> pangoLayout_;
     std::map<int, UniqueCPtr<PangoFontDescription, pango_font_description_free>> fontDescMap_;
     TrackableObjectReference<InputContext> lastInputContext_;

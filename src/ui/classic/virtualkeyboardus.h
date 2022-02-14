@@ -23,6 +23,7 @@ class UsKeyboard : public I18nKeyboard {
 public:
     KeyboardType type() const override { return KeyboardType::Us; };
     const char *label() const override { return "US"; }
+    const std::string languageCode() const override { return "us"; }
     void updateKeys() override;
     void switchMode();
     UsKeyboardMode mode() const { return mode_; }

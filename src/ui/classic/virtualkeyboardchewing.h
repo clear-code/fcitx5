@@ -23,6 +23,7 @@ class ChewingKeyboard : public I18nKeyboard {
 public:
     KeyboardType type() const override { return KeyboardType::Chewing; };
     const char *label() const override { return "TW"; }
+    const std::string languageCode() const override { return "zh_TW"; }
     void updateKeys() override;
     void switchMode();
     ChewingKeyboardMode mode() const { return mode_; }
