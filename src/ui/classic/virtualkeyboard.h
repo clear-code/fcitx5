@@ -30,8 +30,9 @@ public:
     using PangoAttrListUniquePtr = UniqueCPtr<PangoAttrList, pango_attr_list_unref>;
     static constexpr double DefaultFontSize = 22;
     static void addForegroundAttr(PangoAttrList *attrList,
-                                  guint start_index, guint end_index,
-                                  double r, double g, double b) {
+                                  double r, double g, double b,
+                                  guint start_index = 0,
+                                  guint end_index = G_MAXUINT) {
         const auto scale = std::numeric_limits<uint16_t>::max();
         auto attr = pango_attr_foreground_new(r * scale, g * scale, b * scale);
         attr->start_index = start_index;
@@ -76,8 +77,16 @@ public:
     bool visible() { return visible_; }
 
 protected:
-    virtual void fillLayout(VirtualKeyboard *keyboard, PangoLayout *layout);
-    virtual void applyFont(VirtualKeyboard *keyboard, PangoLayout *layout);
+    virtual void applyFont(
+        VirtualKeyboard *keyboard,
+        PangoLayout *layout,
+        PangoAttrList *attrList
+    );
+    virtual void fillLayout(
+        VirtualKeyboard *keyboard,
+        PangoLayout *layout,
+        PangoAttrList *attrList
+    );
 
     Rect region_;
     double fontSize_ = DefaultFontSize;

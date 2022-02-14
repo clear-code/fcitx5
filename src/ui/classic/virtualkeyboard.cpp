@@ -14,8 +14,11 @@ namespace fcitx::classicui {
 void VirtualKey::paintLabel(VirtualKeyboard *keyboard, cairo_t *cr, PangoLayout *layout) {
     cairo_save(cr);
 
-    fillLayout(keyboard, layout);
-    applyFont(keyboard, layout);
+    PangoAttrListUniquePtr attrList(pango_attr_list_new());
+    pango_layout_set_attributes(layout, attrList.get());
+
+    applyFont(keyboard, layout, attrList.get());
+    fillLayout(keyboard, layout, attrList.get());
 
     int width, height;
     pango_layout_get_pixel_size(layout, &width, &height);
@@ -29,16 +32,11 @@ void VirtualKey::paintLabel(VirtualKeyboard *keyboard, cairo_t *cr, PangoLayout 
     cairo_restore(cr);
 }
 
-void VirtualKey::fillLayout(VirtualKeyboard *keyboard, PangoLayout *layout) {
-    PangoAttrListUniquePtr attrList(pango_attr_list_new());
-    auto [r, g, b] = fontColorRgb_;
-    auto text = label(keyboard);
-    addForegroundAttr(attrList.get(), 0, strlen(text), r, g, b);
-    pango_layout_set_text(layout, text, -1);
-    pango_layout_set_attributes(layout, attrList.get());
-}
-
-void VirtualKey::applyFont(VirtualKeyboard *keyboard, PangoLayout *layout) {
+void VirtualKey::applyFont(
+    VirtualKeyboard *keyboard,
+    PangoLayout *layout,
+    PangoAttrList *attrList
+) {
     auto fontDesc = keyboard->getFontDesc(fontSize_);
     pango_layout_set_font_description(layout, fontDesc);
 
@@ -50,15 +48,18 @@ void VirtualKey::applyFont(VirtualKeyboard *keyboard, PangoLayout *layout) {
     auto language = pango_language_from_string(entry->languageCode().c_str());
     if (!language) return;
 
-    const auto attrList = pango_layout_get_attributes(layout);
-    if (attrList) {
-        pango_attr_list_insert(attrList, pango_attr_language_new(language));
-        pango_layout_set_attributes(layout, attrList);
-    } else {
-        PangoAttrListUniquePtr newAttrList(pango_attr_list_new());
-        pango_attr_list_insert(newAttrList.get(), pango_attr_language_new(language));
-        pango_layout_set_attributes(layout, newAttrList.get());
-    }
+    pango_attr_list_insert(attrList, pango_attr_language_new(language));
+}
+
+void VirtualKey::fillLayout(
+    VirtualKeyboard *keyboard,
+    PangoLayout *layout,
+    PangoAttrList *attrList
+) {
+    auto [r, g, b] = fontColorRgb_;
+    auto text = label(keyboard);
+    addForegroundAttr(attrList, r, g, b);
+    pango_layout_set_text(layout, text, -1);
 }
 
 void VirtualKey::paintBackground(cairo_t *cr, bool highlight) {

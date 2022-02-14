@@ -85,16 +85,17 @@ void ToggleKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, boo
     toggle(keyboard, inputContext);
 }
 
-void ToggleKey::fillLayout(VirtualKeyboard *keyboard, PangoLayout *layout) {
-    PangoAttrListUniquePtr attrList(pango_attr_list_new());
-    auto text = label(keyboard);
+void ToggleKey::fillLayout(
+    VirtualKeyboard *keyboard,
+    PangoLayout *layout,
+    PangoAttrList *attrList
+) {
     if (isOn(keyboard)) {
-        addForegroundAttr(attrList.get(), 0, strlen(text), 0.2, 0.7, 0.6);
+        addForegroundAttr(attrList, 0.2, 0.7, 0.6);
     } else {
-        addForegroundAttr(attrList.get(), 0, strlen(text), 0.8, 0.8, 0.8);
+        addForegroundAttr(attrList, 0.8, 0.8, 0.8);
     }
     pango_layout_set_text(layout, label(keyboard), -1);
-    pango_layout_set_attributes(layout, attrList.get());
 }
 
 void ShiftToggleKey::toggle(VirtualKeyboard *keyboard, InputContext *) {
@@ -118,23 +119,25 @@ void SwitchKey::click(VirtualKeyboard *keyboard, InputContext *inputContext, boo
     switchState(keyboard, inputContext);
 }
 
-void SwitchKey::fillLayout(VirtualKeyboard *keyboard, PangoLayout *layout) {
+void SwitchKey::fillLayout(
+    VirtualKeyboard *keyboard,
+    PangoLayout *layout,
+    PangoAttrList *attrList
+) {
     std::string label;
-    PangoAttrListUniquePtr attrList(pango_attr_list_new());
 
     for (int i = 0; i < numberOfStates(); i++)
     {
         int end_index = label.size() + strlen(stateLabel(i));
         if (i == currentIndex(keyboard)) {
-            addForegroundAttr(attrList.get(), label.size(), end_index, 0.2, 0.7, 0.6);
+            addForegroundAttr(attrList, 0.2, 0.7, 0.6, label.size(), end_index);
         } else {
-            addForegroundAttr(attrList.get(), label.size(), end_index, 0.8, 0.8, 0.8);
+            addForegroundAttr(attrList, 0.8, 0.8, 0.8, label.size(), end_index);
         }
         label.append(stateLabel(i));
     }
 
     pango_layout_set_text(layout, label.c_str(), -1);
-    pango_layout_set_attributes(layout, attrList.get());
 }
 
 const char *LanguageSwitchKey::label(VirtualKeyboard *keyboard) const {
