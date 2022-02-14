@@ -91,6 +91,8 @@ InputWindow::InputWindow(ClassicUI *parent) : parent_(parent) {
     context_.reset(pango_font_map_create_context(fontMap_.get()));
     upperLayout_ = newPangoLayout(context_.get());
     lowerLayout_ = newPangoLayout(context_.get());
+
+    keyboard_.reset(new VirtualKeyboard(parent->instance(), context_.get()));
 }
 
 void InputWindow::insertAttr(PangoAttrList *attrList, TextFormatFlags format,
@@ -269,6 +271,11 @@ void InputWindow::update(InputContext *inputContext) {
     auto &inputPanel = inputContext->inputPanel();
     inputContext_ = inputContext->watch();
 
+    if (hasVirtualKeyboard()) {
+        keyboard_->syncState();
+        keyboard_->setInputContext(inputContext);
+    }
+
     cursor_ = -1;
     auto preedit = instance->outputFilter(inputContext, inputPanel.preedit());
     auto auxUp = instance->outputFilter(inputContext, inputPanel.auxUp());
@@ -339,7 +346,8 @@ void InputWindow::update(InputContext *inputContext) {
         hasNext_ = false;
     }
 
-    visible_ = nCandidates_ ||
+    visible_ = hasVirtualKeyboard() ||
+               nCandidates_ ||
                pango_layout_get_character_count(upperLayout_.get()) ||
                pango_layout_get_character_count(lowerLayout_.get());
 }
@@ -393,6 +401,8 @@ std::pair<unsigned int, unsigned int> InputWindow::sizeHint() {
     } else if (layoutHint_ == CandidateLayoutHint::Horizontal) {
         vertical = false;
     }
+    if (hasVirtualKeyboard())
+        vertical = false;
 
     size_t wholeH = 0, wholeW = 0;
     for (size_t i = 0; i < nCandidates_; i++) {
@@ -432,6 +442,16 @@ std::pair<unsigned int, unsigned int> InputWindow::sizeHint() {
         if (prev.valid() && next.valid()) {
             width += prev.width() + next.width();
         }
+    }
+
+    if (hasVirtualKeyboard()) {
+        // TODO: Probably it's not correct yet
+        auto pair = keyboard_->size();
+        size_t borderWidth = 2;
+        size_t keyboardWidth = pair.first + keyboard_->marginX() * 2;
+        size_t keyboardHeight = pair.second + keyboard_->marginY() * 2;
+        width = std::max(width, keyboardWidth + borderWidth * 2);
+        height += keyboardHeight;
     }
 
     return {width, height};
@@ -537,6 +557,8 @@ void InputWindow::paint(cairo_t *cr, unsigned int width, unsigned int height) {
     } else if (layoutHint_ == CandidateLayoutHint::Horizontal) {
         vertical = false;
     }
+    if (hasVirtualKeyboard())
+        vertical = false;
 
     candidateRegions_.clear();
     candidateRegions_.reserve(nCandidates_);
@@ -566,13 +588,12 @@ void InputWindow::paint(cairo_t *cr, unsigned int width, unsigned int height) {
             candidateW = candidateLayouts_[i].width();
             candidateH = fontHeight * candidateLayouts_[i].size();
         }
-        int vheight;
+        int vheight = std::max({fontHeight, labelH, candidateH});
         if (vertical) {
-            vheight = std::max({fontHeight, labelH, candidateH});
             wholeH += vheight + extraH;
         } else {
-            vheight = candidatesHeight_ - extraH;
             wholeW += candidateW + labelW + extraW;
+            wholeH = std::max(wholeH, static_cast<size_t>(vheight + extraH));
         }
         const auto &highlightMargin = *theme.inputPanel->highlight->margin;
         const auto &clickMargin = *theme.inputPanel->highlight->clickMargin;
@@ -617,14 +638,24 @@ void InputWindow::paint(cairo_t *cr, unsigned int width, unsigned int height) {
                                         highlight);
         }
     }
+
+    if (hasVirtualKeyboard()) {
+        wholeH += currentHeight + keyboard_->marginY();
+        keyboard_->paint(cr, keyboard_->marginX(), wholeH);
+    }
+
     cairo_restore(cr);
 }
 
-void InputWindow::click(int x, int y) {
+void InputWindow::click(int x, int y, bool isRelease) {
     auto *inputContext = inputContext_.get();
     if (!inputContext) {
         return;
     }
+
+    if (hasVirtualKeyboard())
+        keyboard_->click(inputContext, x, y, isRelease);
+
     const auto candidateList = inputContext->inputPanel().candidateList();
     if (!candidateList) {
         return;

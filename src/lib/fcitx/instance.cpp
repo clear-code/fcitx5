@@ -971,6 +971,8 @@ Instance::Instance(int argc, char **argv) {
             FCITX_KEYTRACE() << "KeyEvent: " << keyEvent.key()
                              << " rawKey: " << keyEvent.rawKey()
                              << " origKey: " << keyEvent.origKey()
+                             << " code: " << keyEvent.key().code()
+                             << " sym: " << keyEvent.key().sym()
                              << " Release:" << keyEvent.isRelease();
 #ifdef ENABLE_KEYBOARD
             auto *xkbState = inputState->customXkbState();

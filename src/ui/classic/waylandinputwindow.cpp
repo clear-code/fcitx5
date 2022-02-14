@@ -33,8 +33,9 @@ WaylandInputWindow::WaylandInputWindow(WaylandUI *ui)
     });
     window_->click().connect([this](int x, int y, uint32_t button,
                                     uint32_t state) {
-        if (state == WL_POINTER_BUTTON_STATE_PRESSED && button == BTN_LEFT) {
-            click(x, y);
+        if (button == BTN_LEFT) {
+            click(x, y, state == WL_POINTER_BUTTON_STATE_RELEASED);
+            repaint();
         }
     });
     window_->hover().connect([this](int x, int y) {
@@ -118,7 +119,10 @@ void WaylandInputWindow::update(fcitx::InputContext *ic) {
         if (!panelSurface_) {
             panelSurface_.reset(
                 panel->getInputPanelSurface(window_->surface()));
-            panelSurface_->setOverlayPanel();
+            if (hasVirtualKeyboard())
+                panelSurface_->setToplevel(ui_->display()->output(), 0);
+            else
+                panelSurface_->setOverlayPanel();
         }
     }
     if (!panelSurface_ && !panelSurfaceV2_) {
