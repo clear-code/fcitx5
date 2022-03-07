@@ -168,6 +168,7 @@ void WaylandIMInputContextV1::activate(wayland::ZwpInputMethodContextV1 *ic) {
     ic_->modifiersMap(&array);
     wl_array_release(&array);
     focusIn();
+    updateUserInterface(UserInterfaceComponent::InputPanel);
 }
 
 void WaylandIMInputContextV1::deactivate(wayland::ZwpInputMethodContextV1 *ic) {
